@@ -1,7 +1,21 @@
+import "dotenv/config";
 import { PrismaClient, Prisma, StockStatus } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { branchProducts, branches, business, categories, products } from "../lib/demo-data";
 
-const prisma = new PrismaClient();
+const databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error("DIRECT_URL or DATABASE_URL must be configured before running the seed.");
+}
+
+const adapter = new PrismaNeon({
+  connectionString: databaseUrl
+});
+
+const prisma = new PrismaClient({
+  adapter
+});
 
 function requiredId(map: Map<string, string>, key: string) {
   const value = map.get(key);
