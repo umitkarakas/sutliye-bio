@@ -8,6 +8,42 @@ type ProductPriceSummary = {
   maxPrice: number | null;
 };
 
+export type AdminBranchListItem = {
+  id: string;
+  name: string;
+  slug: string;
+  address: string;
+  district: string;
+  city: string;
+  phone: string;
+  whatsapp: string;
+  mapUrl: string;
+  isActive: boolean;
+  displayOrder: number;
+};
+
+export type AdminCategoryListItem = {
+  id: string;
+  name: string;
+  slug: string;
+  isActive: boolean;
+  displayOrder: number;
+};
+
+export type AdminProductListItem = {
+  id: string;
+  categoryId: string;
+  name: string;
+  slug: string;
+  description: string;
+  imageUrl?: string | null;
+  badgeLabel?: string | null;
+  isFeatured: boolean;
+  isActive: boolean;
+  displayOrder: number;
+  priceSummary: ProductPriceSummary;
+};
+
 function getDemoProductPriceSummary(productId: string): ProductPriceSummary {
   const matchingEntries = branchProducts.filter((entry) => entry.productId === productId);
   const prices = matchingEntries.map((entry) => entry.price).filter((price) => price > 0);
@@ -57,7 +93,7 @@ async function getPrimaryBusinessId() {
   return business.id;
 }
 
-export async function listAdminBranches() {
+export async function listAdminBranches(): Promise<AdminBranchListItem[]> {
   if (!hasDatabaseUrl()) {
     return branches.map((branch, index) => ({
       id: branch.id,
@@ -153,7 +189,7 @@ export async function createAdminBranch(input: {
   });
 }
 
-export async function listAdminCategories() {
+export async function listAdminCategories(): Promise<AdminCategoryListItem[]> {
   if (!hasDatabaseUrl()) {
     return categories.map((category, index) => ({
       id: category.id,
@@ -204,7 +240,7 @@ export async function createAdminCategory(input: { name: string; slug: string; d
   });
 }
 
-export async function listAdminProducts() {
+export async function listAdminProducts(): Promise<AdminProductListItem[]> {
   if (!hasDatabaseUrl()) {
     return products.map((product, index) => ({
       id: product.id,
