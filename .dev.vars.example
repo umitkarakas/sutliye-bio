@@ -1,5 +1,4 @@
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/kebapci_menu?sslmode=require"
-DIRECT_URL="postgresql://USER:PASSWORD@HOST:5432/kebapci_menu?sslmode=require"
 ADMIN_EMAIL="owner@ocakbasisofrasi.test"
 ADMIN_PASSWORD="change-me"
 ADMIN_SESSION_SECRET="change-me-too"

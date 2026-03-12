@@ -7,7 +7,9 @@ export function hasDatabaseUrl() {
 }
 
 export async function getPrisma() {
-  if (!hasDatabaseUrl()) {
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (!databaseUrl) {
     throw new Error("DATABASE_URL is not configured.");
   }
 
@@ -15,9 +17,17 @@ export async function getPrisma() {
     return globalForPrisma.__prisma__ as import("@prisma/client").PrismaClient;
   }
 
-  const { PrismaClient } = await import("@prisma/client");
+  const [{ PrismaClient }, { PrismaNeon }] = await Promise.all([
+    import("@prisma/client"),
+    import("@prisma/adapter-neon")
+  ]);
+
+  const adapter = new PrismaNeon({
+    connectionString: databaseUrl
+  });
 
   const prisma = new PrismaClient({
+    adapter,
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"]
   });
 
