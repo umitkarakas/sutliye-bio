@@ -1,3 +1,5 @@
+import type { PrismaClient as PrismaClientType } from "@prisma/client";
+
 const globalForPrisma = globalThis as {
   __prisma__?: unknown;
 };
@@ -14,7 +16,7 @@ export async function getPrisma() {
   }
 
   if (globalForPrisma.__prisma__) {
-    return globalForPrisma.__prisma__ as import("@prisma/client").PrismaClient;
+    return globalForPrisma.__prisma__ as PrismaClientType;
   }
 
   const [{ PrismaClient }, { PrismaNeon }] = await Promise.all([
