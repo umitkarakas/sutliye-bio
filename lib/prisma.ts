@@ -1,7 +1,23 @@
-import type { PrismaClient as PrismaClientType } from "@prisma/client";
+async function createPrismaClient(databaseUrl: string) {
+  const [{ PrismaClient }, { PrismaNeon }] = await Promise.all([
+    import("@prisma/client"),
+    import("@prisma/adapter-neon")
+  ]);
+
+  const adapter = new PrismaNeon({
+    connectionString: databaseUrl
+  });
+
+  return new PrismaClient({
+    adapter,
+    log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"]
+  });
+}
+
+type PrismaClientInstance = Awaited<ReturnType<typeof createPrismaClient>>;
 
 const globalForPrisma = globalThis as {
-  __prisma__?: unknown;
+  __prisma__?: PrismaClientInstance;
 };
 
 export function hasDatabaseUrl() {
@@ -16,22 +32,10 @@ export async function getPrisma() {
   }
 
   if (globalForPrisma.__prisma__) {
-    return globalForPrisma.__prisma__ as PrismaClientType;
+    return globalForPrisma.__prisma__;
   }
 
-  const [{ PrismaClient }, { PrismaNeon }] = await Promise.all([
-    import("@prisma/client"),
-    import("@prisma/adapter-neon")
-  ]);
-
-  const adapter = new PrismaNeon({
-    connectionString: databaseUrl
-  });
-
-  const prisma = new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"]
-  });
+  const prisma = await createPrismaClient(databaseUrl);
 
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.__prisma__ = prisma;
