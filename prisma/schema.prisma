@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AdminRole {
+  owner
+  editor
+}
+
+enum StockStatus {
+  in_stock
+  out_of_stock
+  hidden
+}
+
+enum FeedbackStatus {
+  new
+  reviewed
+  archived
+}
+
+model Business {
+  id               String          @id @default(cuid())
+  name             String
+  slug             String          @unique
+  logoUrl          String?
+  primaryPhone     String
+  primaryWhatsapp  String
+  defaultCurrency  String          @default("TRY")
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  adminUsers       AdminUser[]
+  branches         Branch[]
+  menuCategories   MenuCategory[]
+  products         Product[]
+  feedbacks        Feedback[]
+  eventLogs        EventLog[]
+}
+
+model AdminUser {
+  id             String    @id @default(cuid())
+  businessId     String
+  email          String    @unique
+  passwordHash   String?
+  authProviderId String?
+  fullName       String
+  role           AdminRole @default(editor)
+  isActive       Boolean   @default(true)
+  lastLoginAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  business       Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+}
+
+model Branch {
+  id           String          @id @default(cuid())
+  businessId   String
+  name         String
+  slug         String
+  address      String
+  district     String
+  city         String
+  mapUrl       String
+  phone        String
+  whatsapp     String
+  latitude     Float?
+  longitude    Float?
+  isActive     Boolean         @default(true)
+  displayOrder Int             @default(0)
+  blurb        String?
+  heroNote     String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  business     Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  hours        BranchHour[]
+  branchProducts BranchProduct[]
+  feedbacks    Feedback[]
+  eventLogs    EventLog[]
+
+  @@unique([businessId, slug])
+  @@index([businessId, isActive, displayOrder])
+}
+
+model BranchHour {
+  id        String   @id @default(cuid())
+  branchId  String
+  dayOfWeek Int
+  openTime  String?
+  closeTime String?
+  isClosed  Boolean  @default(false)
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([branchId, dayOfWeek])
+}
+
+model MenuCategory {
+  id           String     @id @default(cuid())
+  businessId   String
+  name         String
+  slug         String
+  description  String?
+  displayOrder Int        @default(0)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  business     Business   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  products     Product[]
+
+  @@unique([businessId, slug])
+  @@index([businessId, isActive, displayOrder])
+}
+
+model Product {
+  id           String          @id @default(cuid())
+  businessId   String
+  categoryId   String
+  name         String
+  slug         String
+  description  String
+  imageUrl     String?
+  badgeLabel   String?
+  isFeatured   Boolean         @default(false)
+  isActive     Boolean         @default(true)
+  displayOrder Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  business     Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category     MenuCategory    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  branchProducts BranchProduct[]
+  eventLogs    EventLog[]
+
+  @@unique([businessId, slug])
+  @@index([businessId, categoryId, isActive, displayOrder])
+}
+
+model BranchProduct {
+  id                   String       @id @default(cuid())
+  branchId             String
+  productId            String
+  price                Decimal      @db.Decimal(10, 2)
+  currency             String       @default("TRY")
+  stockStatus          StockStatus  @default(in_stock)
+  stockQuantity        Int?
+  isAvailable          Boolean      @default(true)
+  displayOrderOverride Int?
+  isFeaturedOverride   Boolean?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+  branch               Branch       @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  product              Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([branchId, productId])
+  @@index([branchId, stockStatus])
+}
+
+model Feedback {
+  id           String          @id @default(cuid())
+  businessId   String
+  branchId     String?
+  rating       Int?
+  message      String
+  source       String
+  status       FeedbackStatus  @default(new)
+  contactName  String?
+  contactPhone String?
+  createdAt    DateTime        @default(now())
+  business     Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  branch       Branch?         @relation(fields: [branchId], references: [id], onDelete: SetNull)
+
+  @@index([businessId, status, createdAt])
+}
+
+model EventLog {
+  id          String    @id @default(cuid())
+  businessId  String
+  branchId    String?
+  productId   String?
+  sessionId   String
+  eventName   String
+  source      String
+  metadataJson Json?
+  createdAt   DateTime  @default(now())
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  branch      Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  product     Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([businessId, eventName, createdAt])
+}
