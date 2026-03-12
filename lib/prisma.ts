@@ -1,8 +1,9 @@
 async function createPrismaClient(databaseUrl: string) {
-  const [{ PrismaClient }, { PrismaNeon }] = await Promise.all([
+  const [{ default: prismaModule }, { PrismaNeon }] = await Promise.all([
     import("@prisma/client"),
     import("@prisma/adapter-neon")
   ]);
+  const { PrismaClient } = prismaModule;
 
   const adapter = new PrismaNeon({
     connectionString: databaseUrl

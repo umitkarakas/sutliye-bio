@@ -203,7 +203,8 @@ export async function updateBranchProduct(input: {
   }
 
   const prisma = await getPrisma();
-  const { Prisma } = await import("@prisma/client");
+  const { default: prismaModule } = await import("@prisma/client");
+  const { Prisma } = prismaModule;
 
   return prisma.branchProduct.update({
     where: { id: input.id },
@@ -259,7 +260,8 @@ export async function batchUpdatePricing(input: BatchPricingInput) {
     };
   }
 
-  const { Prisma } = await import("@prisma/client");
+  const { default: prismaModule } = await import("@prisma/client");
+  const { Prisma } = prismaModule;
   await prisma.$transaction(
     matchingEntries.map((entry) =>
       prisma.branchProduct.update({
