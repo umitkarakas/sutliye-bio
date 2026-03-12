@@ -38,140 +38,55 @@ function computeAdjustedPrice(currentPrice: number, type: PricingAdjustmentType,
   return Number(value.toFixed(2));
 }
 
-export async function listPricingMatrix(filters: PricingMatrixFilters = {}): Promise<PricingMatrixData> {
-  if (!hasDatabaseUrl()) {
-    const availableBranchIds = branches.map((branch) => branch.id);
-    const selectedBranchIds = normalizeBranchIds(filters.branchIds, availableBranchIds);
-    const selectedCategoryId = filters.categoryId ?? "";
-    const search = (filters.search ?? "").trim();
-
-    const rows: PricingMatrixRow[] = products
-      .filter((product) => (selectedCategoryId ? product.categoryId === selectedCategoryId : true))
-      .filter((product) =>
-        search
-          ? includesSearch(product.name, search) || includesSearch(product.description, search)
-          : true
-      )
-      .map((product) => {
-        const category = categories.find((entry) => entry.id === product.categoryId);
-
-        return {
-          productId: product.id,
-          productName: product.name,
-          categoryId: product.categoryId,
-          categoryName: category?.name ?? "Kategori",
-          badge: product.badge,
-          cells: selectedBranchIds.map((branchId) => {
-            const branch = branches.find((entry) => entry.id === branchId);
-            const branchProduct = branchProducts.find(
-              (entry) => entry.branchId === branchId && entry.productId === product.id
-            );
-
-            return {
-              id: `${branchId}:${product.id}`,
-              branchId,
-              branchName: branch?.name ?? "Sube",
-              price: branchProduct?.price ?? null,
-              stockStatus: branchProduct?.stockStatus ?? "hidden",
-              isAvailable: branchProduct?.stockStatus === "in_stock",
-              canEdit: false
-            };
-          })
-        };
-      });
-
-    return {
-      isDemo: true,
-      branches: branches.map((branch) => ({
-        id: branch.id,
-        name: branch.name,
-        slug: branch.slug
-      })),
-      categories: categories.map((category) => ({
-        id: category.id,
-        name: category.name,
-        slug: category.slug
-      })),
-      rows,
-      selectedBranchIds,
-      selectedCategoryId,
-      search
-    };
-  }
-
-  const prisma = await getPrisma();
-  const [dbBranches, dbCategories] = await Promise.all([
-    prisma.branch.findMany({
-      where: { isActive: true },
-      orderBy: { displayOrder: "asc" }
-    }),
-    prisma.menuCategory.findMany({
-      where: { isActive: true },
-      orderBy: { displayOrder: "asc" }
-    })
-  ]);
-
-  const availableBranchIds = dbBranches.map((branch) => branch.id);
+function buildDemoPricingMatrix(filters: PricingMatrixFilters = {}): PricingMatrixData {
+  const availableBranchIds = branches.map((branch) => branch.id);
   const selectedBranchIds = normalizeBranchIds(filters.branchIds, availableBranchIds);
   const selectedCategoryId = filters.categoryId ?? "";
   const search = (filters.search ?? "").trim();
 
-  const dbProducts = await prisma.product.findMany({
-    where: {
-      isActive: true,
-      ...(selectedCategoryId ? { categoryId: selectedCategoryId } : {}),
-      ...(search
-        ? {
-            OR: [
-              { name: { contains: search, mode: "insensitive" } },
-              { description: { contains: search, mode: "insensitive" } }
-            ]
-          }
-        : {})
-    },
-    orderBy: { displayOrder: "asc" },
-    include: {
-      category: true,
-      branchProducts: {
-        where: {
-          branchId: {
-            in: selectedBranchIds
-          }
-        }
-      }
-    }
-  });
-
-  const rows: PricingMatrixRow[] = dbProducts.map((product) => ({
-    productId: product.id,
-    productName: product.name,
-    categoryId: product.categoryId,
-    categoryName: product.category.name,
-    badge: product.badgeLabel ?? undefined,
-    cells: selectedBranchIds.map((branchId) => {
-      const branch = dbBranches.find((entry) => entry.id === branchId);
-      const branchProduct = product.branchProducts.find((entry) => entry.branchId === branchId);
+  const rows: PricingMatrixRow[] = products
+    .filter((product) => (selectedCategoryId ? product.categoryId === selectedCategoryId : true))
+    .filter((product) =>
+      search
+        ? includesSearch(product.name, search) || includesSearch(product.description, search)
+        : true
+    )
+    .map((product) => {
+      const category = categories.find((entry) => entry.id === product.categoryId);
 
       return {
-        id: branchProduct?.id ?? `${branchId}:${product.id}`,
-        branchId,
-        branchName: branch?.name ?? "Sube",
-        price: branchProduct ? Number(branchProduct.price) : null,
-        stockStatus: branchProduct?.stockStatus ?? "hidden",
-        isAvailable: branchProduct?.isAvailable ?? false,
-        canEdit: Boolean(branchProduct)
+        productId: product.id,
+        productName: product.name,
+        categoryId: product.categoryId,
+        categoryName: category?.name ?? "Kategori",
+        badge: product.badge,
+        cells: selectedBranchIds.map((branchId) => {
+          const branch = branches.find((entry) => entry.id === branchId);
+          const branchProduct = branchProducts.find(
+            (entry) => entry.branchId === branchId && entry.productId === product.id
+          );
+
+          return {
+            id: `${branchId}:${product.id}`,
+            branchId,
+            branchName: branch?.name ?? "Şube",
+            price: branchProduct?.price ?? null,
+            stockStatus: branchProduct?.stockStatus ?? "hidden",
+            isAvailable: branchProduct?.stockStatus === "in_stock",
+            canEdit: false
+          };
+        })
       };
-    })
-  }));
+    });
 
   return {
-    isDemo: false,
-    branches: dbBranches.map((branch) => ({
+    isDemo: true,
+    branches: branches.map((branch) => ({
       id: branch.id,
       name: branch.name,
       slug: branch.slug
     })),
-    categories: dbCategories.map((category) => ({
+    categories: categories.map((category) => ({
       id: category.id,
       name: category.name,
       slug: category.slug
@@ -181,6 +96,100 @@ export async function listPricingMatrix(filters: PricingMatrixFilters = {}): Pro
     selectedCategoryId,
     search
   };
+}
+
+export async function listPricingMatrix(filters: PricingMatrixFilters = {}): Promise<PricingMatrixData> {
+  if (!hasDatabaseUrl()) {
+    return buildDemoPricingMatrix(filters);
+  }
+
+  try {
+    const prisma = await getPrisma();
+    const [dbBranches, dbCategories] = await Promise.all([
+      prisma.branch.findMany({
+        where: { isActive: true },
+        orderBy: { displayOrder: "asc" }
+      }),
+      prisma.menuCategory.findMany({
+        where: { isActive: true },
+        orderBy: { displayOrder: "asc" }
+      })
+    ]);
+
+    const availableBranchIds = dbBranches.map((branch) => branch.id);
+    const selectedBranchIds = normalizeBranchIds(filters.branchIds, availableBranchIds);
+    const selectedCategoryId = filters.categoryId ?? "";
+    const search = (filters.search ?? "").trim();
+
+    const dbProducts = await prisma.product.findMany({
+      where: {
+        isActive: true,
+        ...(selectedCategoryId ? { categoryId: selectedCategoryId } : {}),
+        ...(search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { description: { contains: search, mode: "insensitive" } }
+              ]
+            }
+          : {})
+      },
+      orderBy: { displayOrder: "asc" },
+      include: {
+        category: true,
+        branchProducts: {
+          where: {
+            branchId: {
+              in: selectedBranchIds
+            }
+          }
+        }
+      }
+    });
+
+    const rows: PricingMatrixRow[] = dbProducts.map((product) => ({
+      productId: product.id,
+      productName: product.name,
+      categoryId: product.categoryId,
+      categoryName: product.category.name,
+      badge: product.badgeLabel ?? undefined,
+      cells: selectedBranchIds.map((branchId) => {
+        const branch = dbBranches.find((entry) => entry.id === branchId);
+        const branchProduct = product.branchProducts.find((entry) => entry.branchId === branchId);
+
+        return {
+          id: branchProduct?.id ?? `${branchId}:${product.id}`,
+          branchId,
+          branchName: branch?.name ?? "Şube",
+          price: branchProduct ? Number(branchProduct.price) : null,
+          stockStatus: branchProduct?.stockStatus ?? "hidden",
+          isAvailable: branchProduct?.isAvailable ?? false,
+          canEdit: Boolean(branchProduct)
+        };
+      })
+    }));
+
+    return {
+      isDemo: false,
+      branches: dbBranches.map((branch) => ({
+        id: branch.id,
+        name: branch.name,
+        slug: branch.slug
+      })),
+      categories: dbCategories.map((category) => ({
+        id: category.id,
+        name: category.name,
+        slug: category.slug
+      })),
+      rows,
+      selectedBranchIds,
+      selectedCategoryId,
+      search
+    };
+  } catch (error) {
+    console.error("[pricing-data] Falling back to demo pricing matrix.", error);
+    return buildDemoPricingMatrix(filters);
+  }
 }
 
 export async function updateBranchProduct(input: {

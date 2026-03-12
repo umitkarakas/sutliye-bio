@@ -19,6 +19,10 @@ export type DashboardSummary = {
   whatsappClicks: number;
 };
 
+function logAnalyticsFallback(error: unknown, scope: string) {
+  console.error(`[analytics-data] Falling back to demo mode for ${scope}.`, error);
+}
+
 async function getPrimaryBusinessId() {
   const prisma = await getPrisma();
   const business = await prisma.business.findFirst({
@@ -53,29 +57,37 @@ export async function recordAnalyticsEvent(input: RecordEventInput) {
     };
   }
 
-  const prisma = await getPrisma();
-  const businessId = await getPrimaryBusinessId();
+  try {
+    const prisma = await getPrisma();
+    const businessId = await getPrimaryBusinessId();
 
-  if (!businessId) {
-    throw new Error("No business found. Seed the database first.");
-  }
-
-  await prisma.eventLog.create({
-    data: {
-      businessId,
-      branchId: input.branchId,
-      productId: input.productId,
-      sessionId: input.sessionId || crypto.randomUUID(),
-      eventName: input.eventName,
-      source: input.source || "public_shell",
-      metadataJson: input.metadata as Prisma.InputJsonValue | undefined
+    if (!businessId) {
+      throw new Error("No business found. Seed the database first.");
     }
-  });
 
-  return {
-    ok: true,
-    isDemo: false
-  };
+    await prisma.eventLog.create({
+      data: {
+        businessId,
+        branchId: input.branchId,
+        productId: input.productId,
+        sessionId: input.sessionId || crypto.randomUUID(),
+        eventName: input.eventName,
+        source: input.source || "public_shell",
+        metadataJson: input.metadata as Prisma.InputJsonValue | undefined
+      }
+    });
+
+    return {
+      ok: true,
+      isDemo: false
+    };
+  } catch (error) {
+    logAnalyticsFallback(error, `record:${input.eventName}`);
+    return {
+      ok: true,
+      isDemo: true
+    };
+  }
 }
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
@@ -90,10 +102,72 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     };
   }
 
-  const prisma = await getPrisma();
-  const businessId = await getPrimaryBusinessId();
+  try {
+    const prisma = await getPrisma();
+    const businessId = await getPrimaryBusinessId();
 
-  if (!businessId) {
+    if (!businessId) {
+      return {
+        isDemo: true,
+        totalVisits: 0,
+        topBranchName: "Veri yok",
+        callClicks: 0,
+        mapClicks: 0,
+        whatsappClicks: 0
+      };
+    }
+
+    const [totalVisits, callClicks, mapClicks, whatsappClicks, topBranch] = await Promise.all([
+      prisma.eventLog.count({
+        where: {
+          businessId,
+          eventName: "page_view"
+        }
+      }),
+      countEventsByName("call_click"),
+      countEventsByName("map_click"),
+      countEventsByName("whatsapp_click"),
+      prisma.eventLog.groupBy({
+        by: ["branchId"],
+        where: {
+          businessId,
+          eventName: "branch_view",
+          branchId: {
+            not: null
+          }
+        },
+        _count: {
+          _all: true
+        },
+        orderBy: {
+          _count: {
+            branchId: "desc"
+          }
+        },
+        take: 1
+      })
+    ]);
+
+    let topBranchName = "Veri yok";
+
+    if (topBranch[0]?.branchId) {
+      const branch = await prisma.branch.findUnique({
+        where: { id: topBranch[0].branchId },
+        select: { name: true }
+      });
+      topBranchName = branch?.name ?? "Veri yok";
+    }
+
+    return {
+      isDemo: false,
+      totalVisits,
+      topBranchName,
+      callClicks,
+      mapClicks,
+      whatsappClicks
+    };
+  } catch (error) {
+    logAnalyticsFallback(error, "dashboard");
     return {
       isDemo: true,
       totalVisits: 0,
@@ -103,54 +177,4 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
       whatsappClicks: 0
     };
   }
-
-  const [totalVisits, callClicks, mapClicks, whatsappClicks, topBranch] = await Promise.all([
-    prisma.eventLog.count({
-      where: {
-        businessId,
-        eventName: "page_view"
-      }
-    }),
-    countEventsByName("call_click"),
-    countEventsByName("map_click"),
-    countEventsByName("whatsapp_click"),
-    prisma.eventLog.groupBy({
-      by: ["branchId"],
-      where: {
-        businessId,
-        eventName: "branch_view",
-        branchId: {
-          not: null
-        }
-      },
-      _count: {
-        _all: true
-      },
-      orderBy: {
-        _count: {
-          branchId: "desc"
-        }
-      },
-      take: 1
-    })
-  ]);
-
-  let topBranchName = "Veri yok";
-
-  if (topBranch[0]?.branchId) {
-    const branch = await prisma.branch.findUnique({
-      where: { id: topBranch[0].branchId },
-      select: { name: true }
-    });
-    topBranchName = branch?.name ?? "Veri yok";
-  }
-
-  return {
-    isDemo: false,
-    totalVisits,
-    topBranchName,
-    callClicks,
-    mapClicks,
-    whatsappClicks
-  };
 }

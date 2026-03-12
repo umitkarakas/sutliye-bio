@@ -1,6 +1,10 @@
 import { hasDatabaseUrl, getPrisma } from "@/lib/prisma";
 import { branches, categories, products } from "@/lib/demo-data";
 
+function logAdminFallback(error: unknown, scope: string) {
+  console.error(`[admin-data] Falling back to demo data for ${scope}.`, error);
+}
+
 async function getPrimaryBusinessId() {
   const prisma = await getPrisma();
   const business = await prisma.business.findFirst({
@@ -31,10 +35,27 @@ export async function listAdminBranches() {
     }));
   }
 
-  const prisma = await getPrisma();
-  return prisma.branch.findMany({
-    orderBy: { displayOrder: "asc" }
-  });
+  try {
+    const prisma = await getPrisma();
+    return prisma.branch.findMany({
+      orderBy: { displayOrder: "asc" }
+    });
+  } catch (error) {
+    logAdminFallback(error, "branches");
+    return branches.map((branch, index) => ({
+      id: branch.id,
+      name: branch.name,
+      slug: branch.slug,
+      address: branch.address,
+      district: branch.district,
+      city: branch.city,
+      phone: branch.phone,
+      whatsapp: branch.whatsapp,
+      mapUrl: branch.mapUrl,
+      isActive: true,
+      displayOrder: index
+    }));
+  }
 }
 
 export async function createAdminBranch(input: {
@@ -104,10 +125,21 @@ export async function listAdminCategories() {
     }));
   }
 
-  const prisma = await getPrisma();
-  return prisma.menuCategory.findMany({
-    orderBy: { displayOrder: "asc" }
-  });
+  try {
+    const prisma = await getPrisma();
+    return prisma.menuCategory.findMany({
+      orderBy: { displayOrder: "asc" }
+    });
+  } catch (error) {
+    logAdminFallback(error, "categories");
+    return categories.map((category, index) => ({
+      id: category.id,
+      name: category.name,
+      slug: category.slug,
+      isActive: true,
+      displayOrder: index
+    }));
+  }
 }
 
 export async function createAdminCategory(input: { name: string; slug: string; description?: string }) {
@@ -148,10 +180,25 @@ export async function listAdminProducts() {
     }));
   }
 
-  const prisma = await getPrisma();
-  return prisma.product.findMany({
-    orderBy: { displayOrder: "asc" }
-  });
+  try {
+    const prisma = await getPrisma();
+    return prisma.product.findMany({
+      orderBy: { displayOrder: "asc" }
+    });
+  } catch (error) {
+    logAdminFallback(error, "products");
+    return products.map((product, index) => ({
+      id: product.id,
+      name: product.name,
+      slug: product.id,
+      description: product.description,
+      badgeLabel: product.badge,
+      isFeatured: Boolean(product.badge),
+      isActive: true,
+      displayOrder: index,
+      categoryId: product.categoryId
+    }));
+  }
 }
 
 export async function createAdminProduct(input: {
