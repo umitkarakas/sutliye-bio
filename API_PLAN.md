@@ -99,6 +99,8 @@ Rules:
 Purpose:
 
 - admin login
+- mevcut implementasyonda credentials `.env` icinden okunur
+- `DATABASE_URL` olsa bile endpoint DB tabanli auth'a gecmez
 
 Response:
 

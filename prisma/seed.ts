@@ -2,6 +2,7 @@ import "dotenv/config";
 import { PrismaClient, Prisma, StockStatus } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { branchProducts, branches, business, categories, products } from "../lib/demo-data";
+import { hashPassword } from "../lib/server/passwords";
 
 const databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL;
 
@@ -16,6 +17,8 @@ const adapter = new PrismaNeon({
 const prisma = new PrismaClient({
   adapter
 });
+const demoAdminPassword = process.env.ADMIN_PASSWORD || "demo12345";
+const demoAdminPasswordHash = hashPassword(demoAdminPassword);
 
 function requiredId(map: Map<string, string>, key: string) {
   const value = map.get(key);
@@ -48,13 +51,16 @@ async function main() {
     where: { email: "owner@ocakbasisofrasi.test" },
     update: {
       businessId: createdBusiness.id,
-      fullName: "Demo Owner"
+      fullName: "Demo Owner",
+      passwordHash: demoAdminPasswordHash,
+      isActive: true
     },
     create: {
       businessId: createdBusiness.id,
       email: "owner@ocakbasisofrasi.test",
       fullName: "Demo Owner",
-      role: "owner"
+      role: "owner",
+      passwordHash: demoAdminPasswordHash
     }
   });
 

@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { business } from "@/lib/demo-data";
-import type { Branch, MenuCategoryWithItems, TabId } from "@/lib/types";
+import type { Branch, MenuCategoryWithItems, PublicBusiness, TabId } from "@/lib/types";
 import { AnalyticsBeacon } from "@/components/analytics-beacon";
 import { EventLink } from "@/components/event-link";
 
@@ -9,7 +8,9 @@ type PublicShellProps = {
   activeTab: TabId;
   basePath: string;
   branches: Branch[];
+  business: PublicBusiness;
   menu: MenuCategoryWithItems[];
+  rootBranchSlug: string;
 };
 
 function formatPhoneHref(phone: string) {
@@ -20,7 +21,19 @@ function formatWhatsAppHref(phone: string) {
   return `https://wa.me/${phone.replaceAll(" ", "").replaceAll("+", "")}`;
 }
 
-export function PublicShell({ activeBranch, activeTab, basePath, branches, menu }: PublicShellProps) {
+function getBranchHref(branchSlug: string, rootBranchSlug: string) {
+  return branchSlug === rootBranchSlug ? "/" : `/b/${branchSlug}`;
+}
+
+export function PublicShell({
+  activeBranch,
+  activeTab,
+  basePath,
+  branches,
+  business,
+  menu,
+  rootBranchSlug
+}: PublicShellProps) {
   return (
     <main className="min-h-screen px-4 py-5 text-[15px] text-[color:var(--foreground)] sm:px-6">
       <AnalyticsBeacon branchId={activeBranch.id} activeTab={activeTab} source="public_shell" />
@@ -51,7 +64,7 @@ export function PublicShell({ activeBranch, activeTab, basePath, branches, menu 
               <p className="mb-2 text-[11px] uppercase tracking-[0.22em] text-[color:var(--muted)]">Şube Seçimi</p>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {branches.map((branch) => {
-                  const href = branch.slug === "kadikoy" ? "/" : `/b/${branch.slug}`;
+                  const href = getBranchHref(branch.slug, rootBranchSlug);
                   const isActive = branch.id === activeBranch.id;
 
                   return (
@@ -158,7 +171,7 @@ export function PublicShell({ activeBranch, activeTab, basePath, branches, menu 
                     {branches
                       .filter((branch) => branch.id !== activeBranch.id)
                       .map((branch) => {
-                        const href = branch.slug === "kadikoy" ? "/" : `/b/${branch.slug}`;
+                        const href = getBranchHref(branch.slug, rootBranchSlug);
 
                         return (
                           <Link

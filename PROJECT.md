@@ -53,6 +53,7 @@ Ilk surumde public tarafta 2 ana sekme zorunlu, 1 ek alan opsiyonel:
 
 - Musteri hesabi olmayacak.
 - Musteri girisi ve kayit akisi ilk etapta olmayacak.
+- Admin login mevcut fazda `.env` tabanli kalacak; DB tabanli auth bu fazin parcasi degil.
 - Sistem mobil oncelikli olacak, ama masaustunde de duzgun calisacak.
 - QR ve bio link trafigi icin hizli acilis ve sade gezinme kritik.
 
@@ -77,7 +78,7 @@ MVP'de asagidaki yetenekler mutlaka olmali:
 - kategori bazli urun listeleme
 - her sube icin urun fiyati ve stok durumu tanimlama
 - panelden toplu ve tekil fiyat guncelleme
-- admin girisi
+- `.env` tabanli admin girisi
 - temel olay bazli istatistikler
 
 MVP disinda tutulacaklar:
@@ -170,7 +171,7 @@ Asagidaki olaylar ilk gunden izlenebilir olmali:
 
 ### Phase 3 - Admin MVP
 
-- admin auth
+- `.env` tabanli admin auth
 - sube CRUD
 - kategori CRUD
 - urun CRUD
@@ -198,6 +199,7 @@ Asagidaki kararlar erken verilirse implementasyon daha saglikli olur:
 - feedback herkese acik mi, yoksa sadece belirli QR linklerinden mi acilacak
 - urun gorselleri zorunlu mu, opsiyonel mi
 - admin panelini tek isletmeci mi kullanacak, birden fazla editor olacak mi
+- admin auth ileride DB tabanli kullanici sistemine gececek mi, yoksa `.env` tabanli tek yonetici mi kalacak
 - public tarafta tek bir genel sayfa mi olacak, yoksa sube bazli farkli acilis sayfalari da olacak mi
 - toplu fiyat guncelleme yuzdesel artis/azalis ve sabit tutar olarak mi desteklenecek
 - stok durumu sadece `var/yok` mu olacak, yoksa sayisal envanter de tutulacak mi

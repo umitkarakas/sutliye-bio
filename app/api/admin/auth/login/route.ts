@@ -22,14 +22,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  const token = createSessionToken(email);
+  const sessionToken = createSessionToken({ email });
   const response = contentType.includes("application/json")
     ? NextResponse.json({ ok: true, email })
     : NextResponse.redirect(new URL("/admin", request.url));
 
   response.cookies.set({
     name: getSessionCookieName(),
-    value: token,
+    value: sessionToken,
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

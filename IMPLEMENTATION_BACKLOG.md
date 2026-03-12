@@ -66,6 +66,8 @@
 - login page
 - protected routes
 - session handling
+- not: mevcut fazda source of truth `.env` alanlari (`ADMIN_EMAIL`, `ADMIN_PASSWORD`)
+- not: `admin_users` tablosunu login'e baglamak ayrica planlanmis bir is olmadan yapilmayacak
 
 ### 10. CRUD screens
 

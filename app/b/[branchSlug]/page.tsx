@@ -3,6 +3,7 @@ import { PublicShell } from "@/components/public-shell";
 import {
   getPublicBranchBySlug,
   getPublicBranches,
+  getPublicBusiness,
   getPublicMenuForBranch
 } from "@/lib/server/public-data";
 import type { TabId } from "@/lib/types";
@@ -20,14 +21,18 @@ export default async function BranchPage({ params, searchParams }: BranchPagePro
   const { branchSlug } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
   const activeTab: TabId = resolvedSearchParams.tab === "menu" ? "menu" : "contact";
-  const branch = await getPublicBranchBySlug(branchSlug);
+  const [business, branch, branches] = await Promise.all([
+    getPublicBusiness(),
+    getPublicBranchBySlug(branchSlug),
+    getPublicBranches()
+  ]);
 
   if (!branch) {
     notFound();
   }
 
-  const branches = await getPublicBranches();
   const menu = await getPublicMenuForBranch(branch.id);
+  const rootBranchSlug = branches[0]?.slug ?? branch.slug;
 
   return (
     <PublicShell
@@ -35,7 +40,9 @@ export default async function BranchPage({ params, searchParams }: BranchPagePro
       activeTab={activeTab}
       basePath={`/b/${branch.slug}`}
       branches={branches}
+      business={business}
       menu={menu}
+      rootBranchSlug={rootBranchSlug}
     />
   );
 }

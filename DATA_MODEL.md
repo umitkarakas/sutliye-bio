@@ -69,6 +69,12 @@ Recommended roles:
 
 MVP'de tek admin olsa bile role alani sonra migration gereksinimini azaltir.
 
+Implementation note:
+
+- `admin_users` tablosu veri modeli ve gelecekteki genisleme icin tutulabilir
+- fakat mevcut uygulama fazinda login source of truth bu tablo degil, `.env` credentials'tir
+- bu tabloyu auth icin aktif kullanmak ayrica planlanmis bir migration olarak ele alinmali
+
 ### `branches`
 
 Fields:

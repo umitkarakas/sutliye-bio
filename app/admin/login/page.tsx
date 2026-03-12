@@ -5,7 +5,7 @@ export default function AdminLoginPage() {
         <p className="admin-kicker">Admin girişi</p>
         <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl">Panel Girişi</h1>
         <p className="admin-copy mt-3 text-sm leading-6">
-          Demo ortamındaki varsayılan bilgiler `.env` ile değiştirilebilir. Form doğrudan auth route&apos;una gider.
+          Giris bilgileri `.env` dosyasindaki `ADMIN_EMAIL` ve `ADMIN_PASSWORD` alanlarindan okunur.
         </p>
 
         <form action="/api/admin/auth/login" method="post" className="mt-6 space-y-4">

@@ -5,7 +5,9 @@ const SESSION_COOKIE = "admin_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 12;
 
 type SessionPayload = {
+  userId?: string;
   email: string;
+  role?: "owner" | "editor";
   exp: number;
 };
 
@@ -25,13 +27,13 @@ function sign(value: string) {
   return createHmac("sha256", getSessionSecret()).update(value).digest("base64url");
 }
 
-export function createSessionToken(email: string) {
-  const payload: SessionPayload = {
-    email,
-    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS
-  };
-
-  const encodedPayload = encodeBase64Url(JSON.stringify(payload));
+export function createSessionToken(payload: Omit<SessionPayload, "exp">) {
+  const encodedPayload = encodeBase64Url(
+    JSON.stringify({
+      ...payload,
+      exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS
+    } satisfies SessionPayload)
+  );
   const signature = sign(encodedPayload);
 
   return `${encodedPayload}.${signature}`;

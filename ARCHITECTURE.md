@@ -59,9 +59,20 @@ Tercih:
 ### Authentication
 
 - sadece admin auth
-- email/password veya magic link
+- mevcut implementasyonda admin girisi `.env` icindeki `ADMIN_EMAIL` ve `ADMIN_PASSWORD` ile yapilir
+- mevcut oturum modeli signed cookie tabanlidir
+- `admin_users` tablosu veri modelinin parcasi olsa da su an login source of truth degildir
+- veritabani tabanli email/password veya magic link gecisi ayrica planlanmadan uygulanmamalidir
 
 Musteri auth olmayacak.
+
+### Current auth invariant
+
+Bu repo icin bugun gecerli kural:
+
+- login davranisi DB kayitlarina gore degistirilmez
+- `DATABASE_URL` tanimli olsa bile admin login `.env` bilgileriyle calisir
+- auth degisikligi yapilacaksa once bu dokuman ve ilgili backlog maddeleri birlikte guncellenir
 
 ### Media
 
@@ -249,6 +260,11 @@ QR kodlar dogrudan sube bazli URL'lere gitmeli. Sosyal medya bio linki ise genel
 - `/admin/products`
 - `/admin/feedback`
 - `/admin/analytics`
+
+Admin login notu:
+
+- `/admin/login` formu dogrudan `.env` tabanli auth route'una gider
+- DB tabanli auth'a gecilmeden `admin_users.password_hash` zorunlu varsayilmaz
 
 ## UI Architecture
 

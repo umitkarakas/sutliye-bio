@@ -48,7 +48,7 @@ Isletme panelden icerigi yonetebilsin.
 
 ### Deliverables
 
-- admin login
+- `.env` tabanli admin login
 - sube CRUD
 - kategori CRUD
 - urun CRUD
@@ -62,6 +62,7 @@ Isletme panelden icerigi yonetebilsin.
 
 - demo verisi yerine panel verisi public ekrana yansisin
 - fiyat, stok veya sube bilgisi degisince deploy gerekmeksizin yayinlansin
+- auth source of truth `.env` olarak korunuyor olsun; DB tabanli auth'a gecis ayrica planlanmis olsun
 
 ## Milestone 4 - Analytics and Feedback
 

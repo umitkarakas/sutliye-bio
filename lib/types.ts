@@ -1,5 +1,14 @@
 export type TabId = "contact" | "menu";
 
+export type PublicBusiness = {
+  name: string;
+  tagline: string;
+  badge: string;
+  logoUrl?: string;
+  primaryPhone?: string;
+  primaryWhatsapp?: string;
+};
+
 export type Branch = {
   id: string;
   slug: string;

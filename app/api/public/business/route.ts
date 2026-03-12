@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
-import { business } from "@/lib/demo-data";
-import { getPublicBranches } from "@/lib/server/public-data";
+import { getPublicBranches, getPublicBusiness } from "@/lib/server/public-data";
 
 export async function GET() {
-  const branches = await getPublicBranches();
+  const [business, branches] = await Promise.all([getPublicBusiness(), getPublicBranches()]);
 
   return NextResponse.json({
     business,
