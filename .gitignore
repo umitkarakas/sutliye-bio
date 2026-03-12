@@ -10,3 +10,6 @@ coverage
 .env.production.local
 dist
 tsconfig.tsbuildinfo
+.open-next
+.wrangler
+cloudflare-env.d.ts
