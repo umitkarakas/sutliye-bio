@@ -35,6 +35,7 @@ export type Product = {
   categoryId: string;
   name: string;
   description: string;
+  imageUrl?: string;
   badge?: string;
 };
 
@@ -50,6 +51,7 @@ export type MenuItemView = {
   id: string;
   name: string;
   description: string;
+  imageUrl?: string;
   badge?: string;
   price: number;
   stockStatus: "in_stock" | "out_of_stock";

@@ -222,6 +222,7 @@ export async function getPublicMenuForBranch(branchId: string): Promise<MenuCate
             id: product.id,
             name: product.name,
             description: product.description,
+            imageUrl: product.imageUrl ?? undefined,
             badge: product.badgeLabel ?? undefined,
             price: Number(branchProduct.price),
             stockStatus:

@@ -15,7 +15,7 @@ export async function POST(request: Request) {
   });
 
   if ((request.headers.get("content-type") || "").includes("application/x-www-form-urlencoded")) {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
+    return NextResponse.redirect(new URL("/admin/login", request.url), 303);
   }
 
   return response;

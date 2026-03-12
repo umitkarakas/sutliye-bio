@@ -7,6 +7,9 @@ import {
   createAdminBranch,
   createAdminCategory,
   createAdminProduct,
+  deleteAdminProduct,
+  moveAdminProduct,
+  updateAdminProduct,
   toggleAdminBranchStatus,
   toggleAdminCategoryStatus,
   toggleAdminProductStatus
@@ -14,6 +17,11 @@ import {
 
 function statusUrl(path: string, status: string) {
   return `${path}${path.includes("?") ? "&" : "?"}status=${status}`;
+}
+
+function getReturnTo(formData: FormData, fallbackPath: string) {
+  const returnTo = String(formData.get("returnTo") || fallbackPath);
+  return returnTo.startsWith(fallbackPath) ? returnTo : fallbackPath;
 }
 
 async function requireSessionOrRedirect() {
@@ -28,6 +36,7 @@ async function requireSessionOrRedirect() {
 
 export async function createBranchAction(formData: FormData) {
   await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/branches");
 
   const payload = {
     name: String(formData.get("name") || "").trim(),
@@ -41,13 +50,13 @@ export async function createBranchAction(formData: FormData) {
   };
 
   if (Object.values(payload).some((value) => !value)) {
-    redirect(statusUrl("/admin/branches", "invalid"));
+    redirect(statusUrl(returnTo, "invalid"));
   }
 
   try {
     await createAdminBranch(payload);
   } catch {
-    redirect(statusUrl("/admin/branches", "error"));
+    redirect(statusUrl(returnTo, "error"));
   }
 
   revalidatePath("/admin/branches");
@@ -56,13 +65,14 @@ export async function createBranchAction(formData: FormData) {
 
 export async function createCategoryAction(formData: FormData) {
   await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/categories");
 
   const name = String(formData.get("name") || "").trim();
   const slug = String(formData.get("slug") || "").trim();
   const description = String(formData.get("description") || "").trim();
 
   if (!name || !slug) {
-    redirect(statusUrl("/admin/categories", "invalid"));
+    redirect(statusUrl(returnTo, "invalid"));
   }
 
   try {
@@ -72,7 +82,7 @@ export async function createCategoryAction(formData: FormData) {
       description: description || undefined
     });
   } catch {
-    redirect(statusUrl("/admin/categories", "error"));
+    redirect(statusUrl(returnTo, "error"));
   }
 
   revalidatePath("/admin/categories");
@@ -82,17 +92,31 @@ export async function createCategoryAction(formData: FormData) {
 
 export async function createProductAction(formData: FormData) {
   await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/products");
+  const initialPriceRaw = String(formData.get("initialPrice") || "").trim();
 
   const payload = {
     categoryId: String(formData.get("categoryId") || "").trim(),
     name: String(formData.get("name") || "").trim(),
     slug: String(formData.get("slug") || "").trim(),
     description: String(formData.get("description") || "").trim(),
-    badgeLabel: String(formData.get("badgeLabel") || "").trim()
+    imageUrl: String(formData.get("imageUrl") || "").trim(),
+    badgeLabel: String(formData.get("badgeLabel") || "").trim(),
+    initialPrice: Number(initialPriceRaw),
+    isFeatured: formData.get("isFeatured") === "on"
   };
 
-  if (!payload.categoryId || !payload.name || !payload.slug || !payload.description) {
-    redirect(statusUrl("/admin/products", "invalid"));
+  if (
+    !payload.categoryId ||
+    !payload.name ||
+    !payload.slug ||
+    !payload.description ||
+    !payload.imageUrl ||
+    !initialPriceRaw ||
+    Number.isNaN(payload.initialPrice) ||
+    payload.initialPrice < 0
+  ) {
+    redirect(statusUrl(returnTo, "invalid"));
   }
 
   try {
@@ -101,15 +125,109 @@ export async function createProductAction(formData: FormData) {
       name: payload.name,
       slug: payload.slug,
       description: payload.description,
-      badgeLabel: payload.badgeLabel || undefined
+      imageUrl: payload.imageUrl,
+      badgeLabel: payload.badgeLabel || undefined,
+      initialPrice: payload.initialPrice,
+      isFeatured: payload.isFeatured
     });
   } catch {
-    redirect(statusUrl("/admin/products", "error"));
+    redirect(statusUrl(returnTo, "error"));
   }
 
   revalidatePath("/admin/products");
   revalidatePath("/admin/pricing");
   redirect(statusUrl("/admin/products", "created"));
+}
+
+export async function updateProductAction(formData: FormData) {
+  await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/products");
+
+  const payload = {
+    id: String(formData.get("id") || "").trim(),
+    categoryId: String(formData.get("categoryId") || "").trim(),
+    name: String(formData.get("name") || "").trim(),
+    slug: String(formData.get("slug") || "").trim(),
+    description: String(formData.get("description") || "").trim(),
+    imageUrl: String(formData.get("imageUrl") || "").trim(),
+    badgeLabel: String(formData.get("badgeLabel") || "").trim(),
+    isFeatured: formData.get("isFeatured") === "on"
+  };
+
+  if (
+    !payload.id ||
+    !payload.categoryId ||
+    !payload.name ||
+    !payload.slug ||
+    !payload.description ||
+    !payload.imageUrl
+  ) {
+    redirect(statusUrl(returnTo, "invalid"));
+  }
+
+  try {
+    await updateAdminProduct({
+      id: payload.id,
+      categoryId: payload.categoryId,
+      name: payload.name,
+      slug: payload.slug,
+      description: payload.description,
+      imageUrl: payload.imageUrl,
+      badgeLabel: payload.badgeLabel || undefined,
+      isFeatured: payload.isFeatured
+    });
+  } catch {
+    redirect(statusUrl(returnTo, "error"));
+  }
+
+  revalidatePath("/admin/products");
+  revalidatePath("/admin/pricing");
+  revalidatePath("/");
+  redirect(statusUrl(returnTo, "updated"));
+}
+
+export async function deleteProductAction(formData: FormData) {
+  await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/products");
+
+  const id = String(formData.get("id") || "").trim();
+
+  if (!id) {
+    redirect(statusUrl(returnTo, "invalid"));
+  }
+
+  try {
+    await deleteAdminProduct(id);
+  } catch {
+    redirect(statusUrl(returnTo, "error"));
+  }
+
+  revalidatePath("/admin/products");
+  revalidatePath("/admin/pricing");
+  revalidatePath("/");
+  redirect(statusUrl(returnTo, "deleted"));
+}
+
+export async function moveProductAction(formData: FormData) {
+  await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/products");
+
+  const id = String(formData.get("id") || "").trim();
+  const direction = String(formData.get("direction") || "") as "up" | "down";
+
+  if (!id || (direction !== "up" && direction !== "down")) {
+    redirect(statusUrl(returnTo, "invalid"));
+  }
+
+  try {
+    await moveAdminProduct(id, direction);
+  } catch {
+    redirect(statusUrl(returnTo, "error"));
+  }
+
+  revalidatePath("/admin/products");
+  revalidatePath("/");
+  redirect(statusUrl(returnTo, "reordered"));
 }
 
 export async function toggleBranchStatusAction(formData: FormData) {
@@ -156,21 +274,22 @@ export async function toggleCategoryStatusAction(formData: FormData) {
 
 export async function toggleProductStatusAction(formData: FormData) {
   await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/products");
 
   const id = String(formData.get("id") || "").trim();
 
   if (!id) {
-    redirect(statusUrl("/admin/products", "invalid"));
+    redirect(statusUrl(returnTo, "invalid"));
   }
 
   try {
     await toggleAdminProductStatus(id);
   } catch {
-    redirect(statusUrl("/admin/products", "error"));
+    redirect(statusUrl(returnTo, "error"));
   }
 
   revalidatePath("/admin/products");
   revalidatePath("/admin/pricing");
   revalidatePath("/");
-  redirect(statusUrl("/admin/products", "toggled"));
+  redirect(statusUrl(returnTo, "toggled"));
 }

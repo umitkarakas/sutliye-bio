@@ -1,5 +1,43 @@
 import { hasDatabaseUrl, getPrisma } from "@/lib/prisma";
-import { branches, categories, products } from "@/lib/demo-data";
+import { branchProducts, branches, categories, products } from "@/lib/demo-data";
+
+type ProductPriceSummary = {
+  activeBranchCount: number;
+  pricedBranchCount: number;
+  minPrice: number | null;
+  maxPrice: number | null;
+};
+
+function getDemoProductPriceSummary(productId: string): ProductPriceSummary {
+  const matchingEntries = branchProducts.filter((entry) => entry.productId === productId);
+  const prices = matchingEntries.map((entry) => entry.price).filter((price) => price > 0);
+
+  return {
+    activeBranchCount: branches.length,
+    pricedBranchCount: prices.length,
+    minPrice: prices.length ? Math.min(...prices) : null,
+    maxPrice: prices.length ? Math.max(...prices) : null
+  };
+}
+
+function getDbProductPriceSummary(
+  entries: Array<{
+    price: unknown;
+    branchId: string;
+  }>
+): ProductPriceSummary {
+  const uniqueBranchIds = new Set(entries.map((entry) => entry.branchId));
+  const prices = entries
+    .map((entry) => Number(entry.price))
+    .filter((price) => Number.isFinite(price) && price > 0);
+
+  return {
+    activeBranchCount: uniqueBranchIds.size,
+    pricedBranchCount: prices.length,
+    minPrice: prices.length ? Math.min(...prices) : null,
+    maxPrice: prices.length ? Math.max(...prices) : null
+  };
+}
 
 function logAdminFallback(error: unknown, scope: string) {
   const message = error instanceof Error ? error.message : "Unknown error";
@@ -38,7 +76,7 @@ export async function listAdminBranches() {
 
   try {
     const prisma = await getPrisma();
-    return prisma.branch.findMany({
+    return await prisma.branch.findMany({
       orderBy: { displayOrder: "asc" }
     });
   } catch (error) {
@@ -128,7 +166,7 @@ export async function listAdminCategories() {
 
   try {
     const prisma = await getPrisma();
-    return prisma.menuCategory.findMany({
+    return await prisma.menuCategory.findMany({
       orderBy: { displayOrder: "asc" }
     });
   } catch (error) {
@@ -173,19 +211,39 @@ export async function listAdminProducts() {
       name: product.name,
       slug: product.id,
       description: product.description,
+      imageUrl: product.imageUrl,
       badgeLabel: product.badge,
       isFeatured: Boolean(product.badge),
       isActive: true,
       displayOrder: index,
-      categoryId: product.categoryId
+      categoryId: product.categoryId,
+      priceSummary: getDemoProductPriceSummary(product.id)
     }));
   }
 
   try {
     const prisma = await getPrisma();
-    return prisma.product.findMany({
-      orderBy: { displayOrder: "asc" }
+    const dbProducts = await prisma.product.findMany({
+      orderBy: { displayOrder: "asc" },
+      include: {
+        branchProducts: {
+          where: {
+            branch: {
+              isActive: true
+            }
+          },
+          select: {
+            branchId: true,
+            price: true
+          }
+        }
+      }
     });
+
+    return dbProducts.map(({ branchProducts: currentBranchProducts, ...product }) => ({
+      ...product,
+      priceSummary: getDbProductPriceSummary(currentBranchProducts)
+    }));
   } catch (error) {
     logAdminFallback(error, "products");
     return products.map((product, index) => ({
@@ -193,11 +251,13 @@ export async function listAdminProducts() {
       name: product.name,
       slug: product.id,
       description: product.description,
+      imageUrl: product.imageUrl,
       badgeLabel: product.badge,
       isFeatured: Boolean(product.badge),
       isActive: true,
       displayOrder: index,
-      categoryId: product.categoryId
+      categoryId: product.categoryId,
+      priceSummary: getDemoProductPriceSummary(product.id)
     }));
   }
 }
@@ -207,7 +267,10 @@ export async function createAdminProduct(input: {
   name: string;
   slug: string;
   description: string;
+  imageUrl: string;
   badgeLabel?: string;
+  isFeatured?: boolean;
+  initialPrice: number;
 }) {
   if (!hasDatabaseUrl()) {
     throw new Error("Database is not configured.");
@@ -238,8 +301,9 @@ export async function createAdminProduct(input: {
         name: input.name,
         slug: input.slug,
         description: input.description,
+        imageUrl: input.imageUrl,
         badgeLabel: input.badgeLabel,
-        isFeatured: Boolean(input.badgeLabel),
+        isFeatured: input.isFeatured ?? Boolean(input.badgeLabel),
         displayOrder: (lastProduct?.displayOrder ?? -1) + 1
       }
     });
@@ -249,7 +313,7 @@ export async function createAdminProduct(input: {
         data: activeBranches.map((branch) => ({
           branchId: branch.id,
           productId: product.id,
-          price: 0,
+          price: input.initialPrice,
           stockStatus: "hidden",
           isAvailable: false
         }))
@@ -257,6 +321,100 @@ export async function createAdminProduct(input: {
     }
 
     return product;
+  });
+}
+
+export async function updateAdminProduct(input: {
+  id: string;
+  categoryId: string;
+  name: string;
+  slug: string;
+  description: string;
+  imageUrl: string;
+  badgeLabel?: string;
+  isFeatured: boolean;
+}) {
+  if (!hasDatabaseUrl()) {
+    throw new Error("Database is not configured.");
+  }
+
+  const prisma = await getPrisma();
+
+  return prisma.product.update({
+    where: { id: input.id },
+    data: {
+      categoryId: input.categoryId,
+      name: input.name,
+      slug: input.slug,
+      description: input.description,
+      imageUrl: input.imageUrl,
+      badgeLabel: input.badgeLabel,
+      isFeatured: input.isFeatured
+    }
+  });
+}
+
+export async function deleteAdminProduct(id: string) {
+  if (!hasDatabaseUrl()) {
+    throw new Error("Database is not configured.");
+  }
+
+  const prisma = await getPrisma();
+  return prisma.product.delete({
+    where: { id }
+  });
+}
+
+export async function moveAdminProduct(id: string, direction: "up" | "down") {
+  if (!hasDatabaseUrl()) {
+    throw new Error("Database is not configured.");
+  }
+
+  const prisma = await getPrisma();
+  const currentProduct = await prisma.product.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      displayOrder: true
+    }
+  });
+
+  if (!currentProduct) {
+    throw new Error("Product not found.");
+  }
+
+  const swapCandidate = await prisma.product.findFirst({
+    where:
+      direction === "up"
+        ? { displayOrder: { lt: currentProduct.displayOrder } }
+        : { displayOrder: { gt: currentProduct.displayOrder } },
+    orderBy: {
+      displayOrder: direction === "up" ? "desc" : "asc"
+    },
+    select: {
+      id: true,
+      displayOrder: true
+    }
+  });
+
+  if (!swapCandidate) {
+    return currentProduct;
+  }
+
+  return prisma.$transaction(async (tx) => {
+    await tx.product.update({
+      where: { id: currentProduct.id },
+      data: {
+        displayOrder: swapCandidate.displayOrder
+      }
+    });
+
+    return tx.product.update({
+      where: { id: swapCandidate.id },
+      data: {
+        displayOrder: currentProduct.displayOrder
+      }
+    });
   });
 }
 

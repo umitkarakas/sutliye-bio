@@ -138,6 +138,13 @@ Rules:
 
 Bu tablo urunun ortak kimligini tutar. Fiyat ve stok burada tutulmaz.
 
+Bir restoran urunu uygulama icinde iki katmanli ele alinir:
+
+- `products`: ad, aciklama, gorsel, kategori, yayin durumu ve liste sirasi gibi cekirdek kimlik
+- `branch_products`: sube bazli fiyat, stok ve bulunurluk
+
+Bu ayrim sayesinde ayni urun farkli subelerde farkli fiyatla satilabilir; buna ragmen admin ve public yuzeyde "urun" tek bir butun gibi sunulur.
+
 Fields:
 
 - `id`
@@ -158,6 +165,9 @@ Rules:
 
 - `business_id + slug` unique olmali
 - `is_active = false` ise urun hicbir subede public gosterilmemeli
+- urun olusturma/guncelleme akisinda `name`, `description`, `image_url` ve `category_id` bos birakilmamali
+- `display_order` admin panelindeki liste sirasinin source of truth alanidir
+- bir urunun ticari olarak tamamlanmis sayilmasi icin en az bir aktif sube kaydinda fiyat tanimi bulunmali
 
 ### `branch_products`
 
@@ -190,6 +200,7 @@ Rules:
 - `hidden` urunu ilgili subede tamamen gizler
 - `out_of_stock` urunu gosterir ama siparis/aksiyon yoksa sadece bilgi etiketiyle sunar
 - `stock_quantity` kullaniliyorsa `0` degeri `out_of_stock` ile uyumlu olmali
+- yeni urun acildiginda aktif subeler icin ilk `branch_products` kayitlari olusturulmali; baslangic fiyati bu katmana yazilmalidir
 
 ### `feedback`
 

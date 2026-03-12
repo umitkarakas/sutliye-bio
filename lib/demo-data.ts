@@ -7,6 +7,32 @@ import type {
   ProductCategory
 } from "@/lib/types";
 
+function createDemoProductImage(title: string, accent: string) {
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 320" role="img" aria-label="${title}">
+      <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fff7ec" />
+          <stop offset="100%" stop-color="${accent}" />
+        </linearGradient>
+      </defs>
+      <rect width="480" height="320" rx="36" fill="url(#bg)" />
+      <circle cx="375" cy="72" r="58" fill="rgba(255,255,255,0.34)" />
+      <circle cx="105" cy="238" r="86" fill="rgba(255,255,255,0.2)" />
+      <rect x="72" y="92" width="336" height="156" rx="30" fill="#1f1a17" opacity="0.12" />
+      <rect x="102" y="122" width="276" height="96" rx="24" fill="#fffaf2" />
+      <text x="240" y="168" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#2f241d">
+        ${title}
+      </text>
+      <text x="240" y="204" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#7a5c45">
+        Kebapci Menu
+      </text>
+    </svg>
+  `;
+
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
 export const business = {
   name: "Ocakbaşı Sofrası",
   tagline: "Şube seç, menüyü gör, tek dokunuşla ara veya yol tarifi al.",
@@ -71,31 +97,36 @@ export const products: Product[] = [
     categoryId: "kebap",
     name: "Adana Kebap",
     description: "Közlenmiş biber, sumaklı soğan ve ince lavaş ile.",
+    imageUrl: createDemoProductImage("Adana Kebap", "#f1b15f"),
     badge: "Öne çıkan"
   },
   {
     id: "urfa",
     categoryId: "kebap",
     name: "Urfa Kebap",
-    description: "Daha yumuşak baharat profili ile klasik servis."
+    description: "Daha yumuşak baharat profili ile klasik servis.",
+    imageUrl: createDemoProductImage("Urfa Kebap", "#d99058")
   },
   {
     id: "tavuk-durum",
     categoryId: "durum",
     name: "Tavuk Dürüm",
-    description: "Kor ateşinde tavuk şiş, yeşillik ve özel sos."
+    description: "Kor ateşinde tavuk şiş, yeşillik ve özel sos.",
+    imageUrl: createDemoProductImage("Tavuk Dürüm", "#c6a35d")
   },
   {
     id: "kasap-kofte",
     categoryId: "izgara",
     name: "Kasap Köfte",
-    description: "Pide üzeri servis ve domatesli tereyağı dokunuşu."
+    description: "Pide üzeri servis ve domatesli tereyağı dokunuşu.",
+    imageUrl: createDemoProductImage("Kasap Köfte", "#b97d5e")
   },
   {
     id: "ayran",
     categoryId: "icecek",
     name: "Ayran",
-    description: "Günlük mayalı, soğuk servis."
+    description: "Günlük mayalı, soğuk servis.",
+    imageUrl: createDemoProductImage("Ayran", "#87b2b6")
   }
 ];
 
@@ -138,6 +169,7 @@ export function getMenuForBranch(branchId: string): MenuCategoryWithItems[] {
           id: product.id,
           name: product.name,
           description: product.description,
+          imageUrl: product.imageUrl,
           badge: product.badge,
           price: branchProduct?.price ?? 0,
           stockStatus:

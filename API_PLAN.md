@@ -134,7 +134,13 @@ Purpose:
 - `GET /api/admin/products`
 - `POST /api/admin/products`
 - `PATCH /api/admin/products/:id`
-- `PATCH /api/admin/products/:id/status`
+- `DELETE /api/admin/products/:id`
+
+Canonical contract:
+
+- product core payload: `categoryId`, `name`, `slug`, `description`, `imageUrl`, `badgeLabel?`, `isFeatured`
+- create payload additionally requires `initialPrice`; bu fiyat aktif subelerin ilk `branch_product` kayitlarina yazilir
+- urun pasife alma ayri bir status aksiyonu veya update payload'i ile desteklenebilir, ancak fiyat verisi yine `branch_products` icinde kalir
 
 ## Pricing Contracts
 

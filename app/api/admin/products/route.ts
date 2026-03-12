@@ -25,10 +25,21 @@ export async function POST(request: Request) {
     name?: string;
     slug?: string;
     description?: string;
+    imageUrl?: string;
     badgeLabel?: string;
+    initialPrice?: number;
+    isFeatured?: boolean;
   };
 
-  if (!body.categoryId || !body.name || !body.slug || !body.description) {
+  if (
+    !body.categoryId ||
+    !body.name ||
+    !body.slug ||
+    !body.description ||
+    !body.imageUrl ||
+    typeof body.initialPrice !== "number" ||
+    body.initialPrice < 0
+  ) {
     return jsonError("Missing required product fields");
   }
 
@@ -38,7 +49,10 @@ export async function POST(request: Request) {
       name: body.name,
       slug: body.slug,
       description: body.description,
-      badgeLabel: body.badgeLabel
+      imageUrl: body.imageUrl,
+      badgeLabel: body.badgeLabel,
+      initialPrice: body.initialPrice,
+      isFeatured: Boolean(body.isFeatured)
     });
 
     return NextResponse.json({ product }, { status: 201 });

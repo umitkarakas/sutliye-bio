@@ -3,10 +3,11 @@ import { createSessionToken, getAdminCredentials, getSessionCookieName } from "@
 
 export async function POST(request: Request) {
   const contentType = request.headers.get("content-type") || "";
+  const isJsonRequest = contentType.includes("application/json");
   let email = "";
   let password = "";
 
-  if (contentType.includes("application/json")) {
+  if (isJsonRequest) {
     const body = (await request.json()) as { email?: string; password?: string };
     email = body.email?.trim() || "";
     password = body.password || "";
@@ -19,13 +20,17 @@ export async function POST(request: Request) {
   const credentials = getAdminCredentials();
 
   if (email !== credentials.email || password !== credentials.password) {
+    if (!isJsonRequest) {
+      return NextResponse.redirect(new URL("/admin/login?status=invalid", request.url), 303);
+    }
+
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
   const sessionToken = createSessionToken({ email });
-  const response = contentType.includes("application/json")
+  const response = isJsonRequest
     ? NextResponse.json({ ok: true, email })
-    : NextResponse.redirect(new URL("/admin", request.url));
+    : NextResponse.redirect(new URL("/admin", request.url), 303);
 
   response.cookies.set({
     name: getSessionCookieName(),

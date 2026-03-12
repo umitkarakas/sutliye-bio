@@ -25,6 +25,10 @@ function getBranchHref(branchSlug: string, rootBranchSlug: string) {
   return branchSlug === rootBranchSlug ? "/" : `/b/${branchSlug}`;
 }
 
+function getBranchAvailabilityLabel(hours: string) {
+  return hours.toLocaleLowerCase("tr").includes("kapali") ? "Kapali" : "Bugun acik";
+}
+
 export function PublicShell({
   activeBranch,
   activeTab,
@@ -34,8 +38,12 @@ export function PublicShell({
   menu,
   rootBranchSlug
 }: PublicShellProps) {
+  const visibleCategories = menu.filter((category) => category.items.length > 0);
+  const menuItemCount = visibleCategories.reduce((count, category) => count + category.items.length, 0);
+  const availabilityLabel = getBranchAvailabilityLabel(activeBranch.hours);
+
   return (
-    <main className="min-h-screen px-4 py-5 text-[15px] text-[color:var(--foreground)] sm:px-6">
+    <main className="min-h-screen px-4 py-5 pb-28 text-[15px] text-[color:var(--foreground)] sm:px-6">
       <AnalyticsBeacon branchId={activeBranch.id} activeTab={activeTab} source="public_shell" />
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-md flex-col gap-4">
         <section className="overflow-hidden rounded-[32px] border border-[color:var(--line)] bg-[color:var(--card)] shadow-[var(--shadow)] backdrop-blur">
@@ -51,12 +59,23 @@ export function PublicShell({
                 </h1>
               </div>
               <div className="rounded-[24px] border border-white/15 bg-black/10 px-3 py-2 text-right text-xs text-white/80 shadow-[var(--shadow-soft)]">
-                <p>Bugün</p>
+                <p>{availabilityLabel}</p>
                 <p className="mt-1 font-semibold text-white">{activeBranch.hours}</p>
               </div>
             </div>
             <p className="mt-4 max-w-[28ch] text-sm leading-6 text-white/84">{business.tagline}</p>
             <p className="mt-2 text-xs leading-5 text-white/68">{activeBranch.heroNote}</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-white/84">
+                {branches.length} sube
+              </span>
+              <span className="rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-white/84">
+                {visibleCategories.length} kategori
+              </span>
+              <span className="rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-white/84">
+                {menuItemCount} urun
+              </span>
+            </div>
           </div>
 
           <div className="space-y-4 px-4 py-4">
@@ -71,6 +90,7 @@ export function PublicShell({
                     <Link
                       key={branch.id}
                       href={href}
+                      aria-current={isActive ? "page" : undefined}
                       className={[
                         "inline-flex min-w-fit items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition shadow-[var(--shadow-soft)]",
                         isActive
@@ -88,6 +108,7 @@ export function PublicShell({
             <nav className="grid grid-cols-2 gap-2 rounded-[26px] bg-[color:var(--accent-soft)] p-1 shadow-[var(--shadow-soft)]">
               <Link
                 href={basePath}
+                aria-current={activeTab === "contact" ? "page" : undefined}
                 className={[
                   "inline-flex min-h-14 items-center justify-center rounded-[22px] px-4 py-3 text-center text-sm font-semibold transition",
                   activeTab === "contact"
@@ -99,6 +120,7 @@ export function PublicShell({
               </Link>
               <Link
                 href={`${basePath}?tab=menu`}
+                aria-current={activeTab === "menu" ? "page" : undefined}
                 className={[
                   "inline-flex min-h-14 items-center justify-center rounded-[22px] px-4 py-3 text-center text-sm font-semibold transition",
                   activeTab === "menu"
@@ -118,8 +140,15 @@ export function PublicShell({
                       <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted)]">Aktif Şube</p>
                       <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl">{activeBranch.name}</h2>
                     </div>
-                    <span className="rounded-full bg-[color:var(--accent-soft)] px-3 py-1 text-xs font-medium text-[color:var(--accent-strong)]">
-                      Açık
+                    <span
+                      className={[
+                        "rounded-full px-3 py-1 text-xs font-medium",
+                        availabilityLabel === "Kapali"
+                          ? "bg-[color:var(--danger-soft)] text-[color:var(--danger-strong)]"
+                          : "bg-[color:var(--accent-soft)] text-[color:var(--accent-strong)]"
+                      ].join(" ")}
+                    >
+                      {availabilityLabel}
                     </span>
                   </div>
                   <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{activeBranch.blurb}</p>
@@ -177,6 +206,7 @@ export function PublicShell({
                           <Link
                             key={branch.id}
                             href={href}
+                            aria-label={`${branch.name} subesini ac`}
                             className="flex items-center justify-between rounded-[22px] border border-[color:var(--line)] bg-white/90 px-4 py-3"
                           >
                             <div>
@@ -192,19 +222,41 @@ export function PublicShell({
               </section>
             ) : (
               <section className="space-y-4">
+                <div className="rounded-[26px] border border-[color:var(--line)] bg-[rgba(255,255,255,0.58)] p-3 shadow-[var(--shadow-soft)]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted)]">
+                        Menu ozeti
+                      </p>
+                      <p className="mt-1 text-sm text-[color:var(--muted)]">
+                        {activeBranch.name} icin {menuItemCount} urun gosteriliyor.
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-[color:var(--accent-soft)] px-3 py-1 text-xs font-medium text-[color:var(--accent-strong)]">
+                      {visibleCategories.length} kategori
+                    </span>
+                  </div>
+                </div>
+
                 <div className="flex gap-2 overflow-x-auto pb-1">
-                  {menu.map((category) => (
+                  {visibleCategories.map((category) => (
                     <a
                       key={category.id}
                       href={`#${category.slug}`}
                       className="rounded-full border border-[color:var(--line-strong)] bg-[color:var(--card-muted)] px-4 py-2 text-sm font-medium text-[color:var(--foreground)]"
                     >
-                      {category.name}
+                      {category.name} ({category.items.length})
                     </a>
                   ))}
                 </div>
 
-                {menu.map((category) => (
+                {visibleCategories.length === 0 ? (
+                  <section className="rounded-[28px] border border-[color:var(--line)] bg-[color:var(--card-strong)] p-5 text-sm text-[color:var(--muted)] shadow-[var(--shadow-soft)]">
+                    Bu sube icin gosterilecek aktif menu kaydi bulunamadi.
+                  </section>
+                ) : null}
+
+                {visibleCategories.map((category) => (
                   <section key={category.id} id={category.slug} className="space-y-3">
                     <div className="flex items-end justify-between">
                       <h2 className="font-[family-name:var(--font-display)] text-2xl">{category.name}</h2>
@@ -218,17 +270,31 @@ export function PublicShell({
                         key={item.id}
                         className="rounded-[28px] border border-[color:var(--line)] bg-[color:var(--card-strong)] p-4 shadow-[var(--shadow-soft)]"
                       >
-                        <div className="flex items-start justify-between gap-4">
-                          <div>
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="flex flex-1 gap-4">
+                            {item.imageUrl ? (
+                              <div className="h-24 w-full overflow-hidden rounded-[22px] border border-[color:var(--line)] sm:w-28 sm:flex-none">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={item.imageUrl}
+                                  alt={item.name}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                            ) : null}
                             <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="font-semibold">{item.name}</h3>
-                              {item.featured || item.badge ? (
-                                <span className="rounded-full bg-[color:var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[color:var(--accent-strong)]">
-                                  {item.badge ?? "Öne çıkan"}
-                                </span>
-                              ) : null}
+                              <div>
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <h3 className="font-semibold">{item.name}</h3>
+                                  {item.featured || item.badge ? (
+                                    <span className="rounded-full bg-[color:var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[color:var(--accent-strong)]">
+                                      {item.badge ?? "Öne çıkan"}
+                                    </span>
+                                  ) : null}
+                                </div>
+                                <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{item.description}</p>
+                              </div>
                             </div>
-                            <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{item.description}</p>
                           </div>
                           <div className="text-right">
                             {item.stockStatus === "in_stock" ? (
@@ -258,6 +324,38 @@ export function PublicShell({
             )}
           </div>
         </section>
+
+        <div className="sticky bottom-3 z-10">
+          <div className="grid grid-cols-3 gap-2 rounded-[28px] border border-[color:var(--line)] bg-[rgba(255,250,244,0.92)] p-2 shadow-[var(--shadow)] backdrop-blur">
+            <EventLink
+              eventName="call_click"
+              branchId={activeBranch.id}
+              source="public_shell_sticky"
+              href={formatPhoneHref(activeBranch.phone)}
+              className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--foreground)] px-3 py-4 text-center text-sm font-semibold !text-white"
+            >
+              Ara
+            </EventLink>
+            <EventLink
+              eventName="whatsapp_click"
+              branchId={activeBranch.id}
+              source="public_shell_sticky"
+              href={formatWhatsAppHref(activeBranch.whatsapp)}
+              className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--olive)] px-3 py-4 text-center text-sm font-semibold !text-white"
+            >
+              WhatsApp
+            </EventLink>
+            <EventLink
+              eventName="map_click"
+              branchId={activeBranch.id}
+              source="public_shell_sticky"
+              href={activeBranch.mapUrl}
+              className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--accent)] px-3 py-4 text-center text-sm font-semibold !text-white"
+            >
+              Harita
+            </EventLink>
+          </div>
+        </div>
 
         <Link
           href="/admin"

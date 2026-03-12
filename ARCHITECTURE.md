@@ -161,9 +161,17 @@ Sorumluluklari:
   - name
   - description
   - image_url
+  - slug
+  - badge_label nullable
   - is_featured
   - is_active
   - display_order
+
+Urun tanimi:
+
+- restoran urunu cekirdek olarak isim, aciklama, gorsel, kategori, aktiflik ve liste sirasi tasir
+- fiyat urunun ayrilmaz parcasi olsa da veri modelinde sube baglaminda tutulur
+- bu nedenle admin ve API katmanlari urunu `product + branch_product` agregasi gibi ele almalidir
 
 ### Branch-specific catalog state
 
@@ -192,6 +200,7 @@ Bu model ile:
 - ayni urun farkli subelerde farkli fiyatla satilabilir
 - bir subede stokta olmayan urun diger subede aktif kalabilir
 - public menu sube baglamina gore dogru fiyat ve stokla render edilir
+- admin urun listesi cekirdek urun kaydini ve sube fiyat ozetini ayni yerde gosterebilir
 
 ### Bulk pricing support
 
