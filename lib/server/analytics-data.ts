@@ -20,7 +20,8 @@ export type DashboardSummary = {
 };
 
 function logAnalyticsFallback(error: unknown, scope: string) {
-  console.error(`[analytics-data] Falling back to demo mode for ${scope}.`, error);
+  const message = error instanceof Error ? error.message : "Unknown error";
+  console.warn(`[analytics-data] Falling back to demo mode for ${scope}: ${message}`);
 }
 
 async function getPrimaryBusinessId() {

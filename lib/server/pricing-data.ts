@@ -187,7 +187,8 @@ export async function listPricingMatrix(filters: PricingMatrixFilters = {}): Pro
       search
     };
   } catch (error) {
-    console.error("[pricing-data] Falling back to demo pricing matrix.", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.warn(`[pricing-data] Falling back to demo pricing matrix: ${message}`);
     return buildDemoPricingMatrix(filters);
   }
 }

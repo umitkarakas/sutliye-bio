@@ -3,7 +3,8 @@ import { branches, getBranchBySlug, getMenuForBranch } from "@/lib/demo-data";
 import type { MenuCategoryWithItems, MenuItemView } from "@/lib/types";
 
 function logPublicFallback(error: unknown, scope: string) {
-  console.error(`[public-data] Falling back to demo data for ${scope}.`, error);
+  const message = error instanceof Error ? error.message : "Unknown error";
+  console.warn(`[public-data] Falling back to demo data for ${scope}: ${message}`);
 }
 
 export async function getPublicBranches() {

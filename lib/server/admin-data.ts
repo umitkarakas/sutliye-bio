@@ -2,7 +2,8 @@ import { hasDatabaseUrl, getPrisma } from "@/lib/prisma";
 import { branches, categories, products } from "@/lib/demo-data";
 
 function logAdminFallback(error: unknown, scope: string) {
-  console.error(`[admin-data] Falling back to demo data for ${scope}.`, error);
+  const message = error instanceof Error ? error.message : "Unknown error";
+  console.warn(`[admin-data] Falling back to demo data for ${scope}: ${message}`);
 }
 
 async function getPrimaryBusinessId() {
