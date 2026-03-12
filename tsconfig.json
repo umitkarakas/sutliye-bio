@@ -23,6 +23,9 @@
       }
     ],
     "paths": {
+      "@generated-prisma/client": [
+        "./node_modules/.prisma/client/default"
+      ],
       "@prisma/client": [
         "./node_modules/.prisma/client"
       ],

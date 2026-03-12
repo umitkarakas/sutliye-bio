@@ -1,3 +1,4 @@
+import { Prisma } from "@generated-prisma/client";
 import type { PricingAdjustmentType, PricingMatrixData, PricingMatrixRow } from "@/lib/types";
 import { branchProducts, branches, categories, products } from "@/lib/demo-data";
 import { getPrisma, hasDatabaseUrl } from "@/lib/prisma";
@@ -203,8 +204,6 @@ export async function updateBranchProduct(input: {
   }
 
   const prisma = await getPrisma();
-  const { default: prismaModule } = await import("@prisma/client");
-  const { Prisma } = prismaModule;
 
   return prisma.branchProduct.update({
     where: { id: input.id },
@@ -260,8 +259,6 @@ export async function batchUpdatePricing(input: BatchPricingInput) {
     };
   }
 
-  const { default: prismaModule } = await import("@prisma/client");
-  const { Prisma } = prismaModule;
   await prisma.$transaction(
     matchingEntries.map((entry) =>
       prisma.branchProduct.update({
