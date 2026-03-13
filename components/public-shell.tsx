@@ -214,7 +214,7 @@ export function PublicShell({
                       </p>
                       <p className="font-medium">Çalışma Saatleri: {branch.hours}</p>
                     </div>
-                    <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                    <div className="mt-4 grid grid-cols-3 gap-2">
                       <EventLink
                         href={branch.mapUrl}
                         target="_blank"
