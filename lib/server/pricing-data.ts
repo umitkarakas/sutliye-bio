@@ -1,7 +1,7 @@
-import { Prisma } from "@generated-prisma/client";
 import type { PricingAdjustmentType, PricingMatrixData, PricingMatrixRow } from "@/lib/types";
 import { branchProducts, branches, categories, products } from "@/lib/demo-data";
 import { getPrisma, hasDatabaseUrl } from "@/lib/prisma";
+import { Prisma } from "@/lib/prisma-generated";
 
 type PricingMatrixFilters = {
   branchIds?: string[];
