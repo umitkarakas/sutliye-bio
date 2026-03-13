@@ -56,6 +56,7 @@ export const branches: Branch[] = [
     phone: "+90 216 555 10 10",
     whatsapp: "+90 532 555 10 10",
     mapUrl: "https://maps.google.com/?q=Moda+Caddesi+No:+18+Kadıköy",
+    reviewUrl: "https://maps.google.com/?q=Moda+Caddesi+No:+18+Kadıköy",
     hours: "10:00 - 23:30",
     blurb: "Yoğun yaya trafiği ve hızlı servis odaklı şube.",
     heroNote: "Moda ve Çarşı hattından yürüyerek erişim."
@@ -70,6 +71,7 @@ export const branches: Branch[] = [
     phone: "+90 212 555 20 20",
     whatsapp: "+90 532 555 20 20",
     mapUrl: "https://maps.google.com/?q=Çarşı+İçi+No:+44+Beşiktaş",
+    reviewUrl: "https://maps.google.com/?q=Çarşı+İçi+No:+44+Beşiktaş",
     hours: "11:00 - 00:00",
     blurb: "Akşam yoğunluğu yüksek, paket ve oturma dengeli.",
     heroNote: "İş çıkışı ve gece kullanımı için en hızlı aksiyonlar öne çıkıyor."
@@ -84,6 +86,7 @@ export const branches: Branch[] = [
     phone: "+90 216 555 30 30",
     whatsapp: "+90 532 555 30 30",
     mapUrl: "https://maps.google.com/?q=Hakimiyet-i+Milliye+No:+7+Üsküdar",
+    reviewUrl: "https://maps.google.com/?q=Hakimiyet-i+Milliye+No:+7+Üsküdar",
     hours: "09:30 - 23:00",
     blurb: "Aile masaları ve sakin oturum deneyimi için uygun.",
     heroNote: "Vapur çıkışına yakın, konum odaklı gelen kullanıcı kitlesi ağırlıklı."

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Branch, MenuCategoryWithItems, PublicBusiness, TabId } from "@/lib/types";
 import { AnalyticsBeacon } from "@/components/analytics-beacon";
+import { EventLink } from "@/components/event-link";
 import { brandThemeToCssVariables } from "@/lib/brand-theme";
 
 type PublicShellProps = {
@@ -50,12 +51,66 @@ function MenuIcon({ className }: { className?: string }) {
   );
 }
 
+function PinIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M12 21s-5.5-5.3-5.5-10A5.5 5.5 0 0 1 12 5.5 5.5 5.5 0 0 1 17.5 11c0 4.7-5.5 10-5.5 10Z" />
+      <circle cx="12" cy="11" r="2.2" />
+    </svg>
+  );
+}
+
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M20 11.5A8.5 8.5 0 0 1 7.4 19l-3.4 1 1.1-3.2A8.5 8.5 0 1 1 20 11.5Z" />
+      <path d="M9.3 9.2c.2-.5.4-.5.7-.5h.5c.2 0 .4 0 .6.5l.4 1.1c.1.3.1.5-.1.7l-.5.6c-.1.1-.2.3 0 .6.4.7 1 1.4 1.8 1.8.3.2.5.1.6 0l.6-.5c.2-.2.4-.2.7-.1l1.1.4c.5.2.5.4.5.6v.5c0 .3 0 .5-.5.7-.4.2-1.2.3-2.3-.1-1-.4-2.1-1.2-3.1-2.2s-1.7-2.1-2.1-3.1c-.4-1-.3-1.8-.1-2.2Z" />
+    </svg>
+  );
+}
+
+function StarIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="m12 3.7 2.6 5.2 5.8.8-4.2 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.2-4.1 5.8-.8L12 3.7Z" />
+    </svg>
+  );
+}
+
 function getBranchHref(branchSlug: string, rootBranchSlug: string) {
   return branchSlug === rootBranchSlug ? "/" : `/b/${branchSlug}`;
 }
 
-function getBranchAvailabilityLabel(hours: string) {
-  return hours.toLocaleLowerCase("tr").includes("kapali") ? "Kapali" : "Bugun acik";
+function getWhatsappHref(value: string) {
+  const normalized = value.replace(/\D/g, "");
+  return `https://wa.me/${normalized}`;
+}
+
+function getReviewHref(branch: Branch) {
+  return branch.reviewUrl || branch.mapUrl;
 }
 
 export function PublicShell({
@@ -69,7 +124,10 @@ export function PublicShell({
 }: PublicShellProps) {
   const visibleCategories = menu.filter((category) => category.items.length > 0);
   const menuItemCount = visibleCategories.reduce((count, category) => count + category.items.length, 0);
-  const availabilityLabel = getBranchAvailabilityLabel(activeBranch.hours);
+  const orderedBranches = [
+    activeBranch,
+    ...branches.filter((branch) => branch.id !== activeBranch.id)
+  ];
   const shellStyle = {
     ...brandThemeToCssVariables(business.theme),
     backgroundColor: "color-mix(in srgb, var(--brand-background) 82%, #2a2324 18%)"
@@ -81,13 +139,10 @@ export function PublicShell({
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-md flex-col gap-4">
         <section className="overflow-hidden rounded-[32px] border border-black/6 bg-[rgba(255,250,250,0.72)] shadow-[var(--shadow)]">
           <div className="border-b border-white/6 bg-[#171416] px-5 py-6 text-white">
-            <div className="mb-4 inline-flex rounded-full bg-[color:var(--accent)] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-white">
-              {business.badge}
-            </div>
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-start gap-4">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-5">
                 {business.logoUrl ? (
-                  <div className="flex h-16 w-16 flex-none items-center justify-center overflow-hidden rounded-[24px] border border-white/10 bg-white/8 p-2 shadow-[var(--shadow-soft)]">
+                  <div className="flex h-28 w-28 flex-none items-center justify-center overflow-hidden rounded-[28px] border border-white/10 bg-white/8 p-3 shadow-[var(--shadow-soft)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={business.logoUrl}
@@ -96,30 +151,21 @@ export function PublicShell({
                     />
                   </div>
                 ) : null}
-                <div>
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-white/60">{activeBranch.district}</p>
-                  <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl leading-none">
+                <div className="flex min-h-28 items-center">
+                  <h1 className="font-[family-name:var(--font-display)] text-[2.5rem] leading-[0.92]">
                     {business.name}
                   </h1>
                 </div>
               </div>
-              <div className="rounded-[24px] border border-white/10 bg-white/6 px-3 py-2 text-right text-xs text-white/78 shadow-[var(--shadow-soft)]">
-                <p>{availabilityLabel}</p>
-                <p className="mt-1 font-semibold text-white">{activeBranch.hours}</p>
+
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-base leading-6 text-white/58 sm:text-lg">
+                  {activeBranch.district} / {activeBranch.city}
+                </p>
+                <div className="rounded-[24px] border border-white/10 bg-white/6 px-4 py-3 text-right text-sm text-white shadow-[var(--shadow-soft)]">
+                  <p className="font-semibold leading-snug">{activeBranch.hours}</p>
+                </div>
               </div>
-            </div>
-            <p className="mt-4 max-w-[28ch] text-sm leading-6 text-white/84">{business.tagline}</p>
-            <p className="mt-2 text-xs leading-5 text-white/56">{activeBranch.heroNote}</p>
-            <div className="mt-4 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-white/84">
-                {branches.length} sube
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-white/84">
-                {visibleCategories.length} kategori
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-white/84">
-                {menuItemCount} urun
-              </span>
             </div>
           </div>
 
@@ -152,61 +198,71 @@ export function PublicShell({
 
             {activeTab === "contact" ? (
               <section className="space-y-3">
-                <article className="rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.84)] p-4 shadow-[var(--shadow-soft)]">
-                  <div className="flex items-start justify-between gap-3">
+                {orderedBranches.map((branch) => (
+                  <article
+                    key={branch.id}
+                    className="rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.84)] p-4 shadow-[var(--shadow-soft)]"
+                  >
                     <div>
-                      <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted)]">Aktif Şube</p>
-                      <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl">{activeBranch.name}</h2>
+                      <h2 className="font-[family-name:var(--font-display)] text-3xl">{branch.name}</h2>
                     </div>
-                    <span
-                      className={[
-                        "rounded-full px-3 py-1 text-xs font-medium",
-                        availabilityLabel === "Kapali"
-                          ? "bg-[color:var(--danger-soft)] text-[color:var(--danger-strong)]"
-                          : "bg-[color:var(--accent-soft)] text-[color:var(--accent-strong)]"
-                      ].join(" ")}
-                    >
-                      {availabilityLabel}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{activeBranch.blurb}</p>
-                  <div className="mt-4 space-y-2 text-sm">
-                    <p>{activeBranch.address}</p>
-                    <p>
-                      {activeBranch.district} / {activeBranch.city}
-                    </p>
-                    <p className="font-medium">Çalışma Saatleri: {activeBranch.hours}</p>
-                  </div>
-                </article>
-
-                <section className="rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.7)] p-4 shadow-[var(--shadow-soft)]">
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="font-semibold">Diğer Şubeler</h3>
-                    <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--muted)]">Hızlı Geçiş</p>
-                  </div>
-                  <div className="space-y-3">
-                    {branches
-                      .filter((branch) => branch.id !== activeBranch.id)
-                      .map((branch) => {
-                        const href = getBranchHref(branch.slug, rootBranchSlug);
-
-                        return (
-                          <Link
-                            key={branch.id}
-                            href={href}
-                            aria-label={`${branch.name} subesini ac`}
-                            className="flex items-center justify-between rounded-[22px] border border-black/6 bg-white px-4 py-3"
-                          >
-                            <div>
-                              <p className="font-medium">{branch.name}</p>
-                              <p className="text-sm text-[color:var(--muted)]">{branch.address}</p>
-                            </div>
-                            <span className="text-sm text-[color:var(--accent-strong)]">Aç</span>
-                          </Link>
-                        );
-                      })}
-                  </div>
-                </section>
+                    <p className="mt-3 text-sm leading-6 text-[color:var(--muted)]">{branch.blurb}</p>
+                    <div className="mt-4 space-y-2 text-sm">
+                      <p>{branch.address}</p>
+                      <p>
+                        {branch.district} / {branch.city}
+                      </p>
+                      <p className="font-medium">Çalışma Saatleri: {branch.hours}</p>
+                    </div>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                      <EventLink
+                        href={branch.mapUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        eventName="map_click"
+                        branchId={branch.id}
+                        source="public_shell"
+                        className="inline-flex flex-col items-center justify-center gap-2 rounded-[20px] border border-black/6 bg-white px-4 py-3 text-center"
+                      >
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.16)]">
+                          <PinIcon className="h-4.5 w-4.5" />
+                        </span>
+                        <span className="text-[11px] font-medium tracking-[0.01em] text-[color:var(--muted)]">
+                          Adres
+                        </span>
+                      </EventLink>
+                      <EventLink
+                        href={getWhatsappHref(branch.whatsapp)}
+                        target="_blank"
+                        rel="noreferrer"
+                        eventName="whatsapp_click"
+                        branchId={branch.id}
+                        source="public_shell"
+                        className="inline-flex flex-col items-center justify-center gap-2 rounded-[20px] border border-black/6 bg-white px-4 py-3 text-center"
+                      >
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.16)]">
+                          <WhatsAppIcon className="h-4.5 w-4.5" />
+                        </span>
+                        <span className="text-[11px] font-medium tracking-[0.01em] text-[color:var(--muted)]">
+                          WhatsApp
+                        </span>
+                      </EventLink>
+                      <a
+                        href={getReviewHref(branch)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex flex-col items-center justify-center gap-2 rounded-[20px] border border-black/6 bg-white px-4 py-3 text-center"
+                      >
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.16)]">
+                          <StarIcon className="h-4.5 w-4.5" />
+                        </span>
+                        <span className="text-[11px] font-medium tracking-[0.01em] text-[color:var(--muted)]">
+                          Google Yorum
+                        </span>
+                      </a>
+                    </div>
+                  </article>
+                ))}
               </section>
             ) : (
               <section className="space-y-4">

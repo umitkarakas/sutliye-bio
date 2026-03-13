@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --font-display: "Iowan Old Style", "Palatino Linotype", "URW Palladio L", serif;
+  --font-display: "Avenir Next", "Avenir", "Segoe UI", "Helvetica Neue", sans-serif;
   --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
   --brand-primary: #ba0814;
   --brand-secondary: #dc6f79;

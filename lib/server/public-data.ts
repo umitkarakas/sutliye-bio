@@ -86,6 +86,7 @@ type BranchRow = {
   phone: string;
   whatsapp: string;
   mapUrl: string;
+  reviewUrl: string | null;
   blurb: string | null;
   heroNote: string | null;
   dayOfWeek: number | null;
@@ -138,6 +139,7 @@ function mapBranches(rows: BranchRow[]) {
           phone: row.phone,
           whatsapp: row.whatsapp,
           mapUrl: row.mapUrl,
+          reviewUrl: row.reviewUrl,
           blurb: row.blurb,
           heroNote: row.heroNote
         },
@@ -176,6 +178,7 @@ function mapBranches(rows: BranchRow[]) {
     phone: branch.phone,
     whatsapp: branch.whatsapp,
     mapUrl: branch.mapUrl,
+    reviewUrl: branch.reviewUrl ?? undefined,
     hours: summarizeBranchHours(hours),
     blurb: branch.blurb ?? "",
     heroNote: branch.heroNote ?? ""
@@ -255,6 +258,7 @@ export async function getPublicBranches() {
             b.phone,
             b.whatsapp,
             b."mapUrl",
+            b."reviewUrl",
             b.blurb,
             b."heroNote",
             h."dayOfWeek",
@@ -295,6 +299,7 @@ export async function getPublicBranchBySlug(slug: string) {
             b.phone,
             b.whatsapp,
             b."mapUrl",
+            b."reviewUrl",
             b.blurb,
             b."heroNote",
             h."dayOfWeek",

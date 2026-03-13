@@ -122,6 +122,7 @@ export const BranchScalarFieldEnum = {
   district: 'district',
   city: 'city',
   mapUrl: 'mapUrl',
+  reviewUrl: 'reviewUrl',
   phone: 'phone',
   whatsapp: 'whatsapp',
   latitude: 'latitude',

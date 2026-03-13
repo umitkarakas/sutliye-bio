@@ -143,6 +143,7 @@ export default async function AdminBranchesPage({
                   <p>{branch.address}</p>
                   <p>Telefon: {branch.phone}</p>
                   <p>WhatsApp: {branch.whatsapp}</p>
+                  {branch.reviewUrl ? <p>Google Yorum: Kayıtlı</p> : null}
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Link
@@ -221,6 +222,12 @@ export default async function AdminBranchesPage({
                       placeholder="Harita linki"
                       className="admin-input rounded-2xl px-4 py-3"
                     />
+                    <input
+                      name="reviewUrl"
+                      defaultValue={branch.reviewUrl ?? ""}
+                      placeholder="Google yorum linki"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
                     <button
                       type="submit"
                       disabled={isDemo}
@@ -249,6 +256,11 @@ export default async function AdminBranchesPage({
             <input name="phone" placeholder="Telefon" className="admin-input rounded-2xl px-4 py-3" />
             <input name="whatsapp" placeholder="WhatsApp" className="admin-input rounded-2xl px-4 py-3" />
             <input name="mapUrl" placeholder="Harita linki" className="admin-input rounded-2xl px-4 py-3" />
+            <input
+              name="reviewUrl"
+              placeholder="Google yorum linki"
+              className="admin-input rounded-2xl px-4 py-3"
+            />
             <button
               type="submit"
               disabled={isDemo}

@@ -26,6 +26,7 @@ export type Branch = {
   phone: string;
   whatsapp: string;
   mapUrl: string;
+  reviewUrl?: string;
   hours: string;
   blurb: string;
   heroNote: string;

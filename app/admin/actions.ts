@@ -54,15 +54,28 @@ export async function createBranchAction(formData: FormData) {
     city: String(formData.get("city") || "").trim(),
     phone: String(formData.get("phone") || "").trim(),
     whatsapp: String(formData.get("whatsapp") || "").trim(),
-    mapUrl: String(formData.get("mapUrl") || "").trim()
+    mapUrl: String(formData.get("mapUrl") || "").trim(),
+    reviewUrl: String(formData.get("reviewUrl") || "").trim()
   };
 
-  if (Object.values(payload).some((value) => !value)) {
+  if (
+    !payload.name ||
+    !payload.slug ||
+    !payload.address ||
+    !payload.district ||
+    !payload.city ||
+    !payload.phone ||
+    !payload.whatsapp ||
+    !payload.mapUrl
+  ) {
     redirect(statusUrl(returnTo, "invalid"));
   }
 
   try {
-    await createAdminBranch(payload);
+    await createAdminBranch({
+      ...payload,
+      reviewUrl: payload.reviewUrl || undefined
+    });
   } catch {
     redirect(statusUrl(returnTo, "error"));
   }
@@ -84,15 +97,29 @@ export async function updateBranchAction(formData: FormData) {
     city: String(formData.get("city") || "").trim(),
     phone: String(formData.get("phone") || "").trim(),
     whatsapp: String(formData.get("whatsapp") || "").trim(),
-    mapUrl: String(formData.get("mapUrl") || "").trim()
+    mapUrl: String(formData.get("mapUrl") || "").trim(),
+    reviewUrl: String(formData.get("reviewUrl") || "").trim()
   };
 
-  if (Object.values(payload).some((value) => !value)) {
+  if (
+    !payload.id ||
+    !payload.name ||
+    !payload.slug ||
+    !payload.address ||
+    !payload.district ||
+    !payload.city ||
+    !payload.phone ||
+    !payload.whatsapp ||
+    !payload.mapUrl
+  ) {
     redirect(statusUrl(returnTo, "invalid"));
   }
 
   try {
-    await updateAdminBranch(payload);
+    await updateAdminBranch({
+      ...payload,
+      reviewUrl: payload.reviewUrl || undefined
+    });
   } catch {
     redirect(statusUrl(returnTo, "error"));
   }

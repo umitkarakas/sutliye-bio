@@ -73,6 +73,7 @@ model Branch {
   district     String
   city         String
   mapUrl       String
+  reviewUrl    String?
   phone        String
   whatsapp     String
   latitude     Float?

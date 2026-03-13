@@ -25,6 +25,7 @@ export async function PATCH(request: Request, { params }: Context) {
     phone?: string;
     whatsapp?: string;
     mapUrl?: string;
+    reviewUrl?: string;
   };
 
   if (
@@ -51,7 +52,8 @@ export async function PATCH(request: Request, { params }: Context) {
       city: body.city,
       phone: body.phone,
       whatsapp: body.whatsapp,
-      mapUrl: body.mapUrl
+      mapUrl: body.mapUrl,
+      reviewUrl: body.reviewUrl
     });
 
     return NextResponse.json({ branch });

@@ -29,6 +29,7 @@ export async function POST(request: Request) {
     phone?: string;
     whatsapp?: string;
     mapUrl?: string;
+    reviewUrl?: string;
   };
 
   if (
@@ -53,7 +54,8 @@ export async function POST(request: Request) {
       city: body.city,
       phone: body.phone,
       whatsapp: body.whatsapp,
-      mapUrl: body.mapUrl
+      mapUrl: body.mapUrl,
+      reviewUrl: body.reviewUrl
     });
 
     return NextResponse.json({ branch }, { status: 201 });
