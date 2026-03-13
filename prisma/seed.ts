@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient, Prisma, StockStatus } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { branchProducts, branches, business, categories, products } from "../lib/demo-data";
 import { hashPassword } from "../lib/server/passwords";
@@ -208,7 +208,7 @@ async function main() {
       },
       update: {
         price: new Prisma.Decimal(entry.price),
-        stockStatus: entry.stockStatus as StockStatus,
+        stockStatus: entry.stockStatus,
         isAvailable: entry.stockStatus === "in_stock",
         isFeaturedOverride: entry.featured ?? null
       },
@@ -216,7 +216,7 @@ async function main() {
         branchId,
         productId,
         price: new Prisma.Decimal(entry.price),
-        stockStatus: entry.stockStatus as StockStatus,
+        stockStatus: entry.stockStatus,
         isAvailable: entry.stockStatus === "in_stock",
         isFeaturedOverride: entry.featured ?? null
       }
