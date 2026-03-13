@@ -280,12 +280,9 @@ export async function updateBranchProduct(input: {
         UPDATE "BranchProduct"
         SET
           price = $2::numeric(10, 2),
-          "stockStatus" = $3,
-          "isAvailable" = $3 = 'in_stock',
-          "stockQuantity" = CASE
-            WHEN $3 = 'out_of_stock' THEN 0
-            ELSE "stockQuantity"
-          END,
+          "stockStatus" = $3::"StockStatus",
+          "isAvailable" = $4::boolean,
+          "stockQuantity" = COALESCE($5::integer, "stockQuantity"),
           "updatedAt" = NOW()
         WHERE id = $1
         RETURNING
@@ -298,7 +295,13 @@ export async function updateBranchProduct(input: {
           "stockQuantity",
           currency
       `,
-      [input.id, input.price.toFixed(2), input.stockStatus]
+      [
+        input.id,
+        input.price.toFixed(2),
+        input.stockStatus,
+        input.stockStatus === 'in_stock',
+        input.stockStatus === 'out_of_stock' ? 0 : null
+      ]
     );
 
     const branchProduct = result.rows[0];

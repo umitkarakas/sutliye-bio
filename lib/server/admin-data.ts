@@ -1106,6 +1106,82 @@ export async function toggleAdminCategoryStatus(id: string) {
   });
 }
 
+export type BranchHourItem = {
+  dayOfWeek: number;
+  openTime: string | null;
+  closeTime: string | null;
+  isClosed: boolean;
+};
+
+type BranchHourRow = {
+  dayOfWeek: number;
+  openTime: string | null;
+  closeTime: string | null;
+  isClosed: boolean;
+};
+
+export async function getBranchHours(branchId: string): Promise<BranchHourItem[]> {
+  if (!hasDatabaseUrl()) {
+    return [];
+  }
+
+  try {
+    const result = await withDb((db) =>
+      db.query<BranchHourRow>(
+        `
+          SELECT
+            "dayOfWeek",
+            "openTime",
+            "closeTime",
+            "isClosed"
+          FROM "BranchHour"
+          WHERE "branchId" = $1
+          ORDER BY "dayOfWeek" ASC
+        `,
+        [branchId]
+      )
+    );
+
+    return result.rows;
+  } catch (error) {
+    logAdminFallback(error, "branch hours");
+    return [];
+  }
+}
+
+export async function upsertBranchHours(
+  branchId: string,
+  hours: BranchHourItem[]
+): Promise<void> {
+  if (!hasDatabaseUrl()) {
+    throw new Error("Database is not configured.");
+  }
+
+  return withTransaction(async (db) => {
+    for (const hour of hours) {
+      await db.query(
+        `
+          INSERT INTO "BranchHour" (id, "branchId", "dayOfWeek", "openTime", "closeTime", "isClosed")
+          VALUES ($1, $2, $3, $4, $5, $6)
+          ON CONFLICT ("branchId", "dayOfWeek")
+          DO UPDATE SET
+            "openTime" = EXCLUDED."openTime",
+            "closeTime" = EXCLUDED."closeTime",
+            "isClosed" = EXCLUDED."isClosed"
+        `,
+        [
+          crypto.randomUUID(),
+          branchId,
+          hour.dayOfWeek,
+          hour.isClosed ? null : (hour.openTime || null),
+          hour.isClosed ? null : (hour.closeTime || null),
+          hour.isClosed
+        ]
+      );
+    }
+  });
+}
+
 export async function toggleAdminProductStatus(id: string) {
   if (!hasDatabaseUrl()) {
     throw new Error("Database is not configured.");

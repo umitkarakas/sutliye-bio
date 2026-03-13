@@ -16,7 +16,8 @@ import {
   updateAdminProduct,
   toggleAdminBranchStatus,
   toggleAdminCategoryStatus,
-  toggleAdminProductStatus
+  toggleAdminProductStatus,
+  upsertBranchHours
 } from "@/lib/server/admin-data";
 
 function statusUrl(path: string, status: string) {
@@ -424,6 +425,35 @@ export async function toggleCategoryStatusAction(formData: FormData) {
   revalidatePath("/admin/products");
   revalidatePath("/admin/pricing");
   redirect(statusUrl("/admin/categories", "toggled"));
+}
+
+export async function upsertBranchHoursAction(formData: FormData) {
+  await requireSessionOrRedirect();
+
+  const branchId = String(formData.get("branchId") || "").trim();
+  const returnTo = getReturnTo(formData, "/admin/branches");
+
+  if (!branchId) {
+    redirect(statusUrl(returnTo, "invalid"));
+  }
+
+  const days = [1, 2, 3, 4, 5, 6, 7];
+  const hours = days.map((day) => ({
+    dayOfWeek: day,
+    isClosed: formData.get(`day_${day}_closed`) === "on",
+    openTime: String(formData.get(`day_${day}_open`) || "").trim() || null,
+    closeTime: String(formData.get(`day_${day}_close`) || "").trim() || null
+  }));
+
+  try {
+    await upsertBranchHours(branchId, hours);
+  } catch {
+    redirect(statusUrl(returnTo, "error"));
+  }
+
+  revalidatePath("/admin/branches");
+  revalidatePath("/b/[branchSlug]", "page");
+  redirect(statusUrl(returnTo, "hours_updated"));
 }
 
 export async function toggleProductStatusAction(formData: FormData) {
