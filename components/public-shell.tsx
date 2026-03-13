@@ -317,12 +317,12 @@ export function PublicShell({
                         <div
                           className={
                             item.imageUrl
-                              ? "grid grid-cols-[7.5rem_minmax(0,1fr)] gap-4 sm:grid-cols-[10rem_minmax(0,1fr)]"
+                              ? "grid grid-cols-[7rem_minmax(0,1fr)] gap-4 md:grid-cols-[9rem_minmax(0,1fr)] xl:grid-cols-[10rem_minmax(0,1fr)]"
                               : "flex flex-col gap-4"
                           }
                         >
                           {item.imageUrl ? (
-                            <div className="h-28 overflow-hidden rounded-[22px] border border-black/6 bg-white sm:h-36">
+                            <div className="h-28 overflow-hidden rounded-[22px] border border-black/6 bg-white md:h-32 xl:h-36">
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img src={item.imageUrl} alt={item.name} className="h-full w-full object-contain" />
                             </div>
@@ -332,7 +332,9 @@ export function PublicShell({
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <h3 className="text-lg font-semibold leading-tight sm:text-2xl">{item.name}</h3>
+                                  <h3 className="text-lg font-semibold leading-tight md:text-xl xl:text-2xl">
+                                    {item.name}
+                                  </h3>
                                   {item.featured || item.badge ? (
                                     <span className="rounded-full bg-[color:var(--accent-soft)] px-2.5 py-1 text-[11px] font-medium text-[color:var(--accent-strong)]">
                                       {item.badge ?? "Öne çıkan"}
@@ -344,7 +346,7 @@ export function PublicShell({
                               <div className="shrink-0 text-right">
                                 {item.stockStatus === "in_stock" ? (
                                   <>
-                                    <p className="font-[family-name:var(--font-display)] text-2xl leading-none sm:text-[3rem]">
+                                    <p className="font-[family-name:var(--font-display)] text-[1.9rem] leading-none md:text-[2.35rem] xl:text-[3rem]">
                                       {item.price} TL
                                     </p>
                                     <p className="mt-2 text-xs uppercase tracking-[0.24em] text-[color:var(--olive)]">
@@ -353,7 +355,7 @@ export function PublicShell({
                                   </>
                                 ) : (
                                   <>
-                                    <p className="font-[family-name:var(--font-display)] text-xl text-[color:var(--muted)] sm:text-3xl">
+                                    <p className="font-[family-name:var(--font-display)] text-xl text-[color:var(--muted)] md:text-[2rem] xl:text-3xl">
                                       Tükendi
                                     </p>
                                     <p className="mt-2 text-xs uppercase tracking-[0.24em] text-[color:var(--accent-strong)]">
@@ -364,7 +366,7 @@ export function PublicShell({
                               </div>
                             </div>
 
-                            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)] sm:mt-5 sm:text-[1.05rem]">
+                            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)] md:text-base xl:mt-5 xl:text-[1.05rem]">
                               {item.description}
                             </p>
                           </div>
