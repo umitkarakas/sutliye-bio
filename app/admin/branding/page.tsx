@@ -146,6 +146,34 @@ export default async function AdminBrandingPage({
             </label>
 
             <div className="border-t border-[color:var(--line)] pt-4">
+              <h3 className="font-semibold">SEO</h3>
+              <p className="admin-copy mt-2 text-sm">
+                Link önizlemelerinde görünen başlık ve açıklamayı buradan yönet. Boş bırakırsan içerikten türetilir.
+              </p>
+            </div>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-medium">SEO title</span>
+              <input
+                name="seoTitle"
+                defaultValue={settings.seoTitle}
+                placeholder="Ocakbaşı Sofrası"
+                className="admin-input rounded-2xl px-4 py-3"
+              />
+            </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-medium">SEO description</span>
+              <textarea
+                name="seoDescription"
+                defaultValue={settings.seoDescription}
+                rows={3}
+                placeholder="Şube seç, menüyü gör, tek dokunuşla ara veya yol tarifi al."
+                className="admin-input rounded-2xl px-4 py-3"
+              />
+            </label>
+
+            <div className="border-t border-[color:var(--line)] pt-4">
               <h3 className="font-semibold">Renk paleti</h3>
               <p className="admin-copy mt-2 text-sm">
                 Hex renk kullan. `#RRGGBB` formatındaki değerler public temaya uygulanır.

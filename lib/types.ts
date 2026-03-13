@@ -13,6 +13,8 @@ export type PublicBusiness = {
   logoUrl?: string;
   primaryPhone?: string;
   primaryWhatsapp?: string;
+  seoTitle?: string;
+  seoDescription?: string;
   theme: BrandTheme;
 };
 

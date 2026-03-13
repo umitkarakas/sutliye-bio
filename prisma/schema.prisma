@@ -33,6 +33,8 @@ model Business {
   logoUrl          String?
   brandTagline     String?
   brandBadge       String?
+  seoTitle         String?
+  seoDescription   String?
   primaryColor     String?
   secondaryColor   String?
   backgroundColor  String?

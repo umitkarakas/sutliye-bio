@@ -83,6 +83,8 @@ export const BusinessScalarFieldEnum = {
   logoUrl: 'logoUrl',
   brandTagline: 'brandTagline',
   brandBadge: 'brandBadge',
+  seoTitle: 'seoTitle',
+  seoDescription: 'seoDescription',
   primaryColor: 'primaryColor',
   secondaryColor: 'secondaryColor',
   backgroundColor: 'backgroundColor',

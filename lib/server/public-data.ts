@@ -69,6 +69,8 @@ type BusinessRow = {
   logoUrl: string | null;
   brandTagline: string | null;
   brandBadge: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
   primaryPhone: string;
   primaryWhatsapp: string;
   primaryColor: string | null;
@@ -202,6 +204,8 @@ export async function getPublicBusiness(): Promise<PublicBusiness> {
             "logoUrl",
             "brandTagline",
             "brandBadge",
+            "seoTitle",
+            "seoDescription",
             "primaryPhone",
             "primaryWhatsapp",
             "primaryColor",
@@ -225,6 +229,8 @@ export async function getPublicBusiness(): Promise<PublicBusiness> {
       logoUrl: record.logoUrl ?? demoBusiness.logoUrl ?? undefined,
       primaryPhone: record.primaryPhone,
       primaryWhatsapp: record.primaryWhatsapp,
+      seoTitle: record.seoTitle ?? demoBusiness.seoTitle,
+      seoDescription: record.seoDescription ?? demoBusiness.seoDescription ?? record.brandTagline ?? demoBusiness.tagline,
       theme: createBrandTheme({
         primaryColor: record.primaryColor ?? demoBusiness.theme.primaryColor,
         secondaryColor: record.secondaryColor ?? demoBusiness.theme.secondaryColor,

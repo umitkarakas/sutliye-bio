@@ -31,6 +31,8 @@ export type BusinessMinAggregateOutputType = {
   logoUrl: string | null
   brandTagline: string | null
   brandBadge: string | null
+  seoTitle: string | null
+  seoDescription: string | null
   primaryColor: string | null
   secondaryColor: string | null
   backgroundColor: string | null
@@ -48,6 +50,8 @@ export type BusinessMaxAggregateOutputType = {
   logoUrl: string | null
   brandTagline: string | null
   brandBadge: string | null
+  seoTitle: string | null
+  seoDescription: string | null
   primaryColor: string | null
   secondaryColor: string | null
   backgroundColor: string | null
@@ -65,6 +69,8 @@ export type BusinessCountAggregateOutputType = {
   logoUrl: number
   brandTagline: number
   brandBadge: number
+  seoTitle: number
+  seoDescription: number
   primaryColor: number
   secondaryColor: number
   backgroundColor: number
@@ -84,6 +90,8 @@ export type BusinessMinAggregateInputType = {
   logoUrl?: true
   brandTagline?: true
   brandBadge?: true
+  seoTitle?: true
+  seoDescription?: true
   primaryColor?: true
   secondaryColor?: true
   backgroundColor?: true
@@ -101,6 +109,8 @@ export type BusinessMaxAggregateInputType = {
   logoUrl?: true
   brandTagline?: true
   brandBadge?: true
+  seoTitle?: true
+  seoDescription?: true
   primaryColor?: true
   secondaryColor?: true
   backgroundColor?: true
@@ -118,6 +128,8 @@ export type BusinessCountAggregateInputType = {
   logoUrl?: true
   brandTagline?: true
   brandBadge?: true
+  seoTitle?: true
+  seoDescription?: true
   primaryColor?: true
   secondaryColor?: true
   backgroundColor?: true
@@ -208,6 +220,8 @@ export type BusinessGroupByOutputType = {
   logoUrl: string | null
   brandTagline: string | null
   brandBadge: string | null
+  seoTitle: string | null
+  seoDescription: string | null
   primaryColor: string | null
   secondaryColor: string | null
   backgroundColor: string | null
@@ -246,6 +260,8 @@ export type BusinessWhereInput = {
   logoUrl?: Prisma.StringNullableFilter<"Business"> | string | null
   brandTagline?: Prisma.StringNullableFilter<"Business"> | string | null
   brandBadge?: Prisma.StringNullableFilter<"Business"> | string | null
+  seoTitle?: Prisma.StringNullableFilter<"Business"> | string | null
+  seoDescription?: Prisma.StringNullableFilter<"Business"> | string | null
   primaryColor?: Prisma.StringNullableFilter<"Business"> | string | null
   secondaryColor?: Prisma.StringNullableFilter<"Business"> | string | null
   backgroundColor?: Prisma.StringNullableFilter<"Business"> | string | null
@@ -269,6 +285,8 @@ export type BusinessOrderByWithRelationInput = {
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   brandTagline?: Prisma.SortOrderInput | Prisma.SortOrder
   brandBadge?: Prisma.SortOrderInput | Prisma.SortOrder
+  seoTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  seoDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   primaryColor?: Prisma.SortOrderInput | Prisma.SortOrder
   secondaryColor?: Prisma.SortOrderInput | Prisma.SortOrder
   backgroundColor?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -295,6 +313,8 @@ export type BusinessWhereUniqueInput = Prisma.AtLeast<{
   logoUrl?: Prisma.StringNullableFilter<"Business"> | string | null
   brandTagline?: Prisma.StringNullableFilter<"Business"> | string | null
   brandBadge?: Prisma.StringNullableFilter<"Business"> | string | null
+  seoTitle?: Prisma.StringNullableFilter<"Business"> | string | null
+  seoDescription?: Prisma.StringNullableFilter<"Business"> | string | null
   primaryColor?: Prisma.StringNullableFilter<"Business"> | string | null
   secondaryColor?: Prisma.StringNullableFilter<"Business"> | string | null
   backgroundColor?: Prisma.StringNullableFilter<"Business"> | string | null
@@ -318,6 +338,8 @@ export type BusinessOrderByWithAggregationInput = {
   logoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   brandTagline?: Prisma.SortOrderInput | Prisma.SortOrder
   brandBadge?: Prisma.SortOrderInput | Prisma.SortOrder
+  seoTitle?: Prisma.SortOrderInput | Prisma.SortOrder
+  seoDescription?: Prisma.SortOrderInput | Prisma.SortOrder
   primaryColor?: Prisma.SortOrderInput | Prisma.SortOrder
   secondaryColor?: Prisma.SortOrderInput | Prisma.SortOrder
   backgroundColor?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -341,6 +363,8 @@ export type BusinessScalarWhereWithAggregatesInput = {
   logoUrl?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   brandTagline?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   brandBadge?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  seoTitle?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
+  seoDescription?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   primaryColor?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   secondaryColor?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
   backgroundColor?: Prisma.StringNullableWithAggregatesFilter<"Business"> | string | null
@@ -358,6 +382,8 @@ export type BusinessCreateInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -381,6 +407,8 @@ export type BusinessUncheckedCreateInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -404,6 +432,8 @@ export type BusinessUpdateInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -427,6 +457,8 @@ export type BusinessUncheckedUpdateInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -450,6 +482,8 @@ export type BusinessCreateManyInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -467,6 +501,8 @@ export type BusinessUpdateManyMutationInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -484,6 +520,8 @@ export type BusinessUncheckedUpdateManyInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -501,6 +539,8 @@ export type BusinessCountOrderByAggregateInput = {
   logoUrl?: Prisma.SortOrder
   brandTagline?: Prisma.SortOrder
   brandBadge?: Prisma.SortOrder
+  seoTitle?: Prisma.SortOrder
+  seoDescription?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
   secondaryColor?: Prisma.SortOrder
   backgroundColor?: Prisma.SortOrder
@@ -518,6 +558,8 @@ export type BusinessMaxOrderByAggregateInput = {
   logoUrl?: Prisma.SortOrder
   brandTagline?: Prisma.SortOrder
   brandBadge?: Prisma.SortOrder
+  seoTitle?: Prisma.SortOrder
+  seoDescription?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
   secondaryColor?: Prisma.SortOrder
   backgroundColor?: Prisma.SortOrder
@@ -535,6 +577,8 @@ export type BusinessMinOrderByAggregateInput = {
   logoUrl?: Prisma.SortOrder
   brandTagline?: Prisma.SortOrder
   brandBadge?: Prisma.SortOrder
+  seoTitle?: Prisma.SortOrder
+  seoDescription?: Prisma.SortOrder
   primaryColor?: Prisma.SortOrder
   secondaryColor?: Prisma.SortOrder
   backgroundColor?: Prisma.SortOrder
@@ -653,6 +697,8 @@ export type BusinessCreateWithoutAdminUsersInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -675,6 +721,8 @@ export type BusinessUncheckedCreateWithoutAdminUsersInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -713,6 +761,8 @@ export type BusinessUpdateWithoutAdminUsersInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -735,6 +785,8 @@ export type BusinessUncheckedUpdateWithoutAdminUsersInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -757,6 +809,8 @@ export type BusinessCreateWithoutBranchesInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -779,6 +833,8 @@ export type BusinessUncheckedCreateWithoutBranchesInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -817,6 +873,8 @@ export type BusinessUpdateWithoutBranchesInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -839,6 +897,8 @@ export type BusinessUncheckedUpdateWithoutBranchesInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -861,6 +921,8 @@ export type BusinessCreateWithoutMenuCategoriesInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -883,6 +945,8 @@ export type BusinessUncheckedCreateWithoutMenuCategoriesInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -921,6 +985,8 @@ export type BusinessUpdateWithoutMenuCategoriesInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -943,6 +1009,8 @@ export type BusinessUncheckedUpdateWithoutMenuCategoriesInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -965,6 +1033,8 @@ export type BusinessCreateWithoutProductsInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -987,6 +1057,8 @@ export type BusinessUncheckedCreateWithoutProductsInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -1025,6 +1097,8 @@ export type BusinessUpdateWithoutProductsInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1047,6 +1121,8 @@ export type BusinessUncheckedUpdateWithoutProductsInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1069,6 +1145,8 @@ export type BusinessCreateWithoutFeedbacksInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -1091,6 +1169,8 @@ export type BusinessUncheckedCreateWithoutFeedbacksInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -1129,6 +1209,8 @@ export type BusinessUpdateWithoutFeedbacksInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1151,6 +1233,8 @@ export type BusinessUncheckedUpdateWithoutFeedbacksInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1173,6 +1257,8 @@ export type BusinessCreateWithoutEventLogsInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -1195,6 +1281,8 @@ export type BusinessUncheckedCreateWithoutEventLogsInput = {
   logoUrl?: string | null
   brandTagline?: string | null
   brandBadge?: string | null
+  seoTitle?: string | null
+  seoDescription?: string | null
   primaryColor?: string | null
   secondaryColor?: string | null
   backgroundColor?: string | null
@@ -1233,6 +1321,8 @@ export type BusinessUpdateWithoutEventLogsInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1255,6 +1345,8 @@ export type BusinessUncheckedUpdateWithoutEventLogsInput = {
   logoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandTagline?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   brandBadge?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoTitle?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  seoDescription?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   primaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   secondaryColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backgroundColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1353,6 +1445,8 @@ export type BusinessSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   logoUrl?: boolean
   brandTagline?: boolean
   brandBadge?: boolean
+  seoTitle?: boolean
+  seoDescription?: boolean
   primaryColor?: boolean
   secondaryColor?: boolean
   backgroundColor?: boolean
@@ -1377,6 +1471,8 @@ export type BusinessSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   logoUrl?: boolean
   brandTagline?: boolean
   brandBadge?: boolean
+  seoTitle?: boolean
+  seoDescription?: boolean
   primaryColor?: boolean
   secondaryColor?: boolean
   backgroundColor?: boolean
@@ -1394,6 +1490,8 @@ export type BusinessSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   logoUrl?: boolean
   brandTagline?: boolean
   brandBadge?: boolean
+  seoTitle?: boolean
+  seoDescription?: boolean
   primaryColor?: boolean
   secondaryColor?: boolean
   backgroundColor?: boolean
@@ -1411,6 +1509,8 @@ export type BusinessSelectScalar = {
   logoUrl?: boolean
   brandTagline?: boolean
   brandBadge?: boolean
+  seoTitle?: boolean
+  seoDescription?: boolean
   primaryColor?: boolean
   secondaryColor?: boolean
   backgroundColor?: boolean
@@ -1421,7 +1521,7 @@ export type BusinessSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BusinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logoUrl" | "brandTagline" | "brandBadge" | "primaryColor" | "secondaryColor" | "backgroundColor" | "primaryPhone" | "primaryWhatsapp" | "defaultCurrency" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
+export type BusinessOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "slug" | "logoUrl" | "brandTagline" | "brandBadge" | "seoTitle" | "seoDescription" | "primaryColor" | "secondaryColor" | "backgroundColor" | "primaryPhone" | "primaryWhatsapp" | "defaultCurrency" | "createdAt" | "updatedAt", ExtArgs["result"]["business"]>
 export type BusinessInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   adminUsers?: boolean | Prisma.Business$adminUsersArgs<ExtArgs>
   branches?: boolean | Prisma.Business$branchesArgs<ExtArgs>
@@ -1451,6 +1551,8 @@ export type $BusinessPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     logoUrl: string | null
     brandTagline: string | null
     brandBadge: string | null
+    seoTitle: string | null
+    seoDescription: string | null
     primaryColor: string | null
     secondaryColor: string | null
     backgroundColor: string | null
@@ -1894,6 +1996,8 @@ export interface BusinessFieldRefs {
   readonly logoUrl: Prisma.FieldRef<"Business", 'String'>
   readonly brandTagline: Prisma.FieldRef<"Business", 'String'>
   readonly brandBadge: Prisma.FieldRef<"Business", 'String'>
+  readonly seoTitle: Prisma.FieldRef<"Business", 'String'>
+  readonly seoDescription: Prisma.FieldRef<"Business", 'String'>
   readonly primaryColor: Prisma.FieldRef<"Business", 'String'>
   readonly secondaryColor: Prisma.FieldRef<"Business", 'String'>
   readonly backgroundColor: Prisma.FieldRef<"Business", 'String'>

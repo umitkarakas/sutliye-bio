@@ -340,6 +340,8 @@ export async function updateBrandSettingsAction(formData: FormData) {
   const logoUrl = String(formData.get("logoUrl") || "").trim();
   const tagline = String(formData.get("tagline") || "").trim();
   const badge = String(formData.get("badge") || "").trim();
+  const seoTitle = String(formData.get("seoTitle") || "").trim();
+  const seoDescription = String(formData.get("seoDescription") || "").trim();
   const primaryColor = String(formData.get("primaryColor") || DEFAULT_BRAND_THEME.primaryColor).trim();
   const secondaryColor = String(formData.get("secondaryColor") || DEFAULT_BRAND_THEME.secondaryColor).trim();
   const backgroundColor = String(
@@ -363,6 +365,8 @@ export async function updateBrandSettingsAction(formData: FormData) {
       logoUrl,
       tagline,
       badge,
+      seoTitle,
+      seoDescription,
       theme: {
         primaryColor,
         secondaryColor,

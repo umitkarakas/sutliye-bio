@@ -54,6 +54,8 @@ export type AdminBrandSettings = {
   logoUrl: string;
   tagline: string;
   badge: string;
+  seoTitle: string;
+  seoDescription: string;
   theme: BrandTheme;
 };
 
@@ -67,6 +69,8 @@ type BusinessSettingsRow = {
   logoUrl: string | null;
   brandTagline: string | null;
   brandBadge: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
   primaryColor: string | null;
   secondaryColor: string | null;
   backgroundColor: string | null;
@@ -155,6 +159,8 @@ function getDemoBrandSettings(): AdminBrandSettings {
     logoUrl: demoBusiness.logoUrl ?? "",
     tagline: demoBusiness.tagline,
     badge: demoBusiness.badge,
+    seoTitle: demoBusiness.seoTitle ?? demoBusiness.name,
+    seoDescription: demoBusiness.seoDescription ?? demoBusiness.tagline,
     theme: createBrandTheme(demoBusiness.theme)
   };
 }
@@ -190,6 +196,8 @@ export async function getAdminBrandSettings(): Promise<AdminBrandSettings> {
             "logoUrl",
             "brandTagline",
             "brandBadge",
+            "seoTitle",
+            "seoDescription",
             "primaryColor",
             "secondaryColor",
             "backgroundColor"
@@ -209,6 +217,9 @@ export async function getAdminBrandSettings(): Promise<AdminBrandSettings> {
       logoUrl: business.logoUrl ?? "",
       tagline: business.brandTagline ?? demoBusiness.tagline,
       badge: business.brandBadge ?? demoBusiness.badge,
+      seoTitle: business.seoTitle ?? demoBusiness.seoTitle ?? business.name,
+      seoDescription:
+        business.seoDescription ?? demoBusiness.seoDescription ?? business.brandTagline ?? demoBusiness.tagline,
       theme: createBrandTheme({
         primaryColor: business.primaryColor ?? demoBusiness.theme.primaryColor,
         secondaryColor: business.secondaryColor ?? demoBusiness.theme.secondaryColor,
@@ -237,9 +248,11 @@ export async function updateAdminBrandSettings(input: AdminBrandSettings) {
           "logoUrl" = $3,
           "brandTagline" = $4,
           "brandBadge" = $5,
-          "primaryColor" = $6,
-          "secondaryColor" = $7,
-          "backgroundColor" = $8,
+          "seoTitle" = $6,
+          "seoDescription" = $7,
+          "primaryColor" = $8,
+          "secondaryColor" = $9,
+          "backgroundColor" = $10,
           "updatedAt" = NOW()
         WHERE id = $1
         RETURNING
@@ -248,6 +261,8 @@ export async function updateAdminBrandSettings(input: AdminBrandSettings) {
           "logoUrl",
           "brandTagline",
           "brandBadge",
+          "seoTitle",
+          "seoDescription",
           "primaryColor",
           "secondaryColor",
           "backgroundColor"
@@ -258,6 +273,8 @@ export async function updateAdminBrandSettings(input: AdminBrandSettings) {
         input.logoUrl || null,
         input.tagline,
         input.badge,
+        input.seoTitle || null,
+        input.seoDescription || null,
         input.theme.primaryColor,
         input.theme.secondaryColor,
         input.theme.backgroundColor

@@ -38,6 +38,8 @@ export const business = {
   logoUrl: "",
   tagline: "Şube seç, menüyü gör, tek dokunuşla ara veya yol tarifi al.",
   badge: "QR ve bio-link için hızlı mobil deneyim",
+  seoTitle: "Ocakbaşı Sofrası",
+  seoDescription: "Şube seç, menüyü gör, tek dokunuşla ara veya yol tarifi al.",
   theme: {
     primaryColor: "#ba0814",
     secondaryColor: "#dc6f79",

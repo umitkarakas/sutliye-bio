@@ -1,14 +1,26 @@
 import type { Metadata } from "next";
+import { getPublicBusiness } from "@/lib/server/public-data";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Ocakbasi Sofrasi",
-  description: "Kebapci icin mobil uyumlu sube, iletisim ve menu deneyimi.",
-  openGraph: {
-    title: "Ocakbasi Sofrasi",
-    description: "Sube sec, menuyu incele, tek dokunusla ara veya yol tarifi al."
-  }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const business = await getPublicBusiness();
+  const title = business.seoTitle || business.name;
+  const description = business.seoDescription || business.tagline;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description
+    },
+    twitter: {
+      title,
+      description,
+      card: "summary"
+    }
+  };
+}
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
