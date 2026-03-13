@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid event" }, { status: 400 });
   }
 
-  await recordAnalyticsEvent({
+  const result = await recordAnalyticsEvent({
     eventName: body.eventName,
     branchId: body.branchId,
     productId: body.productId,
@@ -34,6 +34,10 @@ export async function POST(request: Request) {
     sessionId: body.sessionId,
     metadata: body.metadata
   });
+
+  if (!result.ok) {
+    return NextResponse.json({ error: "Failed to record event" }, { status: 503 });
+  }
 
   return NextResponse.json({ ok: true });
 }

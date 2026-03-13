@@ -5,9 +5,10 @@ import { hasDatabaseUrl } from "@/lib/prisma";
 import { listAdminCategories } from "@/lib/server/admin-data";
 import { AdminContentModeSwitch } from "@/components/admin-content-mode-switch";
 import { AdminPageShell } from "@/components/admin-page-shell";
-import { createCategoryAction, toggleCategoryStatusAction } from "../actions";
+import { createCategoryAction, toggleCategoryStatusAction, updateCategoryAction } from "../actions";
 
 type SearchParams = Promise<{
+  edit?: string | string[];
   mode?: string | string[];
   status?: string | string[];
 }>;
@@ -20,6 +21,8 @@ function getMessage(status: string) {
   switch (status) {
     case "created":
       return "Yeni kategori oluşturuldu.";
+    case "updated":
+      return "Kategori bilgileri güncellendi.";
     case "toggled":
       return "Kategori durumu güncellendi.";
     case "invalid":
@@ -33,6 +36,18 @@ function getMessage(status: string) {
 
 function resolveMode(value: string) {
   return value === "new" ? "new" : "list";
+}
+
+function getCategoryHref(categoryId: string, options?: { edit?: boolean }) {
+  const params = new URLSearchParams();
+
+  if (options?.edit) {
+    params.set("edit", categoryId);
+  }
+
+  const query = params.toString();
+  const base = query ? `/admin/categories?${query}` : "/admin/categories";
+  return `${base}#category-${categoryId}`;
 }
 
 export default async function AdminCategoriesPage({
@@ -49,6 +64,7 @@ export default async function AdminCategoriesPage({
   const resolvedSearchParams = (await searchParams) ?? {};
   const status = asSingle(resolvedSearchParams.status);
   const mode = resolveMode(asSingle(resolvedSearchParams.mode));
+  const editingId = asSingle(resolvedSearchParams.edit);
   const categories = await listAdminCategories();
   const isDemo = !hasDatabaseUrl();
   const listHref = "/admin/categories";
@@ -97,11 +113,18 @@ export default async function AdminCategoriesPage({
           </div>
           <div className="mt-4 grid gap-3">
             {categories.map((category) => (
-              <article key={category.id} className="admin-card rounded-[28px] p-4">
+              <article
+                key={category.id}
+                id={`category-${category.id}`}
+                className="admin-card scroll-mt-28 rounded-[28px] p-4"
+              >
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <h3 className="font-semibold">{category.name}</h3>
                     <p className="admin-copy mt-2 text-sm">Sıra: {category.displayOrder + 1}</p>
+                    {category.description ? (
+                      <p className="admin-copy mt-2 text-sm leading-6">{category.description}</p>
+                    ) : null}
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <span className="admin-badge rounded-full px-3 py-1 text-xs font-medium">
@@ -117,16 +140,65 @@ export default async function AdminCategoriesPage({
                     </span>
                   </div>
                 </div>
-                <form action={toggleCategoryStatusAction} className="mt-4">
-                  <input type="hidden" name="id" value={category.id} />
-                  <button
-                    type="submit"
-                    disabled={isDemo}
-                    className="admin-cta-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
+                    href={
+                      editingId === category.id
+                        ? getCategoryHref(category.id)
+                        : getCategoryHref(category.id, { edit: true })
+                    }
+                    className="admin-cta-secondary whitespace-nowrap"
                   >
-                    {category.isActive ? "Pasife al" : "Aktifleştir"}
-                  </button>
-                </form>
+                    {editingId === category.id ? "Düzenlemeyi kapat" : "Düzenle"}
+                  </Link>
+                  <form action={toggleCategoryStatusAction}>
+                    <input type="hidden" name="id" value={category.id} />
+                    <button
+                      type="submit"
+                      disabled={isDemo}
+                      className="admin-cta-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {category.isActive ? "Pasife al" : "Aktifleştir"}
+                    </button>
+                  </form>
+                </div>
+
+                {editingId === category.id ? (
+                  <form action={updateCategoryAction} className="mt-4 space-y-3 rounded-[24px] border border-[color:var(--line)] p-4">
+                    <input type="hidden" name="id" value={category.id} />
+                    <input
+                      type="hidden"
+                      name="returnTo"
+                      value={getCategoryHref(category.id, { edit: true })}
+                    />
+                    <input
+                      name="name"
+                      defaultValue={category.name}
+                      placeholder="Kategori adı"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <input
+                      name="slug"
+                      defaultValue={category.slug}
+                      placeholder="Slug"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <textarea
+                      name="description"
+                      defaultValue={category.description ?? ""}
+                      placeholder="Açıklama"
+                      rows={4}
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isDemo}
+                      className="admin-cta-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Kategoriyi kaydet
+                    </button>
+                  </form>
+                ) : null}
               </article>
             ))}
           </div>

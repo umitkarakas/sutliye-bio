@@ -2,6 +2,10 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "biomenu",
   "main": ".open-next/worker.js",
+  "keep_vars": true,
+  "find_additional_modules": true,
+  "preserve_file_names": true,
+  "base_dir": ".next/server/chunks",
   "compatibility_date": "2026-03-12",
   "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
   "assets": {

@@ -1,4 +1,4 @@
-import { getPrisma, hasDatabaseUrl } from "@/lib/prisma";
+import { hasDatabaseUrl, queryFirst, withDb } from "@/lib/db";
 import { branches, getBranchBySlug, getMenuForBranch } from "@/lib/demo-data";
 import { business as demoBusiness } from "@/lib/demo-data";
 import { createBrandTheme } from "@/lib/brand-theme";
@@ -64,6 +64,124 @@ function summarizeBranchHours(
   return `${todaysHours.openTime} - ${todaysHours.closeTime}`;
 }
 
+type BusinessRow = {
+  name: string;
+  logoUrl: string | null;
+  brandTagline: string | null;
+  brandBadge: string | null;
+  primaryPhone: string;
+  primaryWhatsapp: string;
+  primaryColor: string | null;
+  secondaryColor: string | null;
+  backgroundColor: string | null;
+};
+
+type BranchRow = {
+  id: string;
+  slug: string;
+  name: string;
+  address: string;
+  district: string;
+  city: string;
+  phone: string;
+  whatsapp: string;
+  mapUrl: string;
+  blurb: string | null;
+  heroNote: string | null;
+  dayOfWeek: number | null;
+  openTime: string | null;
+  closeTime: string | null;
+  isClosed: boolean | null;
+};
+
+type MenuRow = {
+  categoryId: string;
+  categorySlug: string;
+  categoryName: string;
+  productId: string | null;
+  productName: string | null;
+  productDescription: string | null;
+  imageUrl: string | null;
+  badgeLabel: string | null;
+  isFeatured: boolean | null;
+  stockStatus: "in_stock" | "out_of_stock" | "hidden" | null;
+  price: string | number | null;
+  isFeaturedOverride: boolean | null;
+};
+
+function mapBranches(rows: BranchRow[]) {
+  const grouped = new Map<
+    string,
+    {
+      branch: Omit<BranchRow, "dayOfWeek" | "openTime" | "closeTime" | "isClosed">;
+      hours: Array<{
+        dayOfWeek: number;
+        openTime: string | null;
+        closeTime: string | null;
+        isClosed: boolean;
+      }>;
+    }
+  >();
+
+  for (const row of rows) {
+    const existing = grouped.get(row.id);
+
+    if (!existing) {
+      grouped.set(row.id, {
+        branch: {
+          id: row.id,
+          slug: row.slug,
+          name: row.name,
+          address: row.address,
+          district: row.district,
+          city: row.city,
+          phone: row.phone,
+          whatsapp: row.whatsapp,
+          mapUrl: row.mapUrl,
+          blurb: row.blurb,
+          heroNote: row.heroNote
+        },
+        hours:
+          row.dayOfWeek === null
+            ? []
+            : [
+                {
+                  dayOfWeek: row.dayOfWeek,
+                  openTime: row.openTime,
+                  closeTime: row.closeTime,
+                  isClosed: row.isClosed ?? false
+                }
+              ]
+      });
+      continue;
+    }
+
+    if (row.dayOfWeek !== null) {
+      existing.hours.push({
+        dayOfWeek: row.dayOfWeek,
+        openTime: row.openTime,
+        closeTime: row.closeTime,
+        isClosed: row.isClosed ?? false
+      });
+    }
+  }
+
+  return [...grouped.values()].map(({ branch, hours }) => ({
+    id: branch.id,
+    slug: branch.slug,
+    name: branch.name,
+    address: branch.address,
+    district: branch.district,
+    city: branch.city,
+    phone: branch.phone,
+    whatsapp: branch.whatsapp,
+    mapUrl: branch.mapUrl,
+    hours: summarizeBranchHours(hours),
+    blurb: branch.blurb ?? "",
+    heroNote: branch.heroNote ?? ""
+  }));
+}
+
 export async function getPublicBusiness(): Promise<PublicBusiness> {
   if (!hasDatabaseUrl()) {
     return {
@@ -72,10 +190,26 @@ export async function getPublicBusiness(): Promise<PublicBusiness> {
   }
 
   try {
-    const prisma = await getPrisma();
-    const record = await prisma.business.findFirst({
-      orderBy: { createdAt: "asc" }
-    });
+    const record = await withDb((db) =>
+      queryFirst<BusinessRow>(
+        db,
+        `
+          SELECT
+            name,
+            "logoUrl",
+            "brandTagline",
+            "brandBadge",
+            "primaryPhone",
+            "primaryWhatsapp",
+            "primaryColor",
+            "secondaryColor",
+            "backgroundColor"
+          FROM "Business"
+          ORDER BY "createdAt" ASC
+          LIMIT 1
+        `
+      )
+    );
 
     if (!record) {
       throw new Error("No business found.");
@@ -108,31 +242,34 @@ export async function getPublicBranches() {
   }
 
   try {
-    const prisma = await getPrisma();
-    const dbBranches = await prisma.branch.findMany({
-      where: { isActive: true },
-      orderBy: { displayOrder: "asc" },
-      include: {
-        hours: {
-          orderBy: { dayOfWeek: "asc" }
-        }
-      }
-    });
+    const rows = await withDb((db) =>
+      db.query<BranchRow>(
+        `
+          SELECT
+            b.id,
+            b.slug,
+            b.name,
+            b.address,
+            b.district,
+            b.city,
+            b.phone,
+            b.whatsapp,
+            b."mapUrl",
+            b.blurb,
+            b."heroNote",
+            h."dayOfWeek",
+            h."openTime",
+            h."closeTime",
+            h."isClosed"
+          FROM "Branch" b
+          LEFT JOIN "BranchHour" h ON h."branchId" = b.id
+          WHERE b."isActive" = TRUE
+          ORDER BY b."displayOrder" ASC, h."dayOfWeek" ASC
+        `
+      )
+    );
 
-    return dbBranches.map((branch) => ({
-      id: branch.id,
-      slug: branch.slug,
-      name: branch.name,
-      address: branch.address,
-      district: branch.district,
-      city: branch.city,
-      phone: branch.phone,
-      whatsapp: branch.whatsapp,
-      mapUrl: branch.mapUrl,
-      hours: summarizeBranchHours(branch.hours),
-      blurb: branch.blurb ?? "",
-      heroNote: branch.heroNote ?? ""
-    }));
+    return mapBranches(rows.rows);
   } catch (error) {
     logPublicFallback(error, "branch list");
     return branches;
@@ -145,37 +282,39 @@ export async function getPublicBranchBySlug(slug: string) {
   }
 
   try {
-    const prisma = await getPrisma();
-    const branch = await prisma.branch.findFirst({
-      where: {
-        slug,
-        isActive: true
-      },
-      include: {
-        hours: {
-          orderBy: { dayOfWeek: "asc" }
-        }
-      }
-    });
+    const rows = await withDb((db) =>
+      db.query<BranchRow>(
+        `
+          SELECT
+            b.id,
+            b.slug,
+            b.name,
+            b.address,
+            b.district,
+            b.city,
+            b.phone,
+            b.whatsapp,
+            b."mapUrl",
+            b.blurb,
+            b."heroNote",
+            h."dayOfWeek",
+            h."openTime",
+            h."closeTime",
+            h."isClosed"
+          FROM "Branch" b
+          LEFT JOIN "BranchHour" h ON h."branchId" = b.id
+          WHERE b.slug = $1 AND b."isActive" = TRUE
+          ORDER BY h."dayOfWeek" ASC
+        `,
+        [slug]
+      )
+    );
 
-    if (!branch) {
+    if (rows.rows.length === 0) {
       return undefined;
     }
 
-    return {
-      id: branch.id,
-      slug: branch.slug,
-      name: branch.name,
-      address: branch.address,
-      district: branch.district,
-      city: branch.city,
-      phone: branch.phone,
-      whatsapp: branch.whatsapp,
-      mapUrl: branch.mapUrl,
-      hours: summarizeBranchHours(branch.hours),
-      blurb: branch.blurb ?? "",
-      heroNote: branch.heroNote ?? ""
-    };
+    return mapBranches(rows.rows)[0];
   } catch (error) {
     logPublicFallback(error, `branch detail:${slug}`);
     return getBranchBySlug(slug);
@@ -188,51 +327,71 @@ export async function getPublicMenuForBranch(branchId: string): Promise<MenuCate
   }
 
   try {
-    const prisma = await getPrisma();
-    const categories = await prisma.menuCategory.findMany({
-      where: { isActive: true },
-      orderBy: { displayOrder: "asc" },
-      include: {
-        products: {
-          where: { isActive: true },
-          orderBy: { displayOrder: "asc" },
-          include: {
-            branchProducts: {
-              where: {
-                branchId
-              }
-            }
-          }
-        }
+    const rows = await withDb((db) =>
+      db.query<MenuRow>(
+        `
+          SELECT
+            c.id AS "categoryId",
+            c.slug AS "categorySlug",
+            c.name AS "categoryName",
+            p.id AS "productId",
+            p.name AS "productName",
+            p.description AS "productDescription",
+            p."imageUrl",
+            p."badgeLabel",
+            p."isFeatured",
+            bp."stockStatus",
+            bp.price,
+            bp."isFeaturedOverride"
+          FROM "MenuCategory" c
+          LEFT JOIN "Product" p
+            ON p."categoryId" = c.id
+           AND p."isActive" = TRUE
+          LEFT JOIN "BranchProduct" bp
+            ON bp."productId" = p.id
+           AND bp."branchId" = $1
+          WHERE c."isActive" = TRUE
+          ORDER BY c."displayOrder" ASC, p."displayOrder" ASC
+        `,
+        [branchId]
+      )
+    );
+
+    const categories = new Map<string, MenuCategoryWithItems>();
+
+    for (const row of rows.rows) {
+      if (!categories.has(row.categoryId)) {
+        categories.set(row.categoryId, {
+          id: row.categoryId,
+          slug: row.categorySlug,
+          name: row.categoryName,
+          items: []
+        });
       }
-    });
 
-    return categories.map((category) => ({
-      id: category.id,
-      slug: category.slug,
-      name: category.name,
-      items: category.products
-        .map((product): MenuItemView | null => {
-          const branchProduct = product.branchProducts[0];
+      if (!row.productId || !row.productName || !row.productDescription) {
+        continue;
+      }
 
-          if (!branchProduct || branchProduct.stockStatus === "hidden") {
-            return null;
-          }
+      if (!row.stockStatus || row.stockStatus === "hidden" || row.price === null) {
+        continue;
+      }
 
-          return {
-            id: product.id,
-            name: product.name,
-            description: product.description,
-            imageUrl: product.imageUrl ?? undefined,
-            badge: product.badgeLabel ?? undefined,
-            price: Number(branchProduct.price),
-            stockStatus:
-              branchProduct.stockStatus === "in_stock" ? "in_stock" : "out_of_stock",
-            featured: branchProduct.isFeaturedOverride ?? product.isFeatured
-          };
-        })
-        .filter((item) => item !== null)
-    }));
+      const item: MenuItemView = {
+        id: row.productId,
+        name: row.productName,
+        description: row.productDescription,
+        imageUrl: row.imageUrl ?? undefined,
+        badge: row.badgeLabel ?? undefined,
+        price: Number(row.price),
+        stockStatus: row.stockStatus === "in_stock" ? "in_stock" : "out_of_stock",
+        featured: row.isFeaturedOverride ?? row.isFeatured ?? false
+      };
+
+      categories.get(row.categoryId)?.items.push(item);
+    }
+
+    return [...categories.values()];
   } catch (error) {
     logPublicFallback(error, `menu:${branchId}`);
     return getMenuForBranch(branchId);

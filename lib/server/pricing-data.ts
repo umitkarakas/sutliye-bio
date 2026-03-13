@@ -1,7 +1,6 @@
-import type { PricingAdjustmentType, PricingMatrixData, PricingMatrixRow } from "@/lib/types";
 import { branchProducts, branches, categories, products } from "@/lib/demo-data";
-import { getPrisma, hasDatabaseUrl } from "@/lib/prisma";
-import { Prisma } from "@/lib/prisma-generated";
+import { hasDatabaseUrl, withDb, withTransaction } from "@/lib/db";
+import type { PricingAdjustmentType, PricingMatrixData, PricingMatrixRow } from "@/lib/types";
 
 type PricingMatrixFilters = {
   branchIds?: string[];
@@ -16,6 +15,49 @@ type BatchPricingInput = {
   adjustmentType: PricingAdjustmentType;
   adjustmentValue: number;
   previewOnly?: boolean;
+};
+
+type BranchRow = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+type CategoryRow = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+type PricingMatrixDbRow = {
+  productId: string;
+  productName: string;
+  categoryId: string;
+  categoryName: string;
+  badgeLabel: string | null;
+  branchProductId: string | null;
+  branchId: string | null;
+  price: string | number | null;
+  stockStatus: "in_stock" | "out_of_stock" | "hidden" | null;
+  isAvailable: boolean | null;
+};
+
+type BranchProductRow = {
+  id: string;
+  branchId: string;
+  productId: string;
+  price: string | number;
+  stockStatus: "in_stock" | "out_of_stock" | "hidden";
+  isAvailable: boolean;
+  stockQuantity: number | null;
+  currency: string;
+};
+
+type BatchPreviewRow = {
+  id: string;
+  branchName: string;
+  productName: string;
+  price: string | number;
 };
 
 function normalizeBranchIds(input: string[] | undefined, availableIds: string[]) {
@@ -99,94 +141,123 @@ function buildDemoPricingMatrix(filters: PricingMatrixFilters = {}): PricingMatr
   };
 }
 
+function normalizeBranchProduct(row: BranchProductRow) {
+  return {
+    id: row.id,
+    branchId: row.branchId,
+    productId: row.productId,
+    price: Number(row.price),
+    stockStatus: row.stockStatus,
+    isAvailable: row.isAvailable,
+    stockQuantity: row.stockQuantity,
+    currency: row.currency
+  };
+}
+
 export async function listPricingMatrix(filters: PricingMatrixFilters = {}): Promise<PricingMatrixData> {
   if (!hasDatabaseUrl()) {
     return buildDemoPricingMatrix(filters);
   }
 
   try {
-    const prisma = await getPrisma();
-    const [dbBranches, dbCategories] = await Promise.all([
-      prisma.branch.findMany({
-        where: { isActive: true },
-        orderBy: { displayOrder: "asc" }
-      }),
-      prisma.menuCategory.findMany({
-        where: { isActive: true },
-        orderBy: { displayOrder: "asc" }
-      })
-    ]);
+    return await withDb(async (db) => {
+      const [dbBranchesResult, dbCategoriesResult] = await Promise.all([
+        db.query<BranchRow>(
+          `
+            SELECT id, name, slug
+            FROM "Branch"
+            WHERE "isActive" = TRUE
+            ORDER BY "displayOrder" ASC
+          `
+        ),
+        db.query<CategoryRow>(
+          `
+            SELECT id, name, slug
+            FROM "MenuCategory"
+            WHERE "isActive" = TRUE
+            ORDER BY "displayOrder" ASC
+          `
+        )
+      ]);
 
-    const availableBranchIds = dbBranches.map((branch) => branch.id);
-    const selectedBranchIds = normalizeBranchIds(filters.branchIds, availableBranchIds);
-    const selectedCategoryId = filters.categoryId ?? "";
-    const search = (filters.search ?? "").trim();
+      const dbBranches = dbBranchesResult.rows;
+      const dbCategories = dbCategoriesResult.rows;
+      const availableBranchIds = dbBranches.map((branch) => branch.id);
+      const selectedBranchIds = normalizeBranchIds(filters.branchIds, availableBranchIds);
+      const selectedCategoryId = filters.categoryId ?? "";
+      const search = (filters.search ?? "").trim();
+      const searchPattern = search ? `%${search}%` : null;
 
-    const dbProducts = await prisma.product.findMany({
-      where: {
-        isActive: true,
-        ...(selectedCategoryId ? { categoryId: selectedCategoryId } : {}),
-        ...(search
-          ? {
-              OR: [
-                { name: { contains: search, mode: "insensitive" } },
-                { description: { contains: search, mode: "insensitive" } }
-              ]
-            }
-          : {})
-      },
-      orderBy: { displayOrder: "asc" },
-      include: {
-        category: true,
-        branchProducts: {
-          where: {
-            branchId: {
-              in: selectedBranchIds
-            }
-          }
+      const dbProducts = await db.query<PricingMatrixDbRow>(
+        `
+          SELECT
+            p.id AS "productId",
+            p.name AS "productName",
+            p."categoryId" AS "categoryId",
+            c.name AS "categoryName",
+            p."badgeLabel" AS "badgeLabel",
+            bp.id AS "branchProductId",
+            bp."branchId" AS "branchId",
+            bp.price,
+            bp."stockStatus" AS "stockStatus",
+            bp."isAvailable" AS "isAvailable"
+          FROM "Product" p
+          INNER JOIN "MenuCategory" c ON c.id = p."categoryId"
+          LEFT JOIN "BranchProduct" bp
+            ON bp."productId" = p.id
+           AND bp."branchId" = ANY($1::text[])
+          WHERE p."isActive" = TRUE
+            AND ($2::text = '' OR p."categoryId" = $2)
+            AND ($3::text IS NULL OR p.name ILIKE $3 OR p.description ILIKE $3)
+          ORDER BY p."displayOrder" ASC, bp."branchId" ASC
+        `,
+        [selectedBranchIds, selectedCategoryId, searchPattern]
+      );
+
+      const rowsByProduct = new Map<string, PricingMatrixRow>();
+
+      for (const row of dbProducts.rows) {
+        if (!rowsByProduct.has(row.productId)) {
+          rowsByProduct.set(row.productId, {
+            productId: row.productId,
+            productName: row.productName,
+            categoryId: row.categoryId,
+            categoryName: row.categoryName,
+            badge: row.badgeLabel ?? undefined,
+            cells: []
+          });
         }
       }
+
+      for (const product of rowsByProduct.values()) {
+        product.cells = selectedBranchIds.map((branchId) => {
+          const branch = dbBranches.find((entry) => entry.id === branchId);
+          const match = dbProducts.rows.find(
+            (entry) => entry.productId === product.productId && entry.branchId === branchId
+          );
+
+          return {
+            id: match?.branchProductId ?? `${branchId}:${product.productId}`,
+            branchId,
+            branchName: branch?.name ?? "Şube",
+            price: match?.price === null || match?.price === undefined ? null : Number(match.price),
+            stockStatus: match?.stockStatus ?? "hidden",
+            isAvailable: match?.isAvailable ?? false,
+            canEdit: Boolean(match?.branchProductId)
+          };
+        });
+      }
+
+      return {
+        isDemo: false,
+        branches: dbBranches,
+        categories: dbCategories,
+        rows: [...rowsByProduct.values()],
+        selectedBranchIds,
+        selectedCategoryId,
+        search
+      };
     });
-
-    const rows: PricingMatrixRow[] = dbProducts.map((product) => ({
-      productId: product.id,
-      productName: product.name,
-      categoryId: product.categoryId,
-      categoryName: product.category.name,
-      badge: product.badgeLabel ?? undefined,
-      cells: selectedBranchIds.map((branchId) => {
-        const branch = dbBranches.find((entry) => entry.id === branchId);
-        const branchProduct = product.branchProducts.find((entry) => entry.branchId === branchId);
-
-        return {
-          id: branchProduct?.id ?? `${branchId}:${product.id}`,
-          branchId,
-          branchName: branch?.name ?? "Şube",
-          price: branchProduct ? Number(branchProduct.price) : null,
-          stockStatus: branchProduct?.stockStatus ?? "hidden",
-          isAvailable: branchProduct?.isAvailable ?? false,
-          canEdit: Boolean(branchProduct)
-        };
-      })
-    }));
-
-    return {
-      isDemo: false,
-      branches: dbBranches.map((branch) => ({
-        id: branch.id,
-        name: branch.name,
-        slug: branch.slug
-      })),
-      categories: dbCategories.map((category) => ({
-        id: category.id,
-        name: category.name,
-        slug: category.slug
-      })),
-      rows,
-      selectedBranchIds,
-      selectedCategoryId,
-      search
-    };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.warn(`[pricing-data] Falling back to demo pricing matrix: ${message}`);
@@ -203,16 +274,40 @@ export async function updateBranchProduct(input: {
     throw new Error("Database is not configured.");
   }
 
-  const prisma = await getPrisma();
+  return withDb(async (db) => {
+    const result = await db.query<BranchProductRow>(
+      `
+        UPDATE "BranchProduct"
+        SET
+          price = $2::numeric(10, 2),
+          "stockStatus" = $3,
+          "isAvailable" = $3 = 'in_stock',
+          "stockQuantity" = CASE
+            WHEN $3 = 'out_of_stock' THEN 0
+            ELSE "stockQuantity"
+          END,
+          "updatedAt" = NOW()
+        WHERE id = $1
+        RETURNING
+          id,
+          "branchId",
+          "productId",
+          price,
+          "stockStatus",
+          "isAvailable",
+          "stockQuantity",
+          currency
+      `,
+      [input.id, input.price.toFixed(2), input.stockStatus]
+    );
 
-  return prisma.branchProduct.update({
-    where: { id: input.id },
-    data: {
-      price: new Prisma.Decimal(input.price.toFixed(2)),
-      stockStatus: input.stockStatus,
-      isAvailable: input.stockStatus === "in_stock",
-      stockQuantity: input.stockStatus === "out_of_stock" ? 0 : undefined
+    const branchProduct = result.rows[0];
+
+    if (!branchProduct) {
+      throw new Error("Branch product not found.");
     }
+
+    return normalizeBranchProduct(branchProduct);
   });
 }
 
@@ -225,58 +320,82 @@ export async function batchUpdatePricing(input: BatchPricingInput) {
     throw new Error("At least one branch must be selected.");
   }
 
-  const prisma = await getPrisma();
-  const matchingEntries = await prisma.branchProduct.findMany({
-    where: {
-      branchId: {
-        in: input.branchIds
-      },
-      product: {
-        isActive: true,
-        ...(input.categoryId ? { categoryId: input.categoryId } : {}),
-        ...(input.productIds?.length ? { id: { in: input.productIds } } : {})
-      }
-    },
-    include: {
-      product: true,
-      branch: true
-    }
-  });
+  const productIds = input.productIds?.filter(Boolean) ?? [];
 
-  if (input.previewOnly) {
-    return {
-      affectedCount: matchingEntries.length,
-      sample: matchingEntries.slice(0, 5).map((entry) => ({
-        branchName: entry.branch.name,
-        productName: entry.product.name,
-        currentPrice: Number(entry.price),
-        nextPrice: computeAdjustedPrice(
-          Number(entry.price),
-          input.adjustmentType,
-          input.adjustmentValue
-        )
-      }))
-    };
-  }
-
-  await prisma.$transaction(
-    matchingEntries.map((entry) =>
-      prisma.branchProduct.update({
-        where: { id: entry.id },
-        data: {
-          price: new Prisma.Decimal(
-            computeAdjustedPrice(
-              Number(entry.price),
-              input.adjustmentType,
-              input.adjustmentValue
-            ).toFixed(2)
+  return withTransaction(async (db) => {
+    const matchingEntriesResult = await db.query<BatchPreviewRow>(
+      `
+        SELECT
+          bp.id,
+          b.name AS "branchName",
+          p.name AS "productName",
+          bp.price
+        FROM "BranchProduct" bp
+        INNER JOIN "Product" p ON p.id = bp."productId"
+        INNER JOIN "Branch" b ON b.id = bp."branchId"
+        WHERE bp."branchId" = ANY($1::text[])
+          AND p."isActive" = TRUE
+          AND ($2::text IS NULL OR p."categoryId" = $2)
+          AND (
+            COALESCE(array_length($3::text[], 1), 0) = 0
+            OR p.id = ANY($3::text[])
           )
-        }
-      })
-    )
-  );
+      `,
+      [input.branchIds, input.categoryId ?? null, productIds]
+    );
 
-  return {
-    affectedCount: matchingEntries.length
-  };
+    const matchingEntries = matchingEntriesResult.rows;
+
+    if (input.previewOnly) {
+      return {
+        affectedCount: matchingEntries.length,
+        sample: matchingEntries.slice(0, 5).map((entry) => ({
+          branchName: entry.branchName,
+          productName: entry.productName,
+          currentPrice: Number(entry.price),
+          nextPrice: computeAdjustedPrice(
+            Number(entry.price),
+            input.adjustmentType,
+            input.adjustmentValue
+          )
+        }))
+      };
+    }
+
+    const updatedResult = await db.query<{ id: string }>(
+      `
+        UPDATE "BranchProduct" bp
+        SET
+          price = CASE
+            WHEN $4 = 'percentage'
+              THEN ROUND((bp.price * (1 + ($5::numeric / 100)))::numeric, 2)
+            WHEN $4 = 'fixed_delta'
+              THEN ROUND((bp.price + $5::numeric)::numeric, 2)
+            ELSE ROUND($5::numeric, 2)
+          END,
+          "updatedAt" = NOW()
+        FROM "Product" p
+        WHERE bp."productId" = p.id
+          AND bp."branchId" = ANY($1::text[])
+          AND p."isActive" = TRUE
+          AND ($2::text IS NULL OR p."categoryId" = $2)
+          AND (
+            COALESCE(array_length($3::text[], 1), 0) = 0
+            OR p.id = ANY($3::text[])
+          )
+        RETURNING bp.id
+      `,
+      [
+        input.branchIds,
+        input.categoryId ?? null,
+        productIds,
+        input.adjustmentType,
+        input.adjustmentValue
+      ]
+    );
+
+    return {
+      affectedCount: updatedResult.rows.length
+    };
+  });
 }

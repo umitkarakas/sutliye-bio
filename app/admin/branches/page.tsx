@@ -5,9 +5,10 @@ import { hasDatabaseUrl } from "@/lib/prisma";
 import { listAdminBranches } from "@/lib/server/admin-data";
 import { AdminContentModeSwitch } from "@/components/admin-content-mode-switch";
 import { AdminPageShell } from "@/components/admin-page-shell";
-import { createBranchAction, toggleBranchStatusAction } from "../actions";
+import { createBranchAction, toggleBranchStatusAction, updateBranchAction } from "../actions";
 
 type SearchParams = Promise<{
+  edit?: string | string[];
   mode?: string | string[];
   status?: string | string[];
 }>;
@@ -20,6 +21,8 @@ function getMessage(status: string) {
   switch (status) {
     case "created":
       return "Yeni şube kaydı oluşturuldu.";
+    case "updated":
+      return "Şube bilgileri güncellendi.";
     case "toggled":
       return "Şube durumu güncellendi.";
     case "invalid":
@@ -33,6 +36,18 @@ function getMessage(status: string) {
 
 function resolveMode(value: string) {
   return value === "new" ? "new" : "list";
+}
+
+function getBranchHref(branchId: string, options?: { edit?: boolean }) {
+  const params = new URLSearchParams();
+
+  if (options?.edit) {
+    params.set("edit", branchId);
+  }
+
+  const query = params.toString();
+  const base = query ? `/admin/branches?${query}` : "/admin/branches";
+  return `${base}#branch-${branchId}`;
 }
 
 export default async function AdminBranchesPage({
@@ -49,6 +64,7 @@ export default async function AdminBranchesPage({
   const resolvedSearchParams = (await searchParams) ?? {};
   const status = asSingle(resolvedSearchParams.status);
   const mode = resolveMode(asSingle(resolvedSearchParams.mode));
+  const editingId = asSingle(resolvedSearchParams.edit);
   const branches = await listAdminBranches();
   const isDemo = !hasDatabaseUrl();
   const listHref = "/admin/branches";
@@ -97,7 +113,11 @@ export default async function AdminBranchesPage({
           </div>
           <div className="mt-4 grid gap-3">
             {branches.map((branch) => (
-              <article key={branch.id} className="admin-card rounded-[28px] p-4">
+              <article
+                key={branch.id}
+                id={`branch-${branch.id}`}
+                className="admin-card scroll-mt-28 rounded-[28px] p-4"
+              >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="font-semibold">{branch.name}</h3>
@@ -124,16 +144,92 @@ export default async function AdminBranchesPage({
                   <p>Telefon: {branch.phone}</p>
                   <p>WhatsApp: {branch.whatsapp}</p>
                 </div>
-                <form action={toggleBranchStatusAction} className="mt-4">
-                  <input type="hidden" name="id" value={branch.id} />
-                  <button
-                    type="submit"
-                    disabled={isDemo}
-                    className="admin-cta-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link
+                    href={
+                      editingId === branch.id
+                        ? getBranchHref(branch.id)
+                        : getBranchHref(branch.id, { edit: true })
+                    }
+                    className="admin-cta-secondary whitespace-nowrap"
                   >
-                    {branch.isActive ? "Pasife al" : "Aktifleştir"}
-                  </button>
-                </form>
+                    {editingId === branch.id ? "Düzenlemeyi kapat" : "Düzenle"}
+                  </Link>
+                  <form action={toggleBranchStatusAction}>
+                    <input type="hidden" name="id" value={branch.id} />
+                    <button
+                      type="submit"
+                      disabled={isDemo}
+                      className="admin-cta-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {branch.isActive ? "Pasife al" : "Aktifleştir"}
+                    </button>
+                  </form>
+                </div>
+
+                {editingId === branch.id ? (
+                  <form action={updateBranchAction} className="mt-4 space-y-3 rounded-[24px] border border-[color:var(--line)] p-4">
+                    <input type="hidden" name="id" value={branch.id} />
+                    <input type="hidden" name="returnTo" value={getBranchHref(branch.id, { edit: true })} />
+                    <input
+                      name="name"
+                      defaultValue={branch.name}
+                      placeholder="Şube adı"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <input
+                      name="slug"
+                      defaultValue={branch.slug}
+                      placeholder="Slug"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <input
+                      name="address"
+                      defaultValue={branch.address}
+                      placeholder="Adres"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        name="district"
+                        defaultValue={branch.district}
+                        placeholder="İlçe"
+                        className="admin-input rounded-2xl px-4 py-3"
+                      />
+                      <input
+                        name="city"
+                        defaultValue={branch.city}
+                        placeholder="Şehir"
+                        className="admin-input rounded-2xl px-4 py-3"
+                      />
+                    </div>
+                    <input
+                      name="phone"
+                      defaultValue={branch.phone}
+                      placeholder="Telefon"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <input
+                      name="whatsapp"
+                      defaultValue={branch.whatsapp}
+                      placeholder="WhatsApp"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <input
+                      name="mapUrl"
+                      defaultValue={branch.mapUrl}
+                      placeholder="Harita linki"
+                      className="admin-input rounded-2xl px-4 py-3"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isDemo}
+                      className="admin-cta-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      Şubeyi kaydet
+                    </button>
+                  </form>
+                ) : null}
               </article>
             ))}
           </div>

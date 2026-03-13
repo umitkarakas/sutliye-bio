@@ -10,7 +10,9 @@ import {
   createAdminProduct,
   deleteAdminProduct,
   moveAdminProduct,
+  updateAdminBranch,
   updateAdminBrandSettings,
+  updateAdminCategory,
   updateAdminProduct,
   toggleAdminBranchStatus,
   toggleAdminCategoryStatus,
@@ -69,6 +71,39 @@ export async function createBranchAction(formData: FormData) {
   redirect(statusUrl("/admin/branches", "created"));
 }
 
+export async function updateBranchAction(formData: FormData) {
+  await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/branches");
+
+  const payload = {
+    id: String(formData.get("id") || "").trim(),
+    name: String(formData.get("name") || "").trim(),
+    slug: String(formData.get("slug") || "").trim(),
+    address: String(formData.get("address") || "").trim(),
+    district: String(formData.get("district") || "").trim(),
+    city: String(formData.get("city") || "").trim(),
+    phone: String(formData.get("phone") || "").trim(),
+    whatsapp: String(formData.get("whatsapp") || "").trim(),
+    mapUrl: String(formData.get("mapUrl") || "").trim()
+  };
+
+  if (Object.values(payload).some((value) => !value)) {
+    redirect(statusUrl(returnTo, "invalid"));
+  }
+
+  try {
+    await updateAdminBranch(payload);
+  } catch {
+    redirect(statusUrl(returnTo, "error"));
+  }
+
+  revalidatePath("/admin/branches");
+  revalidatePath("/admin/pricing");
+  revalidatePath("/");
+  revalidatePath("/b/[branchSlug]", "page");
+  redirect(statusUrl(returnTo, "updated"));
+}
+
 export async function createCategoryAction(formData: FormData) {
   await requireSessionOrRedirect();
   const returnTo = getReturnTo(formData, "/admin/categories");
@@ -94,6 +129,40 @@ export async function createCategoryAction(formData: FormData) {
   revalidatePath("/admin/categories");
   revalidatePath("/admin/products");
   redirect(statusUrl("/admin/categories", "created"));
+}
+
+export async function updateCategoryAction(formData: FormData) {
+  await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/categories");
+
+  const payload = {
+    id: String(formData.get("id") || "").trim(),
+    name: String(formData.get("name") || "").trim(),
+    slug: String(formData.get("slug") || "").trim(),
+    description: String(formData.get("description") || "").trim()
+  };
+
+  if (!payload.id || !payload.name || !payload.slug) {
+    redirect(statusUrl(returnTo, "invalid"));
+  }
+
+  try {
+    await updateAdminCategory({
+      id: payload.id,
+      name: payload.name,
+      slug: payload.slug,
+      description: payload.description || undefined
+    });
+  } catch {
+    redirect(statusUrl(returnTo, "error"));
+  }
+
+  revalidatePath("/admin/categories");
+  revalidatePath("/admin/products");
+  revalidatePath("/admin/pricing");
+  revalidatePath("/");
+  revalidatePath("/b/[branchSlug]", "page");
+  redirect(statusUrl(returnTo, "updated"));
 }
 
 export async function createProductAction(formData: FormData) {

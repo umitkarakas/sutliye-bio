@@ -1,5 +1,4 @@
-import { getPrisma, hasDatabaseUrl } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
+import { hasDatabaseUrl, queryFirst, withDb } from "@/lib/db";
 
 type RecordEventInput = {
   eventName: string;
@@ -19,34 +18,39 @@ export type DashboardSummary = {
   whatsappClicks: number;
 };
 
+type BusinessIdRow = {
+  id: string;
+};
+
+type EventSummaryRow = {
+  totalVisits: number;
+  callClicks: number;
+  mapClicks: number;
+  whatsappClicks: number;
+};
+
+type TopBranchRow = {
+  name: string;
+};
+
 function logAnalyticsFallback(error: unknown, scope: string) {
   const message = error instanceof Error ? error.message : "Unknown error";
   console.warn(`[analytics-data] Falling back to demo mode for ${scope}: ${message}`);
 }
 
 async function getPrimaryBusinessId() {
-  const prisma = await getPrisma();
-  const business = await prisma.business.findFirst({
-    orderBy: { createdAt: "asc" },
-    select: { id: true }
-  });
+  return withDb(async (db) => {
+    const business = await queryFirst<BusinessIdRow>(
+      db,
+      `
+        SELECT id
+        FROM "Business"
+        ORDER BY "createdAt" ASC
+        LIMIT 1
+      `
+    );
 
-  return business?.id;
-}
-
-async function countEventsByName(eventName: string) {
-  const prisma = await getPrisma();
-  const businessId = await getPrimaryBusinessId();
-
-  if (!businessId) {
-    return 0;
-  }
-
-  return prisma.eventLog.count({
-    where: {
-      businessId,
-      eventName
-    }
+    return business?.id;
   });
 }
 
@@ -59,24 +63,39 @@ export async function recordAnalyticsEvent(input: RecordEventInput) {
   }
 
   try {
-    const prisma = await getPrisma();
     const businessId = await getPrimaryBusinessId();
 
     if (!businessId) {
       throw new Error("No business found. Seed the database first.");
     }
 
-    await prisma.eventLog.create({
-      data: {
-        businessId,
-        branchId: input.branchId,
-        productId: input.productId,
-        sessionId: input.sessionId || crypto.randomUUID(),
-        eventName: input.eventName,
-        source: input.source || "public_shell",
-        metadataJson: input.metadata as Prisma.InputJsonValue | undefined
-      }
-    });
+    await withDb((db) =>
+      db.query(
+        `
+          INSERT INTO "EventLog" (
+            id,
+            "businessId",
+            "branchId",
+            "productId",
+            "sessionId",
+            "eventName",
+            source,
+            "metadataJson"
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
+        `,
+        [
+          crypto.randomUUID(),
+          businessId,
+          input.branchId ?? null,
+          input.productId ?? null,
+          input.sessionId || crypto.randomUUID(),
+          input.eventName,
+          input.source || "public_shell",
+          input.metadata ? JSON.stringify(input.metadata) : null
+        ]
+      )
+    );
 
     return {
       ok: true,
@@ -85,8 +104,8 @@ export async function recordAnalyticsEvent(input: RecordEventInput) {
   } catch (error) {
     logAnalyticsFallback(error, `record:${input.eventName}`);
     return {
-      ok: true,
-      isDemo: true
+      ok: false,
+      isDemo: false
     };
   }
 }
@@ -104,69 +123,68 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
   }
 
   try {
-    const prisma = await getPrisma();
-    const businessId = await getPrimaryBusinessId();
+    return await withDb(async (db) => {
+      const business = await queryFirst<BusinessIdRow>(
+        db,
+        `
+          SELECT id
+          FROM "Business"
+          ORDER BY "createdAt" ASC
+          LIMIT 1
+        `
+      );
 
-    if (!businessId) {
+      if (!business) {
+        return {
+          isDemo: true,
+          totalVisits: 0,
+          topBranchName: "Veri yok",
+          callClicks: 0,
+          mapClicks: 0,
+          whatsappClicks: 0
+        };
+      }
+
+      const [summary, topBranch] = await Promise.all([
+        queryFirst<EventSummaryRow>(
+          db,
+          `
+            SELECT
+              COUNT(*) FILTER (WHERE "eventName" = 'page_view')::int AS "totalVisits",
+              COUNT(*) FILTER (WHERE "eventName" = 'call_click')::int AS "callClicks",
+              COUNT(*) FILTER (WHERE "eventName" = 'map_click')::int AS "mapClicks",
+              COUNT(*) FILTER (WHERE "eventName" = 'whatsapp_click')::int AS "whatsappClicks"
+            FROM "EventLog"
+            WHERE "businessId" = $1
+          `,
+          [business.id]
+        ),
+        queryFirst<TopBranchRow>(
+          db,
+          `
+            SELECT b.name
+            FROM "EventLog" e
+            INNER JOIN "Branch" b ON b.id = e."branchId"
+            WHERE e."businessId" = $1
+              AND e."eventName" = 'branch_view'
+              AND e."branchId" IS NOT NULL
+            GROUP BY b.id, b.name
+            ORDER BY COUNT(*) DESC, b.name ASC
+            LIMIT 1
+          `,
+          [business.id]
+        )
+      ]);
+
       return {
-        isDemo: true,
-        totalVisits: 0,
-        topBranchName: "Veri yok",
-        callClicks: 0,
-        mapClicks: 0,
-        whatsappClicks: 0
+        isDemo: false,
+        totalVisits: summary?.totalVisits ?? 0,
+        topBranchName: topBranch?.name ?? "Veri yok",
+        callClicks: summary?.callClicks ?? 0,
+        mapClicks: summary?.mapClicks ?? 0,
+        whatsappClicks: summary?.whatsappClicks ?? 0
       };
-    }
-
-    const [totalVisits, callClicks, mapClicks, whatsappClicks, topBranch] = await Promise.all([
-      prisma.eventLog.count({
-        where: {
-          businessId,
-          eventName: "page_view"
-        }
-      }),
-      countEventsByName("call_click"),
-      countEventsByName("map_click"),
-      countEventsByName("whatsapp_click"),
-      prisma.eventLog.groupBy({
-        by: ["branchId"],
-        where: {
-          businessId,
-          eventName: "branch_view",
-          branchId: {
-            not: null
-          }
-        },
-        _count: {
-          _all: true
-        },
-        orderBy: {
-          _count: {
-            branchId: "desc"
-          }
-        },
-        take: 1
-      })
-    ]);
-
-    let topBranchName = "Veri yok";
-
-    if (topBranch[0]?.branchId) {
-      const branch = await prisma.branch.findUnique({
-        where: { id: topBranch[0].branchId },
-        select: { name: true }
-      });
-      topBranchName = branch?.name ?? "Veri yok";
-    }
-
-    return {
-      isDemo: false,
-      totalVisits,
-      topBranchName,
-      callClicks,
-      mapClicks,
-      whatsappClicks
-    };
+    });
   } catch (error) {
     logAnalyticsFallback(error, "dashboard");
     return {

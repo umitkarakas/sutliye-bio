@@ -19,7 +19,7 @@ function ContactIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.9"
+      strokeWidth="2.15"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -37,7 +37,7 @@ function MenuIcon({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.9"
+      strokeWidth="2.15"
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
@@ -313,21 +313,30 @@ export function PublicShell({
           </div>
         </section>
 
-        <div className="sticky bottom-3 z-10">
-          <nav className="rounded-[32px] border border-white/24 bg-[color:var(--accent)] p-2 shadow-[0_20px_50px_rgba(122,8,18,0.28)]">
-            <div className="grid grid-cols-2 gap-2 rounded-[26px] bg-black/8 p-1">
+        <div className="sticky bottom-4 z-10 px-1">
+          <nav className="rounded-[30px] border border-white/65 bg-[rgba(255,247,248,0.92)] p-2.5 shadow-[0_18px_42px_rgba(67,24,28,0.16)] backdrop-blur">
+            <div className="grid grid-cols-2 gap-2">
               <Link
                 href={basePath}
                 aria-current={activeTab === "contact" ? "page" : undefined}
                 className={[
-                  "inline-flex min-h-[3.75rem] items-center justify-center rounded-[22px] px-4 py-3 text-center text-sm font-semibold transition",
+                  "inline-flex min-h-[4rem] items-center justify-center rounded-[22px] border px-4 py-3 text-left text-sm font-semibold transition",
                   activeTab === "contact"
-                    ? "bg-white !text-[color:var(--accent)] shadow-[0_10px_26px_rgba(96,8,16,0.22)]"
-                    : "text-white/84"
+                    ? "border-[color:var(--accent-soft-strong)] bg-white text-[color:var(--foreground)] shadow-[0_12px_24px_rgba(96,8,16,0.14)]"
+                    : "border-transparent bg-transparent text-[color:var(--muted)]"
                 ].join(" ")}
               >
-                <span className="flex items-center gap-2.5">
-                  <ContactIcon className="h-[1.05rem] w-[1.05rem] flex-none" />
+                <span className="flex items-center gap-3">
+                  <span
+                    className={[
+                      "flex h-11 w-11 flex-none items-center justify-center rounded-2xl transition",
+                      activeTab === "contact"
+                        ? "bg-[color:var(--accent)] text-white shadow-[0_10px_20px_rgba(96,8,16,0.22)]"
+                        : "bg-white text-[color:var(--accent-strong)]"
+                    ].join(" ")}
+                  >
+                    <ContactIcon className="h-5 w-5" />
+                  </span>
                   <span className="tracking-[0.01em]">İletişim</span>
                 </span>
               </Link>
@@ -335,14 +344,23 @@ export function PublicShell({
                 href={`${basePath}?tab=menu`}
                 aria-current={activeTab === "menu" ? "page" : undefined}
                 className={[
-                  "inline-flex min-h-[3.75rem] items-center justify-center rounded-[22px] px-4 py-3 text-center text-sm font-semibold transition",
+                  "inline-flex min-h-[4rem] items-center justify-center rounded-[22px] border px-4 py-3 text-left text-sm font-semibold transition",
                   activeTab === "menu"
-                    ? "bg-white !text-[color:var(--accent)] shadow-[0_10px_26px_rgba(96,8,16,0.22)]"
-                    : "text-white/84"
+                    ? "border-[color:var(--accent-soft-strong)] bg-white text-[color:var(--foreground)] shadow-[0_12px_24px_rgba(96,8,16,0.14)]"
+                    : "border-transparent bg-transparent text-[color:var(--muted)]"
                 ].join(" ")}
               >
-                <span className="flex items-center gap-2.5">
-                  <MenuIcon className="h-[1.05rem] w-[1.05rem] flex-none" />
+                <span className="flex items-center gap-3">
+                  <span
+                    className={[
+                      "flex h-11 w-11 flex-none items-center justify-center rounded-2xl transition",
+                      activeTab === "menu"
+                        ? "bg-[color:var(--accent)] text-white shadow-[0_10px_20px_rgba(96,8,16,0.22)]"
+                        : "bg-white text-[color:var(--accent-strong)]"
+                    ].join(" ")}
+                  >
+                    <MenuIcon className="h-5 w-5" />
+                  </span>
                   <span className="tracking-[0.01em]">Menü</span>
                 </span>
               </Link>
