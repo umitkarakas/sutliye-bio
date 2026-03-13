@@ -35,8 +35,14 @@ function createDemoProductImage(title: string, accent: string) {
 
 export const business = {
   name: "Ocakbaşı Sofrası",
+  logoUrl: "",
   tagline: "Şube seç, menüyü gör, tek dokunuşla ara veya yol tarifi al.",
-  badge: "QR ve bio-link için hızlı mobil deneyim"
+  badge: "QR ve bio-link için hızlı mobil deneyim",
+  theme: {
+    primaryColor: "#ba0814",
+    secondaryColor: "#dc6f79",
+    backgroundColor: "#efb7bd"
+  }
 };
 
 export const branches: Branch[] = [

@@ -6,6 +6,8 @@ import {
 } from "@/lib/server/public-data";
 import type { TabId } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 type HomePageProps = {
   searchParams?: Promise<{
     tab?: string;

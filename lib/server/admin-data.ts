@@ -1,5 +1,8 @@
 import { hasDatabaseUrl, getPrisma } from "@/lib/prisma";
 import { branchProducts, branches, categories, products } from "@/lib/demo-data";
+import { createBrandTheme } from "@/lib/brand-theme";
+import { business as demoBusiness } from "@/lib/demo-data";
+import type { BrandTheme } from "@/lib/types";
 
 type ProductPriceSummary = {
   activeBranchCount: number;
@@ -42,6 +45,14 @@ export type AdminProductListItem = {
   isActive: boolean;
   displayOrder: number;
   priceSummary: ProductPriceSummary;
+};
+
+export type AdminBrandSettings = {
+  name: string;
+  logoUrl: string;
+  tagline: string;
+  badge: string;
+  theme: BrandTheme;
 };
 
 function getDemoProductPriceSummary(productId: string): ProductPriceSummary {
@@ -91,6 +102,70 @@ async function getPrimaryBusinessId() {
   }
 
   return business.id;
+}
+
+function getDemoBrandSettings(): AdminBrandSettings {
+  return {
+    name: demoBusiness.name,
+    logoUrl: demoBusiness.logoUrl ?? "",
+    tagline: demoBusiness.tagline,
+    badge: demoBusiness.badge,
+    theme: createBrandTheme(demoBusiness.theme)
+  };
+}
+
+export async function getAdminBrandSettings(): Promise<AdminBrandSettings> {
+  if (!hasDatabaseUrl()) {
+    return getDemoBrandSettings();
+  }
+
+  try {
+    const prisma = await getPrisma();
+    const business = await prisma.business.findFirst({
+      orderBy: { createdAt: "asc" }
+    });
+
+    if (!business) {
+      throw new Error("No business found. Seed the database first.");
+    }
+
+    return {
+      name: business.name,
+      logoUrl: business.logoUrl ?? "",
+      tagline: business.brandTagline ?? demoBusiness.tagline,
+      badge: business.brandBadge ?? demoBusiness.badge,
+      theme: createBrandTheme({
+        primaryColor: business.primaryColor ?? demoBusiness.theme.primaryColor,
+        secondaryColor: business.secondaryColor ?? demoBusiness.theme.secondaryColor,
+        backgroundColor: business.backgroundColor ?? demoBusiness.theme.backgroundColor
+      })
+    };
+  } catch (error) {
+    logAdminFallback(error, "brand settings");
+    return getDemoBrandSettings();
+  }
+}
+
+export async function updateAdminBrandSettings(input: AdminBrandSettings) {
+  if (!hasDatabaseUrl()) {
+    throw new Error("Database is not configured.");
+  }
+
+  const prisma = await getPrisma();
+  const businessId = await getPrimaryBusinessId();
+
+  return prisma.business.update({
+    where: { id: businessId },
+    data: {
+      name: input.name,
+      logoUrl: input.logoUrl || null,
+      brandTagline: input.tagline,
+      brandBadge: input.badge,
+      primaryColor: input.theme.primaryColor,
+      secondaryColor: input.theme.secondaryColor,
+      backgroundColor: input.theme.backgroundColor
+    }
+  });
 }
 
 export async function listAdminBranches(): Promise<AdminBranchListItem[]> {

@@ -29,6 +29,11 @@ model Business {
   name             String
   slug             String          @unique
   logoUrl          String?
+  brandTagline     String?
+  brandBadge       String?
+  primaryColor     String?
+  secondaryColor   String?
+  backgroundColor  String?
   primaryPhone     String
   primaryWhatsapp  String
   defaultCurrency  String          @default("TRY")

@@ -3,12 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
+import { DEFAULT_BRAND_THEME } from "@/lib/brand-theme";
 import {
   createAdminBranch,
   createAdminCategory,
   createAdminProduct,
   deleteAdminProduct,
   moveAdminProduct,
+  updateAdminBrandSettings,
   updateAdminProduct,
   toggleAdminBranchStatus,
   toggleAdminCategoryStatus,
@@ -32,6 +34,10 @@ async function requireSessionOrRedirect() {
   }
 
   return session;
+}
+
+function isHexColor(value: string) {
+  return /^#([0-9a-fA-F]{6})$/.test(value);
 }
 
 export async function createBranchAction(formData: FormData) {
@@ -228,6 +234,54 @@ export async function moveProductAction(formData: FormData) {
   revalidatePath("/admin/products");
   revalidatePath("/");
   redirect(statusUrl(returnTo, "reordered"));
+}
+
+export async function updateBrandSettingsAction(formData: FormData) {
+  await requireSessionOrRedirect();
+  const returnTo = getReturnTo(formData, "/admin/branding");
+
+  const name = String(formData.get("name") || "").trim();
+  const logoUrl = String(formData.get("logoUrl") || "").trim();
+  const tagline = String(formData.get("tagline") || "").trim();
+  const badge = String(formData.get("badge") || "").trim();
+  const primaryColor = String(formData.get("primaryColor") || DEFAULT_BRAND_THEME.primaryColor).trim();
+  const secondaryColor = String(formData.get("secondaryColor") || DEFAULT_BRAND_THEME.secondaryColor).trim();
+  const backgroundColor = String(
+    formData.get("backgroundColor") || DEFAULT_BRAND_THEME.backgroundColor
+  ).trim();
+
+  if (
+    !name ||
+    !tagline ||
+    !badge ||
+    !isHexColor(primaryColor) ||
+    !isHexColor(secondaryColor) ||
+    !isHexColor(backgroundColor)
+  ) {
+    redirect(statusUrl(returnTo, "invalid"));
+  }
+
+  try {
+    await updateAdminBrandSettings({
+      name,
+      logoUrl,
+      tagline,
+      badge,
+      theme: {
+        primaryColor,
+        secondaryColor,
+        backgroundColor
+      }
+    });
+  } catch {
+    redirect(statusUrl(returnTo, "error"));
+  }
+
+  revalidatePath("/admin/branding");
+  revalidatePath("/admin");
+  revalidatePath("/");
+  revalidatePath("/b/[branchSlug]", "page");
+  redirect(statusUrl("/admin/branding", "updated"));
 }
 
 export async function toggleBranchStatusAction(formData: FormData) {

@@ -1,17 +1,13 @@
 import { getPrisma, hasDatabaseUrl } from "@/lib/prisma";
 import { branches, getBranchBySlug, getMenuForBranch } from "@/lib/demo-data";
 import { business as demoBusiness } from "@/lib/demo-data";
+import { createBrandTheme } from "@/lib/brand-theme";
 import type { MenuCategoryWithItems, MenuItemView, PublicBusiness } from "@/lib/types";
 
 function logPublicFallback(error: unknown, scope: string) {
   const message = error instanceof Error ? error.message : "Unknown error";
   console.warn(`[public-data] Falling back to demo data for ${scope}: ${message}`);
 }
-
-const DEFAULT_BUSINESS_COPY = {
-  tagline: "Sube sec, menuyu gor, tek dokunusla ara veya yol tarifi al.",
-  badge: "QR ve bio-link icin hizli mobil deneyim"
-};
 
 function getCurrentIstanbulDayOfWeek() {
   const localNow = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Istanbul" }));
@@ -87,11 +83,16 @@ export async function getPublicBusiness(): Promise<PublicBusiness> {
 
     return {
       name: record.name,
-      tagline: DEFAULT_BUSINESS_COPY.tagline,
-      badge: DEFAULT_BUSINESS_COPY.badge,
-      logoUrl: record.logoUrl ?? undefined,
+      tagline: record.brandTagline ?? demoBusiness.tagline,
+      badge: record.brandBadge ?? demoBusiness.badge,
+      logoUrl: record.logoUrl ?? demoBusiness.logoUrl ?? undefined,
       primaryPhone: record.primaryPhone,
-      primaryWhatsapp: record.primaryWhatsapp
+      primaryWhatsapp: record.primaryWhatsapp,
+      theme: createBrandTheme({
+        primaryColor: record.primaryColor ?? demoBusiness.theme.primaryColor,
+        secondaryColor: record.secondaryColor ?? demoBusiness.theme.secondaryColor,
+        backgroundColor: record.backgroundColor ?? demoBusiness.theme.backgroundColor
+      })
     };
   } catch (error) {
     logPublicFallback(error, "business");

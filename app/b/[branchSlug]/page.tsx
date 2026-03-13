@@ -8,6 +8,8 @@ import {
 } from "@/lib/server/public-data";
 import type { TabId } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 type BranchPageProps = {
   params: Promise<{
     branchSlug: string;

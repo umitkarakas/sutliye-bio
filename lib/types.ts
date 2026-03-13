@@ -1,5 +1,11 @@
 export type TabId = "contact" | "menu";
 
+export type BrandTheme = {
+  primaryColor: string;
+  secondaryColor: string;
+  backgroundColor: string;
+};
+
 export type PublicBusiness = {
   name: string;
   tagline: string;
@@ -7,6 +13,7 @@ export type PublicBusiness = {
   logoUrl?: string;
   primaryPhone?: string;
   primaryWhatsapp?: string;
+  theme: BrandTheme;
 };
 
 export type Branch = {

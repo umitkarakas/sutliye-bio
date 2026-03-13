@@ -3,20 +3,23 @@
 :root {
   --font-display: "Iowan Old Style", "Palatino Linotype", "URW Palladio L", serif;
   --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
-  --background: #f5ecdf;
+  --brand-primary: #ba0814;
+  --brand-secondary: #dc6f79;
+  --brand-background: #efb7bd;
+  --background: var(--brand-background);
   --foreground: #2a1a12;
-  --card: rgba(255, 249, 242, 0.9);
-  --card-strong: #fffaf4;
-  --card-muted: #efe4d4;
+  --card: color-mix(in srgb, var(--brand-background) 86%, white 14%);
+  --card-strong: color-mix(in srgb, var(--brand-background) 70%, white 30%);
+  --card-muted: color-mix(in srgb, var(--brand-background) 74%, var(--brand-primary) 26%);
   --line: rgba(88, 56, 39, 0.14);
   --line-strong: rgba(88, 56, 39, 0.22);
-  --accent: #b5532f;
-  --accent-strong: #8f3e21;
-  --accent-soft: #e7c5ab;
-  --accent-soft-strong: #d7b18f;
-  --hero-start: #bb532c;
-  --hero-end: #8e4026;
-  --hero-glow: rgba(255, 214, 183, 0.18);
+  --accent: var(--brand-primary);
+  --accent-strong: color-mix(in srgb, var(--brand-primary) 78%, black 22%);
+  --accent-soft: color-mix(in srgb, var(--brand-primary) 24%, white 76%);
+  --accent-soft-strong: color-mix(in srgb, var(--brand-primary) 36%, white 64%);
+  --hero-start: var(--brand-primary);
+  --hero-end: var(--brand-secondary);
+  --hero-glow: color-mix(in srgb, var(--brand-secondary) 18%, transparent);
   --olive: #5f6f43;
   --olive-soft: #e5ecdc;
   --danger-soft: #f2dfdc;
@@ -38,9 +41,7 @@ body {
   margin: 0;
   min-height: 100vh;
   color: var(--foreground);
-  background:
-    radial-gradient(circle at top, rgba(242, 200, 164, 0.42), transparent 36%),
-    linear-gradient(180deg, #fffaf4 0%, var(--background) 52%, #e9d8c2 100%);
+  background: color-mix(in srgb, var(--brand-background) 84%, #2a2324 16%);
   font-family: var(--font-body), sans-serif;
 }
 
@@ -61,21 +62,21 @@ textarea {
 }
 
 .admin-shell {
-  border: 1px solid var(--line);
-  background: rgba(255, 250, 244, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(255, 248, 249, 0.38);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(18px);
 }
 
 .admin-panel {
-  border: 1px solid var(--line);
-  background: rgba(255, 250, 244, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.84);
   box-shadow: var(--shadow-soft);
 }
 
 .admin-card {
-  border: 1px solid var(--line);
-  background: var(--card-strong);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.92);
 }
 
 .admin-kicker {
@@ -90,25 +91,25 @@ textarea {
 }
 
 .admin-notice {
-  border: 1px solid rgba(181, 83, 47, 0.24);
-  background: rgba(255, 243, 232, 0.88);
-  color: var(--accent-strong);
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, white 74%);
+  background: color-mix(in srgb, var(--accent) 12%, white 88%);
+  color: var(--accent);
 }
 
 .admin-feedback {
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.74);
 }
 
 .admin-chip {
-  border: 1px solid var(--line);
-  background: rgba(239, 228, 212, 0.58);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.74);
   color: var(--foreground);
 }
 
 .admin-badge {
   background: var(--accent-soft);
-  color: var(--accent-strong);
+  color: var(--accent);
 }
 
 .admin-status-active {
@@ -123,8 +124,8 @@ textarea {
 
 .admin-input {
   width: 100%;
-  border: 1px solid var(--line-strong);
-  background: var(--card-strong);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
   color: var(--foreground);
   outline: none;
   transition:
@@ -139,7 +140,7 @@ textarea {
 
 .admin-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(181, 83, 47, 0.14);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, white 82%);
 }
 
 .admin-nav-link,
@@ -163,31 +164,34 @@ textarea {
 }
 
 .admin-nav-link {
-  border: 1px solid var(--line);
-  background: rgba(255, 250, 244, 0.96);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: white;
   color: var(--foreground);
 }
 
 .admin-nav-link[data-active="true"] {
   border-color: transparent;
-  background: var(--foreground);
+  background: var(--accent);
   color: white !important;
+  box-shadow: 0 10px 26px rgba(96, 8, 16, 0.18);
 }
 
 .admin-cta-primary {
-  background: var(--foreground);
+  background: var(--accent);
   color: white !important;
+  box-shadow: 0 12px 28px rgba(96, 8, 16, 0.18);
 }
 
 .admin-cta-secondary {
-  border: 1px solid var(--line-strong);
-  background: rgba(255, 250, 244, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.9);
   color: var(--foreground);
 }
 
 .admin-cta-accent {
   background: var(--accent);
   color: white !important;
+  box-shadow: 0 12px 28px rgba(96, 8, 16, 0.18);
 }
 
 .admin-nav-link:hover,

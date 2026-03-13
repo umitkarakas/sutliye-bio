@@ -35,12 +35,24 @@ async function main() {
     where: { slug: "ocakbasi-sofrasi" },
     update: {
       name: business.name,
+      logoUrl: business.logoUrl,
+      brandTagline: business.tagline,
+      brandBadge: business.badge,
+      primaryColor: business.theme.primaryColor,
+      secondaryColor: business.theme.secondaryColor,
+      backgroundColor: business.theme.backgroundColor,
       primaryPhone: branches[0].phone,
       primaryWhatsapp: branches[0].whatsapp
     },
     create: {
       name: business.name,
       slug: "ocakbasi-sofrasi",
+      logoUrl: business.logoUrl,
+      brandTagline: business.tagline,
+      brandBadge: business.badge,
+      primaryColor: business.theme.primaryColor,
+      secondaryColor: business.theme.secondaryColor,
+      backgroundColor: business.theme.backgroundColor,
       primaryPhone: branches[0].phone,
       primaryWhatsapp: branches[0].whatsapp,
       defaultCurrency: "TRY"

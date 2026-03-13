@@ -20,6 +20,7 @@ export default async function AdminPage() {
     { label: "WhatsApp tıklaması", value: String(summary.whatsappClicks) }
   ];
   const quickActions = [
+    { href: "/admin/branding", label: "Marka", tone: "admin-cta-accent" },
     { href: "/admin/pricing", label: "Fiyatlandırma", tone: "admin-cta-accent" },
     { href: "/admin/branches", label: "Şubeler", tone: "admin-cta-secondary" },
     { href: "/admin/products", label: "Ürünler", tone: "admin-cta-secondary" },

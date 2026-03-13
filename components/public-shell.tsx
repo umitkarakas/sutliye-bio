@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Branch, MenuCategoryWithItems, PublicBusiness, TabId } from "@/lib/types";
 import { AnalyticsBeacon } from "@/components/analytics-beacon";
-import { EventLink } from "@/components/event-link";
+import { brandThemeToCssVariables } from "@/lib/brand-theme";
 
 type PublicShellProps = {
   activeBranch: Branch;
@@ -13,12 +13,41 @@ type PublicShellProps = {
   rootBranchSlug: string;
 };
 
-function formatPhoneHref(phone: string) {
-  return `tel:${phone.replaceAll(" ", "")}`;
+function ContactIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M7 5.5h10A2.5 2.5 0 0 1 19.5 8v8A2.5 2.5 0 0 1 17 18.5H7A2.5 2.5 0 0 1 4.5 16V8A2.5 2.5 0 0 1 7 5.5Z" />
+      <path d="m5.5 8 6.5 5 6.5-5" />
+    </svg>
+  );
 }
 
-function formatWhatsAppHref(phone: string) {
-  return `https://wa.me/${phone.replaceAll(" ", "").replaceAll("+", "")}`;
+function MenuIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M5 7.5h14" />
+      <path d="M5 12h14" />
+      <path d="M5 16.5h10" />
+    </svg>
+  );
 }
 
 function getBranchHref(branchSlug: string, rootBranchSlug: string) {
@@ -41,45 +70,61 @@ export function PublicShell({
   const visibleCategories = menu.filter((category) => category.items.length > 0);
   const menuItemCount = visibleCategories.reduce((count, category) => count + category.items.length, 0);
   const availabilityLabel = getBranchAvailabilityLabel(activeBranch.hours);
+  const shellStyle = {
+    ...brandThemeToCssVariables(business.theme),
+    backgroundColor: "color-mix(in srgb, var(--brand-background) 82%, #2a2324 18%)"
+  };
 
   return (
-    <main className="min-h-screen px-4 py-5 pb-28 text-[15px] text-[color:var(--foreground)] sm:px-6">
+    <main style={shellStyle} className="min-h-screen px-4 py-5 pb-28 text-[15px] text-[color:var(--foreground)] sm:px-6">
       <AnalyticsBeacon branchId={activeBranch.id} activeTab={activeTab} source="public_shell" />
       <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] w-full max-w-md flex-col gap-4">
-        <section className="overflow-hidden rounded-[32px] border border-[color:var(--line)] bg-[color:var(--card)] shadow-[var(--shadow)] backdrop-blur">
-          <div className="border-b border-[color:var(--line)] bg-[linear-gradient(135deg,var(--hero-start),var(--hero-end))] px-5 py-6 text-white">
-            <div className="mb-4 inline-flex rounded-full border border-white/20 bg-[color:var(--hero-glow)] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-white/88">
+        <section className="overflow-hidden rounded-[32px] border border-black/6 bg-[rgba(255,250,250,0.72)] shadow-[var(--shadow)]">
+          <div className="border-b border-white/6 bg-[#171416] px-5 py-6 text-white">
+            <div className="mb-4 inline-flex rounded-full bg-[color:var(--accent)] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-white">
               {business.badge}
             </div>
             <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.28em] text-white/70">{activeBranch.district}</p>
-                <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl leading-none">
-                  {business.name}
-                </h1>
+              <div className="flex items-start gap-4">
+                {business.logoUrl ? (
+                  <div className="flex h-16 w-16 flex-none items-center justify-center overflow-hidden rounded-[24px] border border-white/10 bg-white/8 p-2 shadow-[var(--shadow-soft)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={business.logoUrl}
+                      alt={`${business.name} logosu`}
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                ) : null}
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.28em] text-white/60">{activeBranch.district}</p>
+                  <h1 className="mt-2 font-[family-name:var(--font-display)] text-4xl leading-none">
+                    {business.name}
+                  </h1>
+                </div>
               </div>
-              <div className="rounded-[24px] border border-white/15 bg-black/10 px-3 py-2 text-right text-xs text-white/80 shadow-[var(--shadow-soft)]">
+              <div className="rounded-[24px] border border-white/10 bg-white/6 px-3 py-2 text-right text-xs text-white/78 shadow-[var(--shadow-soft)]">
                 <p>{availabilityLabel}</p>
                 <p className="mt-1 font-semibold text-white">{activeBranch.hours}</p>
               </div>
             </div>
             <p className="mt-4 max-w-[28ch] text-sm leading-6 text-white/84">{business.tagline}</p>
-            <p className="mt-2 text-xs leading-5 text-white/68">{activeBranch.heroNote}</p>
+            <p className="mt-2 text-xs leading-5 text-white/56">{activeBranch.heroNote}</p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-white/84">
+              <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-white/84">
                 {branches.length} sube
               </span>
-              <span className="rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-white/84">
+              <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-white/84">
                 {visibleCategories.length} kategori
               </span>
-              <span className="rounded-full border border-white/16 bg-white/10 px-3 py-1.5 text-white/84">
+              <span className="rounded-full border border-white/10 bg-white/6 px-3 py-1.5 text-white/84">
                 {menuItemCount} urun
               </span>
             </div>
           </div>
 
           <div className="space-y-4 px-4 py-4">
-            <div className="rounded-[26px] border border-[color:var(--line)] bg-[color:var(--card-strong)] p-3 shadow-[var(--shadow-soft)]">
+            <div className="rounded-[26px] border border-black/6 bg-[rgba(255,255,255,0.82)] p-3 shadow-[var(--shadow-soft)]">
               <p className="mb-2 text-[11px] uppercase tracking-[0.22em] text-[color:var(--muted)]">Şube Seçimi</p>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {branches.map((branch) => {
@@ -95,7 +140,7 @@ export function PublicShell({
                         "inline-flex min-w-fit items-center justify-center rounded-full border px-4 py-2 text-sm font-semibold transition shadow-[var(--shadow-soft)]",
                         isActive
                           ? "border-[color:var(--accent)] bg-[color:var(--accent)] !text-white"
-                          : "border-[color:var(--line-strong)] bg-[color:var(--card-muted)] text-[color:var(--foreground)]"
+                          : "border-black/6 bg-white text-[color:var(--foreground)]"
                       ].join(" ")}
                     >
                       {branch.name}
@@ -105,36 +150,9 @@ export function PublicShell({
               </div>
             </div>
 
-            <nav className="grid grid-cols-2 gap-2 rounded-[26px] bg-[color:var(--accent-soft)] p-1 shadow-[var(--shadow-soft)]">
-              <Link
-                href={basePath}
-                aria-current={activeTab === "contact" ? "page" : undefined}
-                className={[
-                  "inline-flex min-h-14 items-center justify-center rounded-[22px] px-4 py-3 text-center text-sm font-semibold transition",
-                  activeTab === "contact"
-                    ? "bg-[color:var(--foreground)] !text-white shadow-[var(--shadow-soft)]"
-                    : "text-[color:var(--foreground)]"
-                ].join(" ")}
-              >
-                İletişim
-              </Link>
-              <Link
-                href={`${basePath}?tab=menu`}
-                aria-current={activeTab === "menu" ? "page" : undefined}
-                className={[
-                  "inline-flex min-h-14 items-center justify-center rounded-[22px] px-4 py-3 text-center text-sm font-semibold transition",
-                  activeTab === "menu"
-                    ? "bg-[color:var(--foreground)] !text-white shadow-[var(--shadow-soft)]"
-                    : "text-[color:var(--foreground)]"
-                ].join(" ")}
-              >
-                Menü
-              </Link>
-            </nav>
-
             {activeTab === "contact" ? (
               <section className="space-y-3">
-                <article className="rounded-[28px] border border-[color:var(--line)] bg-[color:var(--card-strong)] p-4 shadow-[var(--shadow-soft)]">
+                <article className="rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.84)] p-4 shadow-[var(--shadow-soft)]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted)]">Aktif Şube</p>
@@ -161,37 +179,7 @@ export function PublicShell({
                   </div>
                 </article>
 
-                <div className="grid grid-cols-3 gap-2">
-                  <EventLink
-                    eventName="call_click"
-                    branchId={activeBranch.id}
-                    source="public_shell"
-                    href={formatPhoneHref(activeBranch.phone)}
-                    className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--foreground)] px-3 py-4 text-center text-sm font-semibold !text-white shadow-[var(--shadow-soft)]"
-                  >
-                    Ara
-                  </EventLink>
-                  <EventLink
-                    eventName="whatsapp_click"
-                    branchId={activeBranch.id}
-                    source="public_shell"
-                    href={formatWhatsAppHref(activeBranch.whatsapp)}
-                    className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--olive)] px-3 py-4 text-center text-sm font-semibold !text-white shadow-[var(--shadow-soft)]"
-                  >
-                    WhatsApp
-                  </EventLink>
-                  <EventLink
-                    eventName="map_click"
-                    branchId={activeBranch.id}
-                    source="public_shell"
-                    href={activeBranch.mapUrl}
-                    className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--accent)] px-3 py-4 text-center text-sm font-semibold !text-white shadow-[var(--shadow-soft)]"
-                  >
-                    Harita
-                  </EventLink>
-                </div>
-
-                <section className="rounded-[28px] border border-[color:var(--line)] bg-[rgba(255,255,255,0.54)] p-4 shadow-[var(--shadow-soft)]">
+                <section className="rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.7)] p-4 shadow-[var(--shadow-soft)]">
                   <div className="mb-3 flex items-center justify-between">
                     <h3 className="font-semibold">Diğer Şubeler</h3>
                     <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--muted)]">Hızlı Geçiş</p>
@@ -207,7 +195,7 @@ export function PublicShell({
                             key={branch.id}
                             href={href}
                             aria-label={`${branch.name} subesini ac`}
-                            className="flex items-center justify-between rounded-[22px] border border-[color:var(--line)] bg-white/90 px-4 py-3"
+                            className="flex items-center justify-between rounded-[22px] border border-black/6 bg-white px-4 py-3"
                           >
                             <div>
                               <p className="font-medium">{branch.name}</p>
@@ -222,7 +210,7 @@ export function PublicShell({
               </section>
             ) : (
               <section className="space-y-4">
-                <div className="rounded-[26px] border border-[color:var(--line)] bg-[rgba(255,255,255,0.58)] p-3 shadow-[var(--shadow-soft)]">
+                <div className="rounded-[26px] border border-black/6 bg-[rgba(255,255,255,0.78)] p-3 shadow-[var(--shadow-soft)]">
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--muted)]">
@@ -243,7 +231,7 @@ export function PublicShell({
                     <a
                       key={category.id}
                       href={`#${category.slug}`}
-                      className="rounded-full border border-[color:var(--line-strong)] bg-[color:var(--card-muted)] px-4 py-2 text-sm font-medium text-[color:var(--foreground)]"
+                      className="rounded-full border border-black/6 bg-white px-4 py-2 text-sm font-medium text-[color:var(--foreground)]"
                     >
                       {category.name} ({category.items.length})
                     </a>
@@ -251,7 +239,7 @@ export function PublicShell({
                 </div>
 
                 {visibleCategories.length === 0 ? (
-                  <section className="rounded-[28px] border border-[color:var(--line)] bg-[color:var(--card-strong)] p-5 text-sm text-[color:var(--muted)] shadow-[var(--shadow-soft)]">
+                  <section className="rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.84)] p-5 text-sm text-[color:var(--muted)] shadow-[var(--shadow-soft)]">
                     Bu sube icin gosterilecek aktif menu kaydi bulunamadi.
                   </section>
                 ) : null}
@@ -268,12 +256,12 @@ export function PublicShell({
                     {category.items.map((item) => (
                       <article
                         key={item.id}
-                        className="rounded-[28px] border border-[color:var(--line)] bg-[color:var(--card-strong)] p-4 shadow-[var(--shadow-soft)]"
+                        className="rounded-[28px] border border-black/6 bg-[rgba(255,255,255,0.84)] p-4 shadow-[var(--shadow-soft)]"
                       >
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                           <div className="flex flex-1 gap-4">
                             {item.imageUrl ? (
-                              <div className="h-24 w-full overflow-hidden rounded-[22px] border border-[color:var(--line)] sm:w-28 sm:flex-none">
+                              <div className="h-24 w-full overflow-hidden rounded-[22px] border border-black/6 bg-white sm:w-28 sm:flex-none">
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                   src={item.imageUrl}
@@ -326,35 +314,46 @@ export function PublicShell({
         </section>
 
         <div className="sticky bottom-3 z-10">
-          <div className="grid grid-cols-3 gap-2 rounded-[28px] border border-[color:var(--line)] bg-[rgba(255,250,244,0.92)] p-2 shadow-[var(--shadow)] backdrop-blur">
-            <EventLink
-              eventName="call_click"
-              branchId={activeBranch.id}
-              source="public_shell_sticky"
-              href={formatPhoneHref(activeBranch.phone)}
-              className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--foreground)] px-3 py-4 text-center text-sm font-semibold !text-white"
-            >
-              Ara
-            </EventLink>
-            <EventLink
-              eventName="whatsapp_click"
-              branchId={activeBranch.id}
-              source="public_shell_sticky"
-              href={formatWhatsAppHref(activeBranch.whatsapp)}
-              className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--olive)] px-3 py-4 text-center text-sm font-semibold !text-white"
-            >
-              WhatsApp
-            </EventLink>
-            <EventLink
-              eventName="map_click"
-              branchId={activeBranch.id}
-              source="public_shell_sticky"
-              href={activeBranch.mapUrl}
-              className="inline-flex min-h-14 items-center justify-center rounded-[22px] bg-[color:var(--accent)] px-3 py-4 text-center text-sm font-semibold !text-white"
-            >
-              Harita
-            </EventLink>
-          </div>
+          <nav className="rounded-[32px] border border-white/24 bg-[color:var(--accent)] p-2 shadow-[0_20px_50px_rgba(122,8,18,0.28)]">
+            <div className="grid grid-cols-2 gap-2 rounded-[26px] bg-black/8 p-1">
+              <Link
+                href={basePath}
+                aria-current={activeTab === "contact" ? "page" : undefined}
+                className={[
+                  "inline-flex min-h-[3.75rem] items-center justify-center rounded-[22px] px-4 py-3 text-center text-sm font-semibold transition",
+                  activeTab === "contact"
+                    ? "bg-white !text-[color:var(--accent)] shadow-[0_10px_26px_rgba(96,8,16,0.22)]"
+                    : "text-white/84"
+                ].join(" ")}
+              >
+                <span className="flex items-center gap-2.5">
+                  <ContactIcon className="h-[1.05rem] w-[1.05rem] flex-none" />
+                  <span className="tracking-[0.01em]">İletişim</span>
+                </span>
+              </Link>
+              <Link
+                href={`${basePath}?tab=menu`}
+                aria-current={activeTab === "menu" ? "page" : undefined}
+                className={[
+                  "inline-flex min-h-[3.75rem] items-center justify-center rounded-[22px] px-4 py-3 text-center text-sm font-semibold transition",
+                  activeTab === "menu"
+                    ? "bg-white !text-[color:var(--accent)] shadow-[0_10px_26px_rgba(96,8,16,0.22)]"
+                    : "text-white/84"
+                ].join(" ")}
+              >
+                <span className="flex items-center gap-2.5">
+                  <MenuIcon className="h-[1.05rem] w-[1.05rem] flex-none" />
+                  <span className="tracking-[0.01em]">Menü</span>
+                </span>
+              </Link>
+            </div>
+          </nav>
+        </div>
+
+        <div className="h-2" />
+
+        <div className="pb-2">
+          <div className="mx-auto h-1.5 w-24 rounded-full bg-[rgba(42,26,18,0.14)]" />
         </div>
 
         <Link
