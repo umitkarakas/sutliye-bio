@@ -763,6 +763,11 @@ export async function createAdminProduct(input: {
   badgeLabel?: string;
   isFeatured?: boolean;
   initialPrice: number;
+  branchPrices?: Array<{
+    branchId: string;
+    price: number;
+    stockStatus: "in_stock" | "out_of_stock" | "hidden";
+  }>;
 }) {
   if (!hasDatabaseUrl()) {
     throw new Error("Database is not configured.");
@@ -835,6 +840,11 @@ export async function createAdminProduct(input: {
     );
 
     for (const branch of activeBranches.rows) {
+      const branchPrice = input.branchPrices?.find((bp) => bp.branchId === branch.id);
+      const price = branchPrice?.price ?? input.initialPrice;
+      const stockStatus = branchPrice?.stockStatus ?? (price > 0 ? "in_stock" : "hidden");
+      const isAvailable = stockStatus === "in_stock";
+
       await db.query(
         `
           INSERT INTO "BranchProduct" (
@@ -845,9 +855,9 @@ export async function createAdminProduct(input: {
             "stockStatus",
             "isAvailable"
           )
-          VALUES ($1, $2, $3, $4::numeric(10, 2), 'hidden', FALSE)
+          VALUES ($1, $2, $3, $4::numeric(10, 2), $5::"StockStatus", $6)
         `,
-        [crypto.randomUUID(), branch.id, product.id, input.initialPrice.toFixed(2)]
+        [crypto.randomUUID(), branch.id, product.id, price.toFixed(2), stockStatus, isAvailable]
       );
     }
 

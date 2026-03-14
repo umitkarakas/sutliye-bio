@@ -9,6 +9,7 @@ import {
   createAdminCategory,
   createAdminProduct,
   deleteAdminProduct,
+  listAdminBranches,
   moveAdminProduct,
   updateAdminBranch,
   updateAdminBrandSettings,
@@ -19,6 +20,7 @@ import {
   toggleAdminProductStatus,
   upsertBranchHours
 } from "@/lib/server/admin-data";
+import { upsertProductBranchPricing } from "@/lib/server/pricing-data";
 
 function statusUrl(path: string, status: string) {
   return `${path}${path.includes("?") ? "&" : "?"}status=${status}`;
@@ -41,6 +43,37 @@ async function requireSessionOrRedirect() {
 
 function isHexColor(value: string) {
   return /^#([0-9a-fA-F]{6})$/.test(value);
+}
+
+type StockStatus = "in_stock" | "out_of_stock" | "hidden";
+
+function isStockStatus(value: string): value is StockStatus {
+  return value === "in_stock" || value === "out_of_stock" || value === "hidden";
+}
+
+async function parseBranchPricing(formData: FormData) {
+  const pricingMode = String(formData.get("pricingMode") || "uniform");
+  const branchIds = formData.getAll("branchIds").map(String).filter(Boolean);
+
+  if (pricingMode === "per_branch" && branchIds.length > 0) {
+    return branchIds.map((branchId) => {
+      const price = Number(String(formData.get(`branch_${branchId}_price`) || "0"));
+      const rawStatus = String(formData.get(`branch_${branchId}_stockStatus`) || "in_stock");
+      const stockStatus: StockStatus = isStockStatus(rawStatus) ? rawStatus : "in_stock";
+      return { branchId, price: Number.isNaN(price) ? 0 : price, stockStatus };
+    });
+  }
+
+  // Uniform mode: apply same price/status to all active branches
+  const uniformPrice = Number(String(formData.get("uniformPrice") || "0"));
+  const rawStatus = String(formData.get("uniformStockStatus") || "in_stock");
+  const uniformStockStatus: StockStatus = isStockStatus(rawStatus) ? rawStatus : "in_stock";
+  const price = Number.isNaN(uniformPrice) ? 0 : uniformPrice;
+
+  const activeBranches = await listAdminBranches();
+  return activeBranches
+    .filter((b) => b.isActive)
+    .map((b) => ({ branchId: b.id, price, stockStatus: uniformStockStatus }));
 }
 
 export async function createBranchAction(formData: FormData) {
@@ -196,7 +229,6 @@ export async function updateCategoryAction(formData: FormData) {
 export async function createProductAction(formData: FormData) {
   await requireSessionOrRedirect();
   const returnTo = getReturnTo(formData, "/admin/products");
-  const initialPriceRaw = String(formData.get("initialPrice") || "").trim();
 
   const payload = {
     categoryId: String(formData.get("categoryId") || "").trim(),
@@ -205,7 +237,6 @@ export async function createProductAction(formData: FormData) {
     description: String(formData.get("description") || "").trim(),
     imageUrl: String(formData.get("imageUrl") || "").trim(),
     badgeLabel: String(formData.get("badgeLabel") || "").trim(),
-    initialPrice: Number(initialPriceRaw),
     isFeatured: formData.get("isFeatured") === "on"
   };
 
@@ -214,15 +245,15 @@ export async function createProductAction(formData: FormData) {
     !payload.name ||
     !payload.slug ||
     !payload.description ||
-    !payload.imageUrl ||
-    !initialPriceRaw ||
-    Number.isNaN(payload.initialPrice) ||
-    payload.initialPrice < 0
+    !payload.imageUrl
   ) {
     redirect(statusUrl(returnTo, "invalid"));
   }
 
   try {
+    const branchPrices = await parseBranchPricing(formData);
+    const initialPrice = branchPrices.length > 0 ? branchPrices[0].price : 0;
+
     await createAdminProduct({
       categoryId: payload.categoryId,
       name: payload.name,
@@ -230,8 +261,9 @@ export async function createProductAction(formData: FormData) {
       description: payload.description,
       imageUrl: payload.imageUrl,
       badgeLabel: payload.badgeLabel || undefined,
-      initialPrice: payload.initialPrice,
-      isFeatured: payload.isFeatured
+      initialPrice,
+      isFeatured: payload.isFeatured,
+      branchPrices
     });
   } catch {
     redirect(statusUrl(returnTo, "error"));
@@ -239,6 +271,7 @@ export async function createProductAction(formData: FormData) {
 
   revalidatePath("/admin/products");
   revalidatePath("/admin/pricing");
+  revalidatePath("/");
   redirect(statusUrl("/admin/products", "created"));
 }
 
@@ -279,6 +312,11 @@ export async function updateProductAction(formData: FormData) {
       badgeLabel: payload.badgeLabel || undefined,
       isFeatured: payload.isFeatured
     });
+
+    const branchPrices = await parseBranchPricing(formData);
+    if (branchPrices.length > 0) {
+      await upsertProductBranchPricing(payload.id, branchPrices);
+    }
   } catch {
     redirect(statusUrl(returnTo, "error"));
   }

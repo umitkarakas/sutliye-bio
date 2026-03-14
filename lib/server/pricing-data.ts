@@ -314,6 +314,111 @@ export async function updateBranchProduct(input: {
   });
 }
 
+export type ProductBranchPricingItem = {
+  id: string;
+  branchId: string;
+  branchName: string;
+  price: number | null;
+  stockStatus: "in_stock" | "out_of_stock" | "hidden";
+  isAvailable: boolean;
+};
+
+export async function getProductBranchPricing(productId: string): Promise<ProductBranchPricingItem[]> {
+  if (!hasDatabaseUrl()) {
+    return branches.map((branch) => {
+      const bp = branchProducts.find(
+        (entry) => entry.branchId === branch.id && entry.productId === productId
+      );
+      return {
+        id: `${branch.id}:${productId}`,
+        branchId: branch.id,
+        branchName: branch.name,
+        price: bp?.price ?? null,
+        stockStatus: bp?.stockStatus ?? "hidden",
+        isAvailable: bp?.stockStatus === "in_stock"
+      };
+    });
+  }
+
+  try {
+    return await withDb(async (db) => {
+      const result = await db.query<{
+        id: string;
+        branchId: string;
+        branchName: string;
+        price: string | number | null;
+        stockStatus: "in_stock" | "out_of_stock" | "hidden";
+        isAvailable: boolean;
+      }>(
+        `
+          SELECT
+            bp.id,
+            bp."branchId" AS "branchId",
+            b.name AS "branchName",
+            bp.price,
+            bp."stockStatus" AS "stockStatus",
+            bp."isAvailable" AS "isAvailable"
+          FROM "BranchProduct" bp
+          INNER JOIN "Branch" b ON b.id = bp."branchId"
+          WHERE bp."productId" = $1
+            AND b."isActive" = TRUE
+          ORDER BY b."displayOrder" ASC
+        `,
+        [productId]
+      );
+
+      return result.rows.map((row) => ({
+        id: row.id,
+        branchId: row.branchId,
+        branchName: row.branchName,
+        price: row.price === null ? null : Number(row.price),
+        stockStatus: row.stockStatus,
+        isAvailable: row.isAvailable
+      }));
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.warn(`[pricing-data] Falling back to demo for product branch pricing: ${message}`);
+    return [];
+  }
+}
+
+export async function upsertProductBranchPricing(
+  productId: string,
+  entries: Array<{
+    branchId: string;
+    price: number;
+    stockStatus: "in_stock" | "out_of_stock" | "hidden";
+  }>
+): Promise<void> {
+  if (!hasDatabaseUrl()) {
+    throw new Error("Database is not configured.");
+  }
+
+  return withTransaction(async (db) => {
+    for (const entry of entries) {
+      await db.query(
+        `
+          UPDATE "BranchProduct"
+          SET
+            price = $1::numeric(10, 2),
+            "stockStatus" = $2::"StockStatus",
+            "isAvailable" = $3::boolean,
+            "updatedAt" = NOW()
+          WHERE "branchId" = $4 AND "productId" = $5
+        `,
+        [
+          entry.price.toFixed(2),
+          entry.stockStatus,
+          entry.stockStatus === "in_stock",
+          entry.branchId,
+          productId
+        ]
+      );
+    }
+  });
+}
+
 export async function batchUpdatePricing(input: BatchPricingInput) {
   if (!hasDatabaseUrl()) {
     throw new Error("Database is not configured.");

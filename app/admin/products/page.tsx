@@ -2,9 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
 import { hasDatabaseUrl } from "@/lib/prisma";
-import { listAdminCategories, listAdminProducts } from "@/lib/server/admin-data";
+import { listAdminBranches, listAdminCategories, listAdminProducts } from "@/lib/server/admin-data";
+import { getProductBranchPricing } from "@/lib/server/pricing-data";
 import { AdminContentModeSwitch } from "@/components/admin-content-mode-switch";
 import { AdminPageShell } from "@/components/admin-page-shell";
+import { ProductPricingSection } from "@/components/product-pricing-section";
 import {
   createProductAction,
   deleteProductAction,
@@ -26,9 +28,9 @@ function asSingle(value: string | string[] | undefined) {
 function getMessage(status: string) {
   switch (status) {
     case "created":
-      return "Yeni ürün oluşturuldu. Başlangıç fiyatı aktif şubelere işlendi.";
+      return "Yeni ürün oluşturuldu. Fiyatlar aktif şubelere işlendi.";
     case "updated":
-      return "Ürün bilgileri güncellendi.";
+      return "Ürün bilgileri ve fiyatları güncellendi.";
     case "toggled":
       return "Ürün durumu güncellendi.";
     case "deleted":
@@ -36,7 +38,7 @@ function getMessage(status: string) {
     case "reordered":
       return "Ürün liste sırası güncellendi.";
     case "invalid":
-      return "Kategori, ad, slug, açıklama ve görsel zorunlu. Yeni ürün için başlangıç fiyatı da gerekir.";
+      return "Kategori, ad, slug, açıklama, görsel ve fiyat bilgisi zorunlu.";
     case "error":
       return "Ürün işlemi tamamlanamadı. Veritabanı bağlantısını ve alanları kontrol et.";
     default:
@@ -62,14 +64,6 @@ function formatPriceSummary(summary: {
   }
 
   return `${summary.minPrice} - ${summary.maxPrice} TL`;
-}
-
-function getPricingHref(productName: string) {
-  const params = new URLSearchParams({
-    search: productName
-  });
-
-  return `/admin/pricing?${params.toString()}`;
 }
 
 function getProductHref(productId: string, options?: { edit?: boolean }) {
@@ -99,8 +93,17 @@ export default async function AdminProductsPage({
   const status = asSingle(resolvedSearchParams.status);
   const mode = resolveMode(asSingle(resolvedSearchParams.mode));
   const editingId = asSingle(resolvedSearchParams.edit);
-  const [products, categories] = await Promise.all([listAdminProducts(), listAdminCategories()]);
+  const [products, categories, allBranches] = await Promise.all([
+    listAdminProducts(),
+    listAdminCategories(),
+    listAdminBranches()
+  ]);
+  const activeBranches = allBranches.filter((b) => b.isActive);
   const isDemo = !hasDatabaseUrl();
+
+  const editingBranchPricing = editingId
+    ? await getProductBranchPricing(editingId)
+    : [];
   const categoryMap = new Map(categories.map((category) => [category.id, category.name]));
   const listHref = "/admin/products";
   const newHref = "/admin/products?mode=new";
@@ -110,44 +113,15 @@ export default async function AdminProductsPage({
       currentPath="/admin/products"
       title="Ürünler"
       sessionEmail={session.email}
-      actions={
-        <Link href="/admin/pricing" className="admin-cta-primary whitespace-nowrap">
-          Fiyatlandırma
-        </Link>
-      }
+      actions={null}
     >
-      <section className="grid gap-3 xl:grid-cols-[1.2fr_0.8fr]">
-        <article className="admin-panel rounded-[32px] p-5">
-          <p className="admin-kicker">Ürün tanımı</p>
-          <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl">Çekirdek kayıt + şube fiyatı</h2>
-          <p className="admin-copy mt-3 text-sm leading-6">
-            Restoran ürünü; adı, açıklaması, görseli, kategorisi, yayın durumu ve liste sırası olan
-            çekirdek bir kayıttır. Fiyat ve stok ise ürünün şube kaydında tutulur.
-          </p>
-          <div className="mt-4 grid gap-2 md:grid-cols-2">
-            <div className="admin-card rounded-[24px] p-4">
-              <p className="admin-kicker">Çekirdek alanlar</p>
-              <p className="mt-2 text-sm text-[color:var(--muted)]">
-                Ad, slug, açıklama, görsel URL, kategori, etiket, öne çıkarma, aktiflik, liste sırası
-              </p>
-            </div>
-            <div className="admin-card rounded-[24px] p-4">
-              <p className="admin-kicker">Desteklenen işlemler</p>
-              <p className="mt-2 text-sm text-[color:var(--muted)]">
-                Ekle, güncelle, sil, pasife al, sırala ve fiyat/stok katmanına bağla
-              </p>
-            </div>
-          </div>
-        </article>
-
-        <article className="admin-panel rounded-[32px] p-5">
-          <p className="admin-kicker">Operasyon notu</p>
-          <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl">Fiyat artık görünür</h2>
-          <p className="admin-copy mt-3 text-sm leading-6">
-            Ürün listesi artık şube fiyat özetini gösterir. Yeni ürün açarken girilen başlangıç fiyatı
-            aktif şubelere kopyalanır; detaylı fiyat ve stok güncellemesi yine Fiyatlandırma ekranından yapılır.
-          </p>
-        </article>
+      <section className="admin-panel rounded-[32px] p-5">
+        <p className="admin-kicker">Ürün yönetimi</p>
+        <h2 className="mt-2 font-[family-name:var(--font-display)] text-3xl">Ürün + fiyat tek formda</h2>
+        <p className="admin-copy mt-3 text-sm leading-6">
+          Ürün eklerken veya düzenlerken şube bazlı fiyat ve stok durumunu aynı formda yönetebilirsin.
+          Toplu fiyat güncellemesi için <Link href="/admin/pricing" className="underline">Toplu Fiyat</Link> sayfasını kullan.
+        </p>
       </section>
 
       <section className="flex flex-wrap gap-2">
@@ -268,27 +242,109 @@ export default async function AdminProductsPage({
                         </div>
                       </div>
 
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        <Link
-                          href={getPricingHref(product.name)}
-                          className="admin-cta-primary whitespace-nowrap"
-                        >
-                          Fiyatlandır
-                        </Link>
-                        <Link
-                          href={
-                            editingId === product.id
-                              ? getProductHref(product.id)
-                              : getProductHref(product.id, { edit: true })
-                          }
-                          className="admin-cta-secondary whitespace-nowrap"
-                        >
-                          {editingId === product.id ? "Düzenlemeyi kapat" : "Düzenle"}
-                        </Link>
+                      {editingId !== product.id ? (
+                        <div className="mt-4">
+                          <Link
+                            href={getProductHref(product.id, { edit: true })}
+                            className="admin-cta-primary whitespace-nowrap"
+                          >
+                            Düzenle
+                          </Link>
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {editingId === product.id ? (
+                    <div className="mt-5 border-t border-[color:var(--line)] pt-5">
+                      <form action={updateProductAction}>
+                        <input type="hidden" name="id" value={product.id} />
+                        <input
+                          type="hidden"
+                          name="returnTo"
+                          value={getProductHref(product.id, { edit: true })}
+                        />
+                        <div className="grid gap-3 md:grid-cols-2">
+                          <select
+                            name="categoryId"
+                            defaultValue={product.categoryId}
+                            required
+                            className="admin-input rounded-2xl px-4 py-3"
+                          >
+                            {categories.map((category) => (
+                              <option key={category.id} value={category.id}>
+                                {category.name}
+                              </option>
+                            ))}
+                          </select>
+                          <input
+                            name="name"
+                            defaultValue={product.name}
+                            placeholder="Ürün adı"
+                            required
+                            className="admin-input rounded-2xl px-4 py-3"
+                          />
+                          <input
+                            name="slug"
+                            defaultValue={product.slug}
+                            placeholder="Slug"
+                            required
+                            className="admin-input rounded-2xl px-4 py-3"
+                          />
+                          <input
+                            name="imageUrl"
+                            defaultValue={product.imageUrl ?? ""}
+                            placeholder="Görsel URL"
+                            required
+                            className="admin-input rounded-2xl px-4 py-3"
+                          />
+                          <input
+                            name="badgeLabel"
+                            defaultValue={product.badgeLabel ?? ""}
+                            placeholder="Etiket"
+                            className="admin-input rounded-2xl px-4 py-3"
+                          />
+                          <label className="admin-card flex items-center gap-3 rounded-2xl px-4 py-3">
+                            <input type="checkbox" name="isFeatured" defaultChecked={product.isFeatured} />
+                            <span>Öne çıkan ürün</span>
+                          </label>
+                        </div>
+                        <textarea
+                          name="description"
+                          defaultValue={product.description}
+                          placeholder="Açıklama"
+                          rows={4}
+                          required
+                          className="admin-input mt-3 w-full rounded-2xl px-4 py-3"
+                        />
+                        <ProductPricingSection
+                          branches={editingBranchPricing.map((bp) => ({
+                            id: bp.branchId,
+                            name: bp.branchName,
+                            currentPrice: bp.price,
+                            currentStockStatus: bp.stockStatus
+                          }))}
+                          defaultMode="per_branch"
+                        />
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <button
+                            type="submit"
+                            disabled={isDemo}
+                            className="admin-cta-primary disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            Kaydet
+                          </button>
+                          <Link href={listHref} className="admin-cta-secondary">
+                            Vazgeç
+                          </Link>
+                        </div>
+                      </form>
+
+                      <div className="mt-4 flex flex-wrap gap-2 border-t border-[color:var(--line)] pt-4">
                         <form action={moveProductAction}>
                           <input type="hidden" name="id" value={product.id} />
                           <input type="hidden" name="direction" value="up" />
-                          <input type="hidden" name="returnTo" value={getProductHref(product.id)} />
+                          <input type="hidden" name="returnTo" value={getProductHref(product.id, { edit: true })} />
                           <button
                             type="submit"
                             disabled={isDemo}
@@ -300,7 +356,7 @@ export default async function AdminProductsPage({
                         <form action={moveProductAction}>
                           <input type="hidden" name="id" value={product.id} />
                           <input type="hidden" name="direction" value="down" />
-                          <input type="hidden" name="returnTo" value={getProductHref(product.id)} />
+                          <input type="hidden" name="returnTo" value={getProductHref(product.id, { edit: true })} />
                           <button
                             type="submit"
                             disabled={isDemo}
@@ -311,7 +367,7 @@ export default async function AdminProductsPage({
                         </form>
                         <form action={toggleProductStatusAction}>
                           <input type="hidden" name="id" value={product.id} />
-                          <input type="hidden" name="returnTo" value={getProductHref(product.id)} />
+                          <input type="hidden" name="returnTo" value={getProductHref(product.id, { edit: true })} />
                           <button
                             type="submit"
                             disabled={isDemo}
@@ -326,89 +382,13 @@ export default async function AdminProductsPage({
                           <button
                             type="submit"
                             disabled={isDemo}
-                            className="admin-cta-secondary whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-50"
+                            className="admin-cta-secondary whitespace-nowrap text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             Sil
                           </button>
                         </form>
                       </div>
                     </div>
-                  </div>
-
-                  {editingId === product.id ? (
-                    <form action={updateProductAction} className="mt-5 border-t border-[color:var(--line)] pt-5">
-                      <input type="hidden" name="id" value={product.id} />
-                      <input
-                        type="hidden"
-                        name="returnTo"
-                        value={getProductHref(product.id, { edit: true })}
-                      />
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <select
-                          name="categoryId"
-                          defaultValue={product.categoryId}
-                          required
-                          className="admin-input rounded-2xl px-4 py-3"
-                        >
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.name}
-                            </option>
-                          ))}
-                        </select>
-                        <input
-                          name="name"
-                          defaultValue={product.name}
-                          placeholder="Ürün adı"
-                          required
-                          className="admin-input rounded-2xl px-4 py-3"
-                        />
-                        <input
-                          name="slug"
-                          defaultValue={product.slug}
-                          placeholder="Slug"
-                          required
-                          className="admin-input rounded-2xl px-4 py-3"
-                        />
-                        <input
-                          name="imageUrl"
-                          defaultValue={product.imageUrl ?? ""}
-                          placeholder="Görsel URL"
-                          required
-                          className="admin-input rounded-2xl px-4 py-3"
-                        />
-                        <input
-                          name="badgeLabel"
-                          defaultValue={product.badgeLabel ?? ""}
-                          placeholder="Etiket"
-                          className="admin-input rounded-2xl px-4 py-3"
-                        />
-                        <label className="admin-card flex items-center gap-3 rounded-2xl px-4 py-3">
-                          <input type="checkbox" name="isFeatured" defaultChecked={product.isFeatured} />
-                          <span>Öne çıkan ürün</span>
-                        </label>
-                      </div>
-                      <textarea
-                        name="description"
-                        defaultValue={product.description}
-                        placeholder="Açıklama"
-                        rows={4}
-                        required
-                        className="admin-input mt-3 w-full rounded-2xl px-4 py-3"
-                      />
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <button
-                          type="submit"
-                          disabled={isDemo}
-                          className="admin-cta-primary disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          Kaydet
-                        </button>
-                        <Link href={listHref} className="admin-cta-secondary">
-                          Vazgeç
-                        </Link>
-                      </div>
-                    </form>
                   ) : null}
                 </article>
               ))}
@@ -420,8 +400,7 @@ export default async function AdminProductsPage({
           <input type="hidden" name="returnTo" value={newHref} />
           <h2 className="font-[family-name:var(--font-display)] text-2xl">Yeni ürün</h2>
           <p className="admin-copy mt-2 text-sm leading-6">
-            Çekirdek ürün kaydını aç, ardından gerekiyorsa şube bazlı fiyat ve stok detayını Fiyatlandırma ekranında
-            rafine et.
+            Ürün bilgilerini ve şube fiyatlarını tek formda tanımla.
           </p>
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             <select name="categoryId" defaultValue="" required className="admin-input rounded-2xl px-4 py-3">
@@ -438,15 +417,6 @@ export default async function AdminProductsPage({
             <input name="slug" placeholder="Slug" required className="admin-input rounded-2xl px-4 py-3" />
             <input name="imageUrl" placeholder="Görsel URL" required className="admin-input rounded-2xl px-4 py-3" />
             <input
-              name="initialPrice"
-              type="number"
-              min="0"
-              step="0.01"
-              placeholder="Başlangıç fiyatı"
-              required
-              className="admin-input rounded-2xl px-4 py-3"
-            />
-            <input
               name="badgeLabel"
               placeholder="Etiket"
               className="admin-input rounded-2xl px-4 py-3"
@@ -462,6 +432,15 @@ export default async function AdminProductsPage({
             rows={4}
             required
             className="admin-input mt-3 w-full rounded-2xl px-4 py-3"
+          />
+          <ProductPricingSection
+            branches={activeBranches.map((b) => ({
+              id: b.id,
+              name: b.name,
+              currentPrice: null,
+              currentStockStatus: "in_stock" as const
+            }))}
+            defaultMode="uniform"
           />
           <button
             type="submit"
