@@ -6,6 +6,7 @@ import { listAdminBranches, listAdminCategories, listAdminProducts } from "@/lib
 import { getProductBranchPricing } from "@/lib/server/pricing-data";
 import { AdminContentModeSwitch } from "@/components/admin-content-mode-switch";
 import { AdminPageShell } from "@/components/admin-page-shell";
+import { ConfirmDeleteButton } from "@/components/confirm-delete-button";
 import { ProductPricingSection } from "@/components/product-pricing-section";
 import {
   createProductAction,
@@ -376,17 +377,12 @@ export default async function AdminProductsPage({
                             {product.isActive ? "Pasife al" : "Aktifleştir"}
                           </button>
                         </form>
-                        <form action={deleteProductAction}>
-                          <input type="hidden" name="id" value={product.id} />
-                          <input type="hidden" name="returnTo" value={getProductHref(product.id)} />
-                          <button
-                            type="submit"
-                            disabled={isDemo}
-                            className="admin-cta-secondary whitespace-nowrap text-red-700 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            Sil
-                          </button>
-                        </form>
+                        <ConfirmDeleteButton
+                          action={deleteProductAction}
+                          id={product.id}
+                          returnTo={getProductHref(product.id)}
+                          disabled={isDemo}
+                        />
                       </div>
                     </div>
                   ) : null}
