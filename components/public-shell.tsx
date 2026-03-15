@@ -324,7 +324,7 @@ export function PublicShell({
       >
         <div className="mx-auto flex h-14 max-w-md items-stretch gap-2">
 
-          {/* Branch strip — 70%, horizontally scrollable, own pill */}
+          {/* Branch strip — scrollable, own pill */}
           <div
             className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-2xl px-2.5 py-1.5"
             style={{
@@ -342,10 +342,11 @@ export function PublicShell({
                   key={branch.id}
                   href={href}
                   aria-current={isActive ? "page" : undefined}
+                  style={isActive ? { color: "#ffffff" } : undefined}
                   className={[
                     "inline-flex w-[38%] shrink-0 items-center justify-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold transition",
                     isActive
-                      ? "bg-[color:var(--accent)] text-white shadow-[0_3px_8px_rgba(96,8,16,0.30)]"
+                      ? "bg-[color:var(--accent)] shadow-[0_3px_8px_rgba(96,8,16,0.30)]"
                       : "text-[color:var(--foreground)]/70"
                   ].join(" ")}
                 >
@@ -356,7 +357,7 @@ export function PublicShell({
             })}
           </div>
 
-          {/* Contact + Menu — 30%, own pill */}
+          {/* Contact + Menu — own pill, with labels */}
           <div
             className="flex w-[30%] shrink-0 items-stretch gap-1 rounded-2xl p-1.5"
             style={{
@@ -369,26 +370,30 @@ export function PublicShell({
             <Link
               href={basePath}
               aria-current={activeTab === "contact" ? "page" : undefined}
+              style={activeTab === "contact" ? { color: "#ffffff" } : undefined}
               className={[
-                "flex flex-1 items-center justify-center rounded-xl transition",
+                "flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl transition",
                 activeTab === "contact"
-                  ? "bg-[#171416] text-white shadow-[0_3px_8px_rgba(0,0,0,0.25)]"
+                  ? "bg-[#171416] shadow-[0_3px_8px_rgba(0,0,0,0.25)]"
                   : "text-[color:var(--foreground)]/50"
               ].join(" ")}
             >
-              <ContactIcon className="h-[18px] w-[18px]" />
+              <ContactIcon className="h-[16px] w-[16px]" />
+              <span className="text-[9px] font-semibold tracking-wide">İletişim</span>
             </Link>
             <Link
               href={`${basePath}?tab=menu`}
               aria-current={activeTab === "menu" ? "page" : undefined}
+              style={activeTab === "menu" ? { color: "#ffffff" } : undefined}
               className={[
-                "flex flex-1 items-center justify-center rounded-xl transition",
+                "flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl transition",
                 activeTab === "menu"
-                  ? "bg-[#171416] text-white shadow-[0_3px_8px_rgba(0,0,0,0.25)]"
+                  ? "bg-[#171416] shadow-[0_3px_8px_rgba(0,0,0,0.25)]"
                   : "text-[color:var(--foreground)]/50"
               ].join(" ")}
             >
-              <MenuIcon className="h-[18px] w-[18px]" />
+              <MenuIcon className="h-[16px] w-[16px]" />
+              <span className="text-[9px] font-semibold tracking-wide">Menü</span>
             </Link>
           </div>
 
