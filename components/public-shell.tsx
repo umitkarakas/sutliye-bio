@@ -96,21 +96,41 @@ export function PublicShell({
     activeBranch,
     ...branches.filter((branch) => branch.id !== activeBranch.id)
   ];
+
+  // Richer gradient background — gives glass cards something to blur against
   const shellStyle = {
     ...brandThemeToCssVariables(business.theme),
-    backgroundColor: "color-mix(in srgb, var(--brand-background) 72%, #1a1214 28%)"
+    background: [
+      "radial-gradient(ellipse 120% 60% at 10% 0%, color-mix(in srgb, var(--brand-primary) 28%, transparent) 0%, transparent 70%)",
+      "radial-gradient(ellipse 80% 50% at 90% 100%, color-mix(in srgb, var(--brand-secondary) 32%, transparent) 0%, transparent 70%)",
+      "var(--brand-background)"
+    ].join(", ")
   };
+
+  // Glass card style (used inline because Tailwind can't compose arbitrary rgba + blur easily)
+  const glassCard = {
+    background: "rgba(255, 252, 253, 0.55)",
+    backdropFilter: "blur(18px)",
+    WebkitBackdropFilter: "blur(18px)"
+  } as React.CSSProperties;
+
+  const glassCardStrong = {
+    background: "rgba(255, 255, 255, 0.72)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)"
+  } as React.CSSProperties;
 
   return (
     <main style={shellStyle} className="min-h-screen px-4 py-5 pb-[6.5rem] text-[15px] text-[color:var(--foreground)] sm:px-6">
       <AnalyticsBeacon branchId={activeBranch.id} activeTab={activeTab} source="public_shell" />
-      <div className="mx-auto w-full max-w-md">
-        <section className="overflow-hidden rounded-[28px] border border-white/12 shadow-[var(--shadow)] backdrop-blur-xl" style={{ background: "rgba(255,248,249,0.62)" }}>
-          {/* Header */}
-          <div className="border-b border-white/8 bg-[#171416] px-5 py-6 text-white">
+      <div className="mx-auto w-full max-w-md space-y-3">
+
+        {/* Header card — dark, opaque */}
+        <section className="overflow-hidden rounded-[28px] border border-white/10 bg-[#171416] shadow-[var(--shadow)]">
+          <div className="px-5 py-6 text-white">
             <div className="flex items-center gap-5">
               {business.logoUrl ? (
-                <div className="flex h-20 w-20 flex-none items-center justify-center overflow-hidden rounded-[18px] border border-white/10 bg-white/8 p-2.5 shadow-[var(--shadow-soft)]">
+                <div className="flex h-20 w-20 flex-none items-center justify-center overflow-hidden rounded-[18px] border border-white/10 bg-white/8 p-2.5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={business.logoUrl} alt={`${business.name} logosu`} className="h-full w-full object-contain" />
                 </div>
@@ -125,250 +145,254 @@ export function PublicShell({
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Content */}
-          <div className="space-y-4 px-4 py-4">
-            {activeTab === "contact" ? (
-              <section className="space-y-3">
-                {orderedBranches.map((branch) => (
-                  <article
-                    key={branch.id}
-                    className="rounded-[20px] border border-white/60 bg-white/70 p-4 shadow-[var(--shadow-soft)] backdrop-blur-sm"
+        {/* Content — cards float directly on gradient for true glass effect */}
+        {activeTab === "contact" ? (
+          <section className="space-y-3">
+            {orderedBranches.map((branch) => (
+              <article
+                key={branch.id}
+                style={glassCard}
+                className="rounded-[20px] border border-white/40 p-4 shadow-[var(--shadow-soft)]"
+              >
+                <h2 className="font-[family-name:var(--font-display)] text-3xl">{branch.name}</h2>
+                <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{branch.blurb}</p>
+                <div className="mt-3 space-y-1.5 text-sm">
+                  <p>{branch.address}</p>
+                  <p className="text-[color:var(--muted)]">{branch.district} / {branch.city}</p>
+                  <p className="font-medium">Çalışma Saatleri: {branch.hours}</p>
+                </div>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <EventLink
+                    href={branch.mapUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    eventName="map_click"
+                    branchId={branch.id}
+                    source="public_shell"
+                    style={glassCardStrong}
+                    className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
                   >
-                    <h2 className="font-[family-name:var(--font-display)] text-3xl">{branch.name}</h2>
-                    <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{branch.blurb}</p>
-                    <div className="mt-3 space-y-1.5 text-sm">
-                      <p>{branch.address}</p>
-                      <p className="text-[color:var(--muted)]">{branch.district} / {branch.city}</p>
-                      <p className="font-medium">Çalışma Saatleri: {branch.hours}</p>
-                    </div>
-                    <div className="mt-4 grid grid-cols-3 gap-2">
-                      <EventLink
-                        href={branch.mapUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        eventName="map_click"
-                        branchId={branch.id}
-                        source="public_shell"
-                        className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/60 bg-white/80 px-3 py-3 text-center backdrop-blur-sm"
-                      >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.24)]">
-                          <PinIcon className="h-4.5 w-4.5" />
-                        </span>
-                        <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Adres</span>
-                      </EventLink>
-                      <EventLink
-                        href={getWhatsappHref(branch.whatsapp)}
-                        target="_blank"
-                        rel="noreferrer"
-                        eventName="whatsapp_click"
-                        branchId={branch.id}
-                        source="public_shell"
-                        className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/60 bg-white/80 px-3 py-3 text-center backdrop-blur-sm"
-                      >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.24)]">
-                          <WhatsAppIcon className="h-4.5 w-4.5" />
-                        </span>
-                        <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">WhatsApp</span>
-                      </EventLink>
-                      <a
-                        href={getReviewHref(branch)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/60 bg-white/80 px-3 py-3 text-center backdrop-blur-sm"
-                      >
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.24)]">
-                          <StarIcon className="h-4.5 w-4.5" />
-                        </span>
-                        <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Google Yorum</span>
-                      </a>
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <PinIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Adres</span>
+                  </EventLink>
+                  <EventLink
+                    href={getWhatsappHref(branch.whatsapp)}
+                    target="_blank"
+                    rel="noreferrer"
+                    eventName="whatsapp_click"
+                    branchId={branch.id}
+                    source="public_shell"
+                    style={glassCardStrong}
+                    className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <WhatsAppIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">WhatsApp</span>
+                  </EventLink>
+                  <a
+                    href={getReviewHref(branch)}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={glassCardStrong}
+                    className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <StarIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Google Yorum</span>
+                  </a>
+                </div>
+              </article>
+            ))}
+          </section>
+        ) : (
+          <section className="space-y-4">
+            {/* Category anchors */}
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm text-[color:var(--foreground)]/70">{menuItemCount} ürün</p>
+              <div className="flex gap-2 overflow-x-auto">
+                {visibleCategories.map((category) => (
+                  <a
+                    key={category.id}
+                    href={`#${category.slug}`}
+                    style={glassCardStrong}
+                    className="rounded-full border border-white/50 px-3 py-1 text-xs font-medium whitespace-nowrap text-[color:var(--foreground)]"
+                  >
+                    {category.name} ({category.items.length})
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {visibleCategories.length === 0 ? (
+              <section style={glassCard} className="rounded-[20px] border border-white/40 p-5 text-sm text-[color:var(--muted)] shadow-[var(--shadow-soft)]">
+                Bu şube için gösterilecek aktif menü kaydı bulunamadı.
+              </section>
+            ) : null}
+
+            {visibleCategories.map((category) => (
+              <section key={category.id} id={category.slug} className="space-y-3">
+                <div className="flex items-end justify-between px-1">
+                  <h2 className="font-[family-name:var(--font-display)] text-2xl">{category.name}</h2>
+                  <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--muted)]">
+                    {activeBranch.name}
+                  </span>
+                </div>
+
+                {category.items.map((item) => (
+                  <article
+                    key={item.id}
+                    style={glassCard}
+                    className="rounded-[20px] border border-white/40 p-4 shadow-[var(--shadow-soft)]"
+                  >
+                    <div
+                      className={
+                        item.imageUrl
+                          ? "grid grid-cols-[7rem_minmax(0,1fr)] gap-4 md:grid-cols-[9rem_minmax(0,1fr)]"
+                          : "flex flex-col gap-3"
+                      }
+                    >
+                      {item.imageUrl ? (
+                        <div style={glassCardStrong} className="h-28 overflow-hidden rounded-2xl border border-white/50 md:h-32">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={item.imageUrl} alt={item.name} className="h-full w-full object-contain" />
+                        </div>
+                      ) : null}
+
+                      <div className="min-w-0">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <h3 className="text-lg font-semibold leading-tight md:text-xl">
+                              {item.name}
+                            </h3>
+                            {item.featured || item.badge ? (
+                              <span className="mt-1.5 inline-block rounded-full bg-[color:var(--accent)] px-2.5 py-0.5 text-[11px] font-medium text-white">
+                                {item.badge ?? "Öne çıkan"}
+                              </span>
+                            ) : null}
+                          </div>
+
+                          <div className="shrink-0 text-right">
+                            {item.stockStatus === "in_stock" ? (
+                              <>
+                                <p className="font-[family-name:var(--font-display)] text-2xl leading-none md:text-3xl">
+                                  {item.price} TL
+                                </p>
+                                <p className="mt-1.5 text-xs uppercase tracking-[0.2em] text-[color:var(--olive)]">
+                                  Hazır
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <p className="font-[family-name:var(--font-display)] text-xl text-[color:var(--muted)] md:text-2xl">
+                                  Tükendi
+                                </p>
+                                <p className="mt-1.5 text-xs uppercase tracking-[0.2em] text-[color:var(--accent-strong)]">
+                                  Stokta Yok
+                                </p>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        <p className="mt-3 text-sm leading-6 text-[color:var(--muted)] md:text-base">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
                   </article>
                 ))}
               </section>
-            ) : (
-              <section className="space-y-4">
-                {/* Category anchors + count */}
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm text-[color:var(--muted)]">{menuItemCount} ürün</p>
-                  <div className="flex gap-2 overflow-x-auto">
-                    {visibleCategories.map((category) => (
-                      <a
-                        key={category.id}
-                        href={`#${category.slug}`}
-                        className="rounded-full border border-white/60 bg-white/70 px-3 py-1 text-xs font-medium text-[color:var(--foreground)] whitespace-nowrap backdrop-blur-sm"
-                      >
-                        {category.name} ({category.items.length})
-                      </a>
-                    ))}
-                  </div>
-                </div>
-
-                {visibleCategories.length === 0 ? (
-                  <section className="rounded-[20px] border border-white/60 bg-white/70 p-5 text-sm text-[color:var(--muted)] shadow-[var(--shadow-soft)] backdrop-blur-sm">
-                    Bu şube için gösterilecek aktif menü kaydı bulunamadı.
-                  </section>
-                ) : null}
-
-                {visibleCategories.map((category) => (
-                  <section key={category.id} id={category.slug} className="space-y-3">
-                    <div className="flex items-end justify-between">
-                      <h2 className="font-[family-name:var(--font-display)] text-2xl">{category.name}</h2>
-                      <span className="text-xs uppercase tracking-[0.2em] text-[color:var(--muted)]">
-                        {activeBranch.name}
-                      </span>
-                    </div>
-
-                    {category.items.map((item) => (
-                      <article
-                        key={item.id}
-                        className="rounded-[20px] border border-white/60 bg-white/70 p-4 shadow-[var(--shadow-soft)] backdrop-blur-sm"
-                      >
-                        <div
-                          className={
-                            item.imageUrl
-                              ? "grid grid-cols-[7rem_minmax(0,1fr)] gap-4 md:grid-cols-[9rem_minmax(0,1fr)]"
-                              : "flex flex-col gap-3"
-                          }
-                        >
-                          {item.imageUrl ? (
-                            <div className="h-28 overflow-hidden rounded-2xl border border-white/60 bg-white/80 md:h-32">
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={item.imageUrl} alt={item.name} className="h-full w-full object-contain" />
-                            </div>
-                          ) : null}
-
-                          <div className="min-w-0">
-                            <div className="flex items-start justify-between gap-3">
-                              <div className="min-w-0">
-                                <h3 className="text-lg font-semibold leading-tight md:text-xl">
-                                  {item.name}
-                                </h3>
-                                {item.featured || item.badge ? (
-                                  <span className="mt-1.5 inline-block rounded-full bg-[color:var(--accent)] px-2.5 py-0.5 text-[11px] font-medium text-white">
-                                    {item.badge ?? "Öne çıkan"}
-                                  </span>
-                                ) : null}
-                              </div>
-
-                              <div className="shrink-0 text-right">
-                                {item.stockStatus === "in_stock" ? (
-                                  <>
-                                    <p className="font-[family-name:var(--font-display)] text-2xl leading-none md:text-3xl">
-                                      {item.price} TL
-                                    </p>
-                                    <p className="mt-1.5 text-xs uppercase tracking-[0.2em] text-[color:var(--olive)]">
-                                      Hazır
-                                    </p>
-                                  </>
-                                ) : (
-                                  <>
-                                    <p className="font-[family-name:var(--font-display)] text-xl text-[color:var(--muted)] md:text-2xl">
-                                      Tükendi
-                                    </p>
-                                    <p className="mt-1.5 text-xs uppercase tracking-[0.2em] text-[color:var(--accent-strong)]">
-                                      Stokta Yok
-                                    </p>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-
-                            <p className="mt-3 text-sm leading-6 text-[color:var(--muted)] md:text-base">
-                              {item.description}
-                            </p>
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </section>
-                ))}
-              </section>
-            )}
-          </div>
-        </section>
+            ))}
+          </section>
+        )}
       </div>
 
-      {/* Bottom navigation — fixed, layered glass */}
-      <div className="fixed bottom-0 left-0 right-0 z-10">
-        <nav
-          className="mx-auto max-w-md border-t border-white/20 backdrop-blur-xl shadow-[0_-8px_32px_rgba(67,24,28,0.14)]"
-          style={{ background: "rgba(255,244,245,0.88)" }}
-        >
-          {/* Branch strip */}
-          {branches.length > 1 ? (
-            <div className="flex gap-2 overflow-x-auto border-b border-black/6 px-3 py-2">
-              {branches.map((branch) => {
-                const href = getBranchHref(branch.slug, rootBranchSlug);
-                const isActive = branch.id === activeBranch.id;
-                return (
-                  <Link
-                    key={branch.id}
-                    href={href}
-                    aria-current={isActive ? "page" : undefined}
-                    className={[
-                      "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition",
-                      isActive
-                        ? "border-[color:var(--accent)] bg-[color:var(--accent)] text-white"
-                        : "border-black/8 bg-white/80 text-[color:var(--foreground)]"
-                    ].join(" ")}
-                  >
-                    <StoreIcon className="h-3 w-3 shrink-0" />
-                    {branch.name}
-                  </Link>
-                );
-              })}
-            </div>
-          ) : null}
+      {/* Bottom navigation — single row, fixed */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-10 px-3 pb-[max(0.625rem,env(safe-area-inset-bottom))] pt-2"
+        style={{
+          background: "rgba(248, 236, 238, 0.28)",
+          backdropFilter: "blur(28px)",
+          WebkitBackdropFilter: "blur(28px)"
+        }}
+      >
+        <div className="mx-auto flex h-14 max-w-md items-stretch gap-2">
 
-          {/* Tab row */}
-          <div className="grid grid-cols-2 gap-2 px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          {/* Branch strip — 70%, horizontally scrollable, own pill */}
+          <div
+            className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto rounded-2xl px-2.5 py-1.5"
+            style={{
+              background: "rgba(255,255,255,0.72)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              boxShadow: "0 2px 12px rgba(96,8,16,0.08), inset 0 0 0 1px rgba(255,255,255,0.9)"
+            }}
+          >
+            {orderedBranches.map((branch) => {
+              const href = getBranchHref(branch.slug, rootBranchSlug);
+              const isActive = branch.id === activeBranch.id;
+              return (
+                <Link
+                  key={branch.id}
+                  href={href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={[
+                    "inline-flex w-[38%] shrink-0 items-center justify-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold transition",
+                    isActive
+                      ? "bg-[color:var(--accent)] text-white shadow-[0_3px_8px_rgba(96,8,16,0.30)]"
+                      : "text-[color:var(--foreground)]/70"
+                  ].join(" ")}
+                >
+                  <StoreIcon className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{branch.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Contact + Menu — 30%, own pill */}
+          <div
+            className="flex w-[30%] shrink-0 items-stretch gap-1 rounded-2xl p-1.5"
+            style={{
+              background: "rgba(255,255,255,0.72)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              boxShadow: "0 2px 12px rgba(96,8,16,0.08), inset 0 0 0 1px rgba(255,255,255,0.9)"
+            }}
+          >
             <Link
               href={basePath}
               aria-current={activeTab === "contact" ? "page" : undefined}
               className={[
-                "inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border px-4 text-sm font-semibold transition",
+                "flex flex-1 items-center justify-center rounded-xl transition",
                 activeTab === "contact"
-                  ? "border-[color:var(--accent-soft-strong)] bg-white text-[color:var(--foreground)] shadow-[0_8px_20px_rgba(96,8,16,0.12)]"
-                  : "border-transparent bg-transparent text-[color:var(--muted)]"
+                  ? "bg-[#171416] text-white shadow-[0_3px_8px_rgba(0,0,0,0.25)]"
+                  : "text-[color:var(--foreground)]/50"
               ].join(" ")}
             >
-              <span
-                className={[
-                  "flex h-7 w-7 flex-none items-center justify-center rounded-lg transition",
-                  activeTab === "contact"
-                    ? "bg-[color:var(--accent)] text-white shadow-[0_4px_10px_rgba(96,8,16,0.22)]"
-                    : "bg-black/6 text-[color:var(--accent-strong)]"
-                ].join(" ")}
-              >
-                <ContactIcon className="h-4 w-4" />
-              </span>
-              İletişim
+              <ContactIcon className="h-[18px] w-[18px]" />
             </Link>
             <Link
               href={`${basePath}?tab=menu`}
               aria-current={activeTab === "menu" ? "page" : undefined}
               className={[
-                "inline-flex h-12 items-center justify-center gap-2.5 rounded-2xl border px-4 text-sm font-semibold transition",
+                "flex flex-1 items-center justify-center rounded-xl transition",
                 activeTab === "menu"
-                  ? "border-[color:var(--accent-soft-strong)] bg-white text-[color:var(--foreground)] shadow-[0_8px_20px_rgba(96,8,16,0.12)]"
-                  : "border-transparent bg-transparent text-[color:var(--muted)]"
+                  ? "bg-[#171416] text-white shadow-[0_3px_8px_rgba(0,0,0,0.25)]"
+                  : "text-[color:var(--foreground)]/50"
               ].join(" ")}
             >
-              <span
-                className={[
-                  "flex h-7 w-7 flex-none items-center justify-center rounded-lg transition",
-                  activeTab === "menu"
-                    ? "bg-[color:var(--accent)] text-white shadow-[0_4px_10px_rgba(96,8,16,0.22)]"
-                    : "bg-black/6 text-[color:var(--accent-strong)]"
-                ].join(" ")}
-              >
-                <MenuIcon className="h-4 w-4" />
-              </span>
-              Menü
+              <MenuIcon className="h-[18px] w-[18px]" />
             </Link>
           </div>
-        </nav>
+
+        </div>
       </div>
     </main>
   );
