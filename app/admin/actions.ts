@@ -265,7 +265,8 @@ export async function createProductAction(formData: FormData) {
       isFeatured: payload.isFeatured,
       branchPrices
     });
-  } catch {
+  } catch (err) {
+    console.error("[createProductAction]", err);
     redirect(statusUrl(returnTo, "error"));
   }
 

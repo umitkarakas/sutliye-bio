@@ -390,9 +390,10 @@ export async function createAdminBranch(input: {
           whatsapp,
           "mapUrl",
           "reviewUrl",
-          "displayOrder"
+          "displayOrder",
+          "updatedAt"
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
         RETURNING
           id,
           name,
@@ -446,9 +447,10 @@ export async function createAdminBranch(input: {
             "productId",
             price,
             "stockStatus",
-            "isAvailable"
+            "isAvailable",
+            "updatedAt"
           )
-          VALUES ($1, $2, $3, 0, 'hidden', FALSE)
+          VALUES ($1, $2, $3, 0, 'hidden', FALSE, NOW())
         `,
         [crypto.randomUUID(), branch.id, product.id]
       );
@@ -525,9 +527,10 @@ export async function createAdminCategory(input: { name: string; slug: string; d
           name,
           slug,
           description,
-          "displayOrder"
+          "displayOrder",
+          "updatedAt"
         )
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES ($1, $2, $3, $4, $5, $6, NOW())
         RETURNING
           id,
           name,
@@ -796,9 +799,10 @@ export async function createAdminProduct(input: {
           "imageUrl",
           "badgeLabel",
           "isFeatured",
-          "displayOrder"
+          "displayOrder",
+          "updatedAt"
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
         RETURNING
           id,
           "categoryId" AS "categoryId",
@@ -853,9 +857,10 @@ export async function createAdminProduct(input: {
             "productId",
             price,
             "stockStatus",
-            "isAvailable"
+            "isAvailable",
+            "updatedAt"
           )
-          VALUES ($1, $2, $3, $4::numeric(10, 2), $5::"StockStatus", $6)
+          VALUES ($1, $2, $3, $4::numeric(10, 2), $5::"StockStatus", $6, NOW())
         `,
         [crypto.randomUUID(), branch.id, product.id, price.toFixed(2), stockStatus, isAvailable]
       );
