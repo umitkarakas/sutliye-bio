@@ -109,7 +109,6 @@ type MenuRow = {
   isFeatured: boolean | null;
   stockStatus: "in_stock" | "out_of_stock" | "hidden" | null;
   price: string | number | null;
-  isFeaturedOverride: boolean | null;
 };
 
 function mapBranches(rows: BranchRow[]) {
@@ -352,8 +351,7 @@ export async function getPublicMenuForBranch(branchId: string): Promise<MenuCate
             p."badgeLabel",
             p."isFeatured",
             bp."stockStatus",
-            bp.price,
-            bp."isFeaturedOverride"
+            bp.price
           FROM "MenuCategory" c
           LEFT JOIN "Product" p
             ON p."categoryId" = c.id
@@ -396,7 +394,7 @@ export async function getPublicMenuForBranch(branchId: string): Promise<MenuCate
         badge: row.badgeLabel ?? undefined,
         price: Number(row.price),
         stockStatus: row.stockStatus === "in_stock" ? "in_stock" : "out_of_stock",
-        featured: row.isFeaturedOverride ?? row.isFeatured ?? false
+        featured: row.isFeatured ?? false
       };
 
       categories.get(row.categoryId)?.items.push(item);
