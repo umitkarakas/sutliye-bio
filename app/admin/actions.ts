@@ -23,7 +23,11 @@ import {
 import { upsertProductBranchPricing } from "@/lib/server/pricing-data";
 
 function statusUrl(path: string, status: string) {
-  return `${path}${path.includes("?") ? "&" : "?"}status=${status}`;
+  const hashIdx = path.indexOf("#");
+  const base = hashIdx === -1 ? path : path.slice(0, hashIdx);
+  const hash = hashIdx === -1 ? "" : path.slice(hashIdx);
+  const sep = base.includes("?") ? "&" : "?";
+  return `${base}${sep}status=${status}${hash}`;
 }
 
 function getReturnTo(formData: FormData, fallbackPath: string) {
@@ -318,7 +322,8 @@ export async function updateProductAction(formData: FormData) {
     if (branchPrices.length > 0) {
       await upsertProductBranchPricing(payload.id, branchPrices);
     }
-  } catch {
+  } catch (err) {
+    console.error("[updateProductAction]", err);
     redirect(statusUrl(returnTo, "error"));
   }
 
