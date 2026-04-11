@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { createClientSessionId } from "@/lib/client-session-id";
 
 type EventLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   eventName: "call_click" | "whatsapp_click" | "map_click";
@@ -16,7 +17,7 @@ function getAnalyticsSessionId() {
     return existing;
   }
 
-  const generated = crypto.randomUUID();
+  const generated = createClientSessionId();
   window.localStorage.setItem(key, generated);
   return generated;
 }
@@ -42,17 +43,22 @@ export function EventLink({
 
       if (navigator.sendBeacon) {
         navigator.sendBeacon("/api/events", new Blob([body], { type: "application/json" }));
-        return;
+      } else {
+        void fetch("/api/events", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body,
+          keepalive: true
+        });
       }
 
-      void fetch("/api/events", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body,
-        keepalive: true
-      });
+      // GA4 custom event
+      if (typeof window !== "undefined" && "gtag" in window) {
+        (window as Window & { gtag: (...args: unknown[]) => void }).gtag("event", eventName, {
+          branch_id: branchId,
+          source
+        });
+      }
     },
     [branchId, eventName, onClick, source]
   );

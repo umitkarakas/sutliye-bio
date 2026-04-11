@@ -1,0 +1,13 @@
+{
+  "name": "kebapci-menu",
+  "port": 3010,
+  "domain": "mnu.qrbir.com",
+  "master_domain": "qrbir.com",
+  "runtime": "node:20-alpine",
+  "db": "shared-supabase",
+  "repo": null,
+  "deployed_commit": null,
+  "deployed_at": null,
+  "healthcheck": null,
+  "env_keys": ["NODE_ENV", "SUPABASE_URL", "SUPABASE_ANON_KEY"]
+}

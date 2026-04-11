@@ -1,6 +1,8 @@
-import { Pool, type PoolClient, type QueryResultRow } from "@neondatabase/serverless";
+import { Pool, type PoolClient, type QueryResultRow } from "pg";
 
 export type DbQueryable = Pick<Pool, "query"> | Pick<PoolClient, "query">;
+
+let pool: Pool | undefined;
 
 export function hasDatabaseUrl() {
   return Boolean(process.env.DATABASE_URL);
@@ -17,19 +19,18 @@ function getDatabaseUrl() {
 }
 
 function createPool() {
-  return new Pool({
-    connectionString: getDatabaseUrl()
-  });
+  if (!pool) {
+    pool = new Pool({
+      connectionString: getDatabaseUrl()
+    });
+  }
+
+  return pool;
 }
 
 export async function withDb<T>(run: (client: Pool) => Promise<T>) {
   const pool = createPool();
-
-  try {
-    return await run(pool);
-  } finally {
-    await pool.end();
-  }
+  return run(pool);
 }
 
 export async function withTransaction<T>(run: (client: PoolClient) => Promise<T>) {

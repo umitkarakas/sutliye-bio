@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { createSessionToken, getAdminCredentials, getSessionCookieName } from "@/lib/auth";
+import { authenticateAdmin, createSessionToken, getSessionCookieName, touchAdminLogin } from "@/lib/auth";
+import { buildAbsoluteUrl } from "@/lib/request-origin";
 
 export async function POST(request: Request) {
   const contentType = request.headers.get("content-type") || "";
@@ -17,20 +18,26 @@ export async function POST(request: Request) {
     password = String(formData.get("password") || "");
   }
 
-  const credentials = getAdminCredentials();
+  const admin = await authenticateAdmin(email, password);
 
-  if (email !== credentials.email || password !== credentials.password) {
+  if (!admin) {
     if (!isJsonRequest) {
-      return NextResponse.redirect(new URL("/admin/login?status=invalid", request.url), 303);
+      return NextResponse.redirect(buildAbsoluteUrl(request, "/admin/login?status=invalid"), 303);
     }
 
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  const sessionToken = createSessionToken({ email });
+  await touchAdminLogin(admin.userId);
+
+  const sessionToken = createSessionToken({
+    userId: admin.userId,
+    email: admin.email,
+    role: admin.role
+  });
   const response = isJsonRequest
-    ? NextResponse.json({ ok: true, email })
-    : NextResponse.redirect(new URL("/admin", request.url), 303);
+    ? NextResponse.json({ ok: true, email: admin.email, role: admin.role })
+    : NextResponse.redirect(buildAbsoluteUrl(request, "/admin"), 303);
 
   response.cookies.set({
     name: getSessionCookieName(),

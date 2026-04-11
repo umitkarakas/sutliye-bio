@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import type { TabId } from "@/lib/types";
+import { createClientSessionId } from "@/lib/client-session-id";
 
 type AnalyticsBeaconProps = {
   branchId: string;
@@ -17,7 +18,7 @@ function getAnalyticsSessionId() {
     return existing;
   }
 
-  const generated = crypto.randomUUID();
+  const generated = createClientSessionId();
   window.localStorage.setItem(key, generated);
   return generated;
 }
@@ -60,7 +61,9 @@ export function AnalyticsBeacon({ branchId, activeTab, source }: AnalyticsBeacon
       source,
       sessionId,
       metadata: {
-        activeTab
+        activeTab,
+        referrer: document.referrer || "direct",
+        url: window.location.pathname
       }
     });
 

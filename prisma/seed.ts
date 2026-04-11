@@ -1,6 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
-import { PrismaNeon } from "@prisma/adapter-neon";
+import { PrismaClient } from "../lib/generated/prisma/client";
 import { branchProducts, branches, business, categories, products } from "../lib/demo-data";
 import { hashPassword } from "../lib/server/passwords";
 
@@ -10,15 +9,17 @@ if (!databaseUrl) {
   throw new Error("DIRECT_URL or DATABASE_URL must be configured before running the seed.");
 }
 
-const adapter = new PrismaNeon({
-  connectionString: databaseUrl
-});
-
 const prisma = new PrismaClient({
-  adapter
+  datasources: {
+    db: {
+      url: databaseUrl
+    }
+  }
 });
+const demoAdminEmail = process.env.ADMIN_EMAIL || "owner@ocakbasisofrasi.test";
 const demoAdminPassword = process.env.ADMIN_PASSWORD || "demo12345";
 const demoAdminPasswordHash = hashPassword(demoAdminPassword);
+const demoAdminName = process.env.ADMIN_FULL_NAME || "Demo Owner";
 
 function requiredId(map: Map<string, string>, key: string) {
   const value = map.get(key);
@@ -60,17 +61,18 @@ async function main() {
   });
 
   await prisma.adminUser.upsert({
-    where: { email: "owner@ocakbasisofrasi.test" },
+    where: { email: demoAdminEmail },
     update: {
       businessId: createdBusiness.id,
-      fullName: "Demo Owner",
+      fullName: demoAdminName,
       passwordHash: demoAdminPasswordHash,
+      role: "owner",
       isActive: true
     },
     create: {
       businessId: createdBusiness.id,
-      email: "owner@ocakbasisofrasi.test",
-      fullName: "Demo Owner",
+      email: demoAdminEmail,
+      fullName: demoAdminName,
       role: "owner",
       passwordHash: demoAdminPasswordHash
     }

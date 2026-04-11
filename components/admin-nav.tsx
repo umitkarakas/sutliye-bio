@@ -6,7 +6,8 @@ const links = [
   { href: "/admin/pricing", label: "Toplu Fiyat" },
   { href: "/admin/branches", label: "Şubeler" },
   { href: "/admin/categories", label: "Kategoriler" },
-  { href: "/admin/products", label: "Ürünler" }
+  { href: "/admin/products", label: "Ürünler" },
+  { href: "/admin/analytics", label: "Analytics" }
 ];
 
 export function AdminNav({ currentPath }: { currentPath: string }) {

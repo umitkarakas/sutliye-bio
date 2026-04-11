@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Branch, MenuCategoryWithItems, PublicBusiness, TabId } from "@/lib/types";
 import { AnalyticsBeacon } from "@/components/analytics-beacon";
 import { EventLink } from "@/components/event-link";
+import { MenuItemTracker } from "@/components/menu-item-tracker";
 import { brandThemeToCssVariables } from "@/lib/brand-theme";
 
 type PublicShellProps = {
@@ -245,33 +246,36 @@ export function PublicShell({
                 </div>
 
                 {category.items.map((item) => (
-                  <article
+                  <MenuItemTracker
                     key={item.id}
+                    productId={item.id}
+                    branchId={activeBranch.id}
+                    source="public_menu"
                     style={glassCard}
-                    className="rounded-[20px] border border-white/40 p-4 shadow-[var(--shadow-soft)]"
+                    className="rounded-[20px] border border-white/40 p-3 shadow-[var(--shadow-soft)]"
                   >
                     <div
                       className={
                         item.imageUrl
-                          ? "grid grid-cols-[7rem_minmax(0,1fr)] gap-4 md:grid-cols-[9rem_minmax(0,1fr)]"
-                          : "flex flex-col gap-3"
+                          ? "grid grid-cols-[6rem_minmax(0,1fr)] gap-3"
+                          : "flex flex-col gap-2"
                       }
                     >
                       {item.imageUrl ? (
-                        <div style={glassCardStrong} className="h-28 overflow-hidden rounded-2xl border border-white/50 md:h-32">
+                        <div style={glassCardStrong} className="h-24 overflow-hidden rounded-xl border border-white/50">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={item.imageUrl} alt={item.name} className="h-full w-full object-contain" />
                         </div>
                       ) : null}
 
                       <div className="min-w-0">
-                        <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
-                            <h3 className="text-lg font-semibold leading-tight md:text-xl">
+                            <h3 className="text-base font-semibold leading-tight">
                               {item.name}
                             </h3>
                             {item.featured || item.badge ? (
-                              <span className="mt-1.5 inline-block rounded-full bg-[color:var(--accent)] px-2.5 py-0.5 text-[11px] font-medium text-white">
+                              <span className="mt-1 inline-block rounded-full bg-[color:var(--accent)] px-2 py-0.5 text-[10px] font-medium text-white">
                                 {item.badge ?? "Öne çıkan"}
                               </span>
                             ) : null}
@@ -279,20 +283,15 @@ export function PublicShell({
 
                           <div className="shrink-0 text-right">
                             {item.stockStatus === "in_stock" ? (
-                              <>
-                                <p className="font-[family-name:var(--font-display)] text-2xl leading-none md:text-3xl">
-                                  {item.price} TL
-                                </p>
-                                <p className="mt-1.5 text-xs uppercase tracking-[0.2em] text-[color:var(--olive)]">
-                                  Hazır
-                                </p>
-                              </>
+                              <p className="font-[family-name:var(--font-display)] text-xl leading-none">
+                                {item.price} TL
+                              </p>
                             ) : (
                               <>
-                                <p className="font-[family-name:var(--font-display)] text-xl text-[color:var(--muted)] md:text-2xl">
+                                <p className="font-[family-name:var(--font-display)] text-lg text-[color:var(--muted)]">
                                   Tükendi
                                 </p>
-                                <p className="mt-1.5 text-xs uppercase tracking-[0.2em] text-[color:var(--accent-strong)]">
+                                <p className="mt-1 text-[10px] uppercase tracking-[0.15em] text-[color:var(--accent-strong)]">
                                   Stokta Yok
                                 </p>
                               </>
@@ -300,12 +299,14 @@ export function PublicShell({
                           </div>
                         </div>
 
-                        <p className="mt-3 text-sm leading-6 text-[color:var(--muted)] md:text-base">
-                          {item.description}
-                        </p>
+                        {item.description ? (
+                          <p className="mt-2 text-sm leading-5 text-[color:var(--muted)]">
+                            {item.description}
+                          </p>
+                        ) : null}
                       </div>
                     </div>
-                  </article>
+                  </MenuItemTracker>
                 ))}
               </section>
             ))}

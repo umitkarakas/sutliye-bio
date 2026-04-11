@@ -1,0 +1,202 @@
+@import "tailwindcss";
+
+:root {
+  --font-display: "Avenir Next", "Avenir", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-body: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --brand-primary: #ba0814;
+  --brand-secondary: #dc6f79;
+  --brand-background: #efb7bd;
+  --background: var(--brand-background);
+  --foreground: #2a1a12;
+  --card: color-mix(in srgb, var(--brand-background) 86%, white 14%);
+  --card-strong: color-mix(in srgb, var(--brand-background) 70%, white 30%);
+  --card-muted: color-mix(in srgb, var(--brand-background) 74%, var(--brand-primary) 26%);
+  --line: rgba(88, 56, 39, 0.14);
+  --line-strong: rgba(88, 56, 39, 0.22);
+  --accent: var(--brand-primary);
+  --accent-strong: color-mix(in srgb, var(--brand-primary) 78%, black 22%);
+  --accent-soft: color-mix(in srgb, var(--brand-primary) 24%, white 76%);
+  --accent-soft-strong: color-mix(in srgb, var(--brand-primary) 36%, white 64%);
+  --hero-start: var(--brand-primary);
+  --hero-end: var(--brand-secondary);
+  --hero-glow: color-mix(in srgb, var(--brand-secondary) 18%, transparent);
+  --olive: #5f6f43;
+  --olive-soft: #e5ecdc;
+  --danger-soft: #f2dfdc;
+  --danger-strong: #8f3a25;
+  --muted: #745f52;
+  --shadow: 0 20px 50px rgba(74, 40, 23, 0.1);
+  --shadow-soft: 0 12px 30px rgba(74, 40, 23, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--brand-background) 84%, #2a2324 16%);
+  font-family: var(--font-body), sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+.admin-shell {
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(255, 248, 249, 0.38);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.admin-panel {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: var(--shadow-soft);
+}
+
+.admin-card {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.admin-kicker {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.admin-copy {
+  color: var(--muted);
+}
+
+.admin-notice {
+  border: 1px solid color-mix(in srgb, var(--accent) 26%, white 74%);
+  background: color-mix(in srgb, var(--accent) 12%, white 88%);
+  color: var(--accent);
+}
+
+.admin-feedback {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.admin-chip {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--foreground);
+}
+
+.admin-badge {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.admin-status-active {
+  background: var(--olive-soft);
+  color: var(--olive);
+}
+
+.admin-status-inactive {
+  background: var(--danger-soft);
+  color: var(--danger-strong);
+}
+
+.admin-input {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--foreground);
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.admin-input::placeholder {
+  color: color-mix(in srgb, var(--muted) 88%, white);
+}
+
+.admin-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, white 82%);
+}
+
+.admin-nav-link,
+.admin-cta-primary,
+.admin-cta-secondary,
+.admin-cta-accent {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.625rem 1.1rem;
+  font-size: 0.925rem;
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-nav-link {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: white;
+  color: var(--foreground);
+}
+
+.admin-nav-link[data-active="true"] {
+  border-color: transparent;
+  background: var(--accent);
+  color: white !important;
+  box-shadow: 0 10px 26px rgba(96, 8, 16, 0.18);
+}
+
+.admin-cta-primary {
+  background: var(--accent);
+  color: white !important;
+  box-shadow: 0 12px 28px rgba(96, 8, 16, 0.18);
+}
+
+.admin-cta-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--foreground);
+}
+
+.admin-cta-accent {
+  background: var(--accent);
+  color: white !important;
+  box-shadow: 0 12px 28px rgba(96, 8, 16, 0.18);
+}
+
+.admin-nav-link:hover,
+.admin-cta-primary:hover,
+.admin-cta-secondary:hover,
+.admin-cta-accent:hover {
+  transform: translateY(-1px);
+}

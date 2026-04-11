@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionCookieName } from "@/lib/auth";
+import { buildAbsoluteUrl } from "@/lib/request-origin";
 
 export async function POST(request: Request) {
   const response = NextResponse.json({ ok: true });
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
   });
 
   if ((request.headers.get("content-type") || "").includes("application/x-www-form-urlencoded")) {
-    return NextResponse.redirect(new URL("/admin/login", request.url), 303);
+    return NextResponse.redirect(buildAbsoluteUrl(request, "/admin/login"), 303);
   }
 
   return response;

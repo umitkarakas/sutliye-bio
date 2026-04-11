@@ -106,7 +106,22 @@ export async function createBranchAction(formData: FormData) {
     !payload.whatsapp ||
     !payload.mapUrl
   ) {
-    redirect(statusUrl(returnTo, "invalid"));
+    const hashIdx = returnTo.indexOf("#");
+    const base = hashIdx === -1 ? returnTo : returnTo.slice(0, hashIdx);
+    const sep = base.includes("?") ? "&" : "?";
+    const fields = new URLSearchParams({
+      status: "invalid",
+      f_name: payload.name,
+      f_slug: payload.slug,
+      f_address: payload.address,
+      f_district: payload.district,
+      f_city: payload.city,
+      f_phone: payload.phone,
+      f_whatsapp: payload.whatsapp,
+      f_mapUrl: payload.mapUrl,
+      f_reviewUrl: payload.reviewUrl
+    });
+    redirect(`${base}${sep}${fields.toString()}`);
   }
 
   try {

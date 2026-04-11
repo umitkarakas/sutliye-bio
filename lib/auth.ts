@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
+import { hasDatabaseUrl, queryFirst, withDb } from "@/lib/db";
+import { verifyPassword } from "@/lib/server/passwords";
 
 const SESSION_COOKIE = "admin_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 12;
@@ -9,6 +11,14 @@ type SessionPayload = {
   email: string;
   role?: "owner" | "editor";
   exp: number;
+};
+
+type AdminLoginRow = {
+  id: string;
+  email: string;
+  passwordHash: string | null;
+  role: "owner" | "editor";
+  isActive: boolean;
 };
 
 function getSessionSecret() {
@@ -86,4 +96,71 @@ export function getAdminCredentials() {
     email: process.env.ADMIN_EMAIL || "owner@ocakbasisofrasi.test",
     password: process.env.ADMIN_PASSWORD || "demo12345"
   };
+}
+
+export async function authenticateAdmin(email: string, password: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail || !password) {
+    return null;
+  }
+
+  if (!hasDatabaseUrl()) {
+    const credentials = getAdminCredentials();
+
+    if (normalizedEmail !== credentials.email.trim().toLowerCase() || password !== credentials.password) {
+      return null;
+    }
+
+    return {
+      userId: undefined,
+      email: credentials.email,
+      role: "owner" as const
+    };
+  }
+
+  const admin = await withDb((db) =>
+    queryFirst<AdminLoginRow>(
+      db,
+      `
+        SELECT
+          id,
+          email,
+          "passwordHash",
+          role,
+          "isActive"
+        FROM "AdminUser"
+        WHERE LOWER(email) = LOWER($1)
+        LIMIT 1
+      `,
+      [normalizedEmail]
+    )
+  );
+
+  if (!admin || !admin.isActive || !verifyPassword(password, admin.passwordHash)) {
+    return null;
+  }
+
+  return {
+    userId: admin.id,
+    email: admin.email,
+    role: admin.role
+  };
+}
+
+export async function touchAdminLogin(userId: string | undefined) {
+  if (!userId || !hasDatabaseUrl()) {
+    return;
+  }
+
+  await withDb((db) =>
+    db.query(
+      `
+        UPDATE "AdminUser"
+        SET "lastLoginAt" = NOW()
+        WHERE id = $1
+      `,
+      [userId]
+    )
+  );
 }

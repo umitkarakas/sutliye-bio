@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "prebuild": "prisma generate",
     "build": "next build --webpack",
     "start": "next start",
+    "start:standalone": "node .next/standalone/server.js",
     "cf:build": "opennextjs-cloudflare build",
     "preview": "npm run cf:build && wrangler dev",
     "deploy": "npm run cf:build && wrangler deploy --keep-vars",
@@ -20,7 +21,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "docker:build": "docker build -t kebapci-menu ."
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
@@ -29,6 +31,7 @@
     "@prisma/client": "^6.19.0",
     "dotenv-cli": "^11.0.0",
     "next": "^16.1.6",
+    "pg": "^8.20.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },

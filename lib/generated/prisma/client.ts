@@ -10,9 +10,12 @@
  * 🟢 You can import this file directly.
  */
 
-globalThis['__dirname'] = '/'
+import * as process from 'node:process'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
+globalThis['__dirname'] = path.dirname(fileURLToPath(import.meta.url))
 
-import * as runtime from "@prisma/client/runtime/wasm-engine-edge"
+import * as runtime from "@prisma/client/runtime/library"
 import * as $Enums from "./enums"
 import * as $Class from "./internal/class"
 import * as Prisma from "./internal/prismaNamespace"
@@ -37,6 +40,9 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-darwin-arm64.dylib.node")
+path.join(process.cwd(), "lib/generated/prisma/libquery_engine-darwin-arm64.dylib.node")
 
 /**
  * Model Business

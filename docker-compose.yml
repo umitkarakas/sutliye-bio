@@ -1,0 +1,25 @@
+name: kebapci-menu
+services:
+  kebapci-menu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: kebapci-menu:latest
+    container_name: kebapci-menu
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3010:3000"
+    env_file:
+      - .env
+    networks:
+      - platform-db
+    healthcheck:
+      test: ["CMD", "node", "-e", "const h=require('http');h.get('http://127.0.0.1:3000/',r=>{process.exit(r.statusCode<500?0:1)}).on('error',_=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+networks:
+  platform-db:
+    external: true

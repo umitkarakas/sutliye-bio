@@ -23,7 +23,7 @@ export default async function AdminLoginPage({ searchParams }: AdminLoginPagePro
         <p className="admin-kicker">Admin girişi</p>
         <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl">Panel Girişi</h1>
         <p className="admin-copy mt-3 text-sm leading-6">
-          Giris bilgileri `.env` dosyasindaki `ADMIN_EMAIL` ve `ADMIN_PASSWORD` alanlarindan okunur.
+          Giris bilgileri veritabanindaki aktif admin kullanicisindan dogrulanir.
         </p>
 
         {statusMessage ? (

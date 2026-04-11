@@ -11,6 +11,15 @@ type SearchParams = Promise<{
   edit?: string | string[];
   mode?: string | string[];
   status?: string | string[];
+  f_name?: string | string[];
+  f_slug?: string | string[];
+  f_address?: string | string[];
+  f_district?: string | string[];
+  f_city?: string | string[];
+  f_phone?: string | string[];
+  f_whatsapp?: string | string[];
+  f_mapUrl?: string | string[];
+  f_reviewUrl?: string | string[];
 }>;
 
 function asSingle(value: string | string[] | undefined) {
@@ -66,6 +75,17 @@ export default async function AdminBranchesPage({
   const resolvedSearchParams = (await searchParams) ?? {};
   const status = asSingle(resolvedSearchParams.status);
   const mode = resolveMode(asSingle(resolvedSearchParams.mode));
+  const draft = {
+    name: asSingle(resolvedSearchParams.f_name),
+    slug: asSingle(resolvedSearchParams.f_slug),
+    address: asSingle(resolvedSearchParams.f_address),
+    district: asSingle(resolvedSearchParams.f_district),
+    city: asSingle(resolvedSearchParams.f_city),
+    phone: asSingle(resolvedSearchParams.f_phone),
+    whatsapp: asSingle(resolvedSearchParams.f_whatsapp),
+    mapUrl: asSingle(resolvedSearchParams.f_mapUrl),
+    reviewUrl: asSingle(resolvedSearchParams.f_reviewUrl)
+  };
   const editingId = asSingle(resolvedSearchParams.edit);
   const branches = await listAdminBranches();
   const editingHours = editingId ? await getBranchHours(editingId) : [];
@@ -301,18 +321,19 @@ export default async function AdminBranchesPage({
           <input type="hidden" name="returnTo" value={newHref} />
           <h2 className="font-[family-name:var(--font-display)] text-2xl">Yeni şube</h2>
           <div className="mt-4 space-y-3">
-            <input name="name" placeholder="Şube adı" className="admin-input rounded-2xl px-4 py-3" />
-            <input name="slug" placeholder="Slug" className="admin-input rounded-2xl px-4 py-3" />
-            <input name="address" placeholder="Adres" className="admin-input rounded-2xl px-4 py-3" />
+            <input name="name" defaultValue={draft.name} placeholder="Şube adı" className="admin-input rounded-2xl px-4 py-3" />
+            <input name="slug" defaultValue={draft.slug} placeholder="Slug" className="admin-input rounded-2xl px-4 py-3" />
+            <input name="address" defaultValue={draft.address} placeholder="Adres" className="admin-input rounded-2xl px-4 py-3" />
             <div className="grid grid-cols-2 gap-3">
-              <input name="district" placeholder="İlçe" className="admin-input rounded-2xl px-4 py-3" />
-              <input name="city" placeholder="Şehir" className="admin-input rounded-2xl px-4 py-3" />
+              <input name="district" defaultValue={draft.district} placeholder="İlçe" className="admin-input rounded-2xl px-4 py-3" />
+              <input name="city" defaultValue={draft.city} placeholder="Şehir" className="admin-input rounded-2xl px-4 py-3" />
             </div>
-            <input name="phone" placeholder="Telefon" className="admin-input rounded-2xl px-4 py-3" />
-            <input name="whatsapp" placeholder="WhatsApp" className="admin-input rounded-2xl px-4 py-3" />
-            <input name="mapUrl" placeholder="Harita linki" className="admin-input rounded-2xl px-4 py-3" />
+            <input name="phone" defaultValue={draft.phone} placeholder="Telefon" className="admin-input rounded-2xl px-4 py-3" />
+            <input name="whatsapp" defaultValue={draft.whatsapp} placeholder="WhatsApp" className="admin-input rounded-2xl px-4 py-3" />
+            <input name="mapUrl" defaultValue={draft.mapUrl} placeholder="Harita linki" className="admin-input rounded-2xl px-4 py-3" />
             <input
               name="reviewUrl"
+              defaultValue={draft.reviewUrl}
               placeholder="Google yorum linki"
               className="admin-input rounded-2xl px-4 py-3"
             />

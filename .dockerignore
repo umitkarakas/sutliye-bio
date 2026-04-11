@@ -1,0 +1,14 @@
+.git
+.github
+.next
+.open-next
+.wrangler
+node_modules
+npm-debug.log
+Dockerfile*
+coverage
+*.log
+.env
+.env.*
+!.env.example
+tsconfig.tsbuildinfo
