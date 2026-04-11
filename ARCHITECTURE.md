@@ -251,12 +251,12 @@ Audit ihtiyaci buyurse sonraki fazda su tablo eklenebilir:
   - genel landing
 - `/b/[branchSlug]`
   - sube odakli landing
-- `/menu`
-  - genel menu
-- `/feedback`
-  - geri bildirim
 
 Not:
+
+- menu ve iletisim ayni public shell icinde tab olarak render edilir
+- bu repoda ayri `/menu` veya `/feedback` route'u yoktur
+- analytics olayi yazimi `/api/events` uzerinden yapilir
 
 QR kodlar dogrudan sube bazli URL'lere gitmeli. Sosyal medya bio linki ise genel landing'e gidebilir.
 
@@ -264,10 +264,11 @@ QR kodlar dogrudan sube bazli URL'lere gitmeli. Sosyal medya bio linki ise genel
 
 - `/admin/login`
 - `/admin`
+- `/admin/branding`
 - `/admin/branches`
 - `/admin/categories`
 - `/admin/products`
-- `/admin/feedback`
+- `/admin/pricing`
 - `/admin/analytics`
 
 Admin login notu:
@@ -320,6 +321,17 @@ Dashboard metrikleri:
 - harita tiklama
 - en cok incelenen urunler
 - geri bildirim sayisi
+
+## Deployment reality
+
+Bu repoda canli deploy gercegi su sekildedir:
+
+- kaynak checkout Hetzner uzerinde `/opt/apps/kebapci-menu`
+- Coolify service metadata ayri olarak `/data/coolify/services/<service-uuid>` altinda tutulur
+- canli compose `.env` kullanir, `.env.production` degil
+- app container'i yalniz `127.0.0.1:3010` uzerinden bind edilir
+
+Bu nedenle Coolify service dizinleri ana kaynak repo gibi ele alinmamali, git ve deploy izlenebilirligi checkout yuzeyinden takip edilmelidir.
 
 ## Security Baseline
 
