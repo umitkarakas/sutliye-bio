@@ -31,7 +31,8 @@ function statusUrl(path: string, status: string) {
 }
 
 function getReturnTo(formData: FormData, fallbackPath: string) {
-  const returnTo = String(formData.get("returnTo") || fallbackPath);
+  const raw = String(formData.get("returnTo") || fallbackPath);
+  const returnTo = raw.split("#")[0]; // strip fragment — redirect() doesn't support fragment URLs
   return returnTo.startsWith(fallbackPath) ? returnTo : fallbackPath;
 }
 
