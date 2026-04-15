@@ -10,7 +10,7 @@
     "start:standalone": "node .next/standalone/server.js",
     "cf:build": "opennextjs-cloudflare build",
     "preview": "npm run cf:build && wrangler dev",
-    "deploy": "npm run cf:build && wrangler deploy --keep-vars",
+    "deploy:cloudflare": "npm run cf:build && wrangler deploy --keep-vars",
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "eslint .",
     "postinstall": "prisma generate",

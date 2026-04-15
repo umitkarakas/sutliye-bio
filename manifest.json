@@ -1,13 +1,19 @@
 {
   "name": "kebapci-menu",
   "port": 3010,
-  "domain": "mnu.qrbir.com",
+  "domain": "01.qrbir.com",
   "master_domain": "qrbir.com",
   "runtime": "node:20-alpine",
-  "db": "shared-supabase",
-  "repo": null,
+  "db": "postgresql-hetzner",
+  "repo": "https://github.com/umitkarakas/biomenu.git",
   "deployed_commit": null,
   "deployed_at": null,
-  "healthcheck": null,
-  "env_keys": ["NODE_ENV", "SUPABASE_URL", "SUPABASE_ANON_KEY"]
+  "healthcheck": "/",
+  "env_keys": [
+    "DATABASE_URL",
+    "APP_BASE_URL",
+    "ADMIN_EMAIL",
+    "ADMIN_PASSWORD",
+    "ADMIN_SESSION_SECRET"
+  ]
 }
