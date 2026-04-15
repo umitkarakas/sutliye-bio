@@ -375,7 +375,7 @@ export function PublicShell({
               className={[
                 "flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl transition",
                 activeTab === "contact"
-                  ? "bg-[#171416] shadow-[0_3px_8px_rgba(0,0,0,0.25)]"
+                  ? "bg-[color:var(--accent)] shadow-[0_3px_8px_rgba(96,8,16,0.30)]"
                   : "text-[color:var(--foreground)]/50"
               ].join(" ")}
             >
@@ -389,7 +389,7 @@ export function PublicShell({
               className={[
                 "flex flex-1 flex-col items-center justify-center gap-0.5 rounded-xl transition",
                 activeTab === "menu"
-                  ? "bg-[#171416] shadow-[0_3px_8px_rgba(0,0,0,0.25)]"
+                  ? "bg-[color:var(--accent)] shadow-[0_3px_8px_rgba(96,8,16,0.30)]"
                   : "text-[color:var(--foreground)]/50"
               ].join(" ")}
             >
