@@ -7,6 +7,7 @@ const links = [
   { href: "/admin/branches", label: "Şubeler" },
   { href: "/admin/categories", label: "Kategoriler" },
   { href: "/admin/products", label: "Ürünler" },
+  { href: "/admin/feedback", label: "Geri Bildirimler" },
   { href: "/admin/analytics", label: "Analytics" }
 ];
 

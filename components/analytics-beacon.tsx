@@ -8,6 +8,7 @@ type AnalyticsBeaconProps = {
   branchId: string;
   activeTab: TabId;
   source: string;
+  tableId?: string;
 };
 
 function getAnalyticsSessionId() {
@@ -21,6 +22,21 @@ function getAnalyticsSessionId() {
   const generated = createClientSessionId();
   window.localStorage.setItem(key, generated);
   return generated;
+}
+
+/**
+ * tableId URL'de varsa sessionStorage'a kaydeder, yoksa mevcut session'daki değeri okur.
+ * Bu sayede QR koddan gelen masa bilgisi oturum boyunca tüm eventlerde korunur.
+ */
+function resolveTableId(tableId: string | undefined): string | undefined {
+  const key = "qr_table_id";
+
+  if (tableId) {
+    window.sessionStorage.setItem(key, tableId);
+    return tableId;
+  }
+
+  return window.sessionStorage.getItem(key) ?? undefined;
 }
 
 function sendEvent(payload: Record<string, unknown>) {
@@ -41,7 +57,7 @@ function sendEvent(payload: Record<string, unknown>) {
   });
 }
 
-export function AnalyticsBeacon({ branchId, activeTab, source }: AnalyticsBeaconProps) {
+export function AnalyticsBeacon({ branchId, activeTab, source, tableId }: AnalyticsBeaconProps) {
   const sentRef = useRef<string>("");
 
   useEffect(() => {
@@ -54,6 +70,8 @@ export function AnalyticsBeacon({ branchId, activeTab, source }: AnalyticsBeacon
     sentRef.current = fingerprint;
 
     const sessionId = getAnalyticsSessionId();
+    const resolvedTableId = resolveTableId(tableId);
+    const tableMetadata = resolvedTableId ? { tableId: resolvedTableId } : {};
 
     sendEvent({
       eventName: "page_view",
@@ -63,7 +81,8 @@ export function AnalyticsBeacon({ branchId, activeTab, source }: AnalyticsBeacon
       metadata: {
         activeTab,
         referrer: document.referrer || "direct",
-        url: window.location.pathname
+        url: window.location.pathname,
+        ...tableMetadata
       }
     });
 
@@ -71,7 +90,8 @@ export function AnalyticsBeacon({ branchId, activeTab, source }: AnalyticsBeacon
       eventName: "branch_view",
       branchId,
       source,
-      sessionId
+      sessionId,
+      metadata: tableMetadata
     });
 
     sendEvent({
@@ -80,10 +100,11 @@ export function AnalyticsBeacon({ branchId, activeTab, source }: AnalyticsBeacon
       source,
       sessionId,
       metadata: {
-        activeTab
+        activeTab,
+        ...tableMetadata
       }
     });
-  }, [activeTab, branchId, source]);
+  }, [activeTab, branchId, source, tableId]);
 
   return null;
 }

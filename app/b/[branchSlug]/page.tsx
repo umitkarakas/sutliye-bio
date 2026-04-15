@@ -14,15 +14,18 @@ type BranchPageProps = {
   params: Promise<{
     branchSlug: string;
   }>;
-  searchParams?: Promise<{
-    tab?: string;
-  }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
+
+function parseTableId(params: Record<string, string | string[] | undefined>): string | undefined {
+  return Object.keys(params).find((key) => /^m\d+$/.test(key));
+}
 
 export default async function BranchPage({ params, searchParams }: BranchPageProps) {
   const { branchSlug } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
-  const activeTab: TabId = resolvedSearchParams.tab === "menu" ? "menu" : "contact";
+  const activeTab: TabId = resolvedSearchParams["tab"] === "menu" ? "menu" : "contact";
+  const tableId = parseTableId(resolvedSearchParams);
   const [business, branch, branches] = await Promise.all([
     getPublicBusiness(),
     getPublicBranchBySlug(branchSlug),
@@ -45,6 +48,7 @@ export default async function BranchPage({ params, searchParams }: BranchPagePro
       business={business}
       menu={menu}
       rootBranchSlug={rootBranchSlug}
+      tableId={tableId}
     />
   );
 }

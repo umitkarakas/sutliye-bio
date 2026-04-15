@@ -12,7 +12,8 @@ import {
   getBranchInteractions,
   getEventTypeTotals,
   getHourlyDistribution,
-  getWeekdayDistribution
+  getWeekdayDistribution,
+  getTableStats
 } from "@/lib/server/analytics-data";
 
 type SearchParams = Promise<{ days?: string | string[] }>;
@@ -92,7 +93,8 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
     branchInteractions,
     eventTypeTotals,
     hourlyDist,
-    weekdayDist
+    weekdayDist,
+    tableStats
   ] = await Promise.all([
     getAnalyticsOverview(days),
     getEventsByDay(days),
@@ -103,7 +105,8 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
     getBranchInteractions(days),
     getEventTypeTotals(days),
     getHourlyDistribution(days),
-    getWeekdayDistribution(days)
+    getWeekdayDistribution(days),
+    getTableStats(days)
   ]);
 
   const maxDayCount = Math.max(...byDay.map((d) => d.count), 1);
@@ -325,6 +328,42 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
                 <span className="admin-badge shrink-0 rounded-full px-3 py-0.5 text-xs">{p.views} tıklama</span>
               </div>
             ))}
+          </div>
+        </section>
+      )}
+
+      {/* Masa bazlı QR trafik */}
+      {tableStats.length > 0 && (
+        <section className="admin-panel rounded-[32px] p-4">
+          <h2 className="font-[family-name:var(--font-display)] text-xl">Masa Bazlı Trafik</h2>
+          <p className="admin-copy mt-1 text-xs">Sadece QR kod ile açılan oturumlar.</p>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[color:var(--line)] text-left">
+                  <th className="admin-copy pb-2 pr-4 text-xs font-medium uppercase tracking-wider">Şube</th>
+                  <th className="admin-copy pb-2 pr-4 text-xs font-medium uppercase tracking-wider">Masa</th>
+                  <th className="admin-copy pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wider">Ziyaret</th>
+                  <th className="admin-copy pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wider">Oturum</th>
+                  <th className="admin-copy pb-2 text-right text-xs font-medium uppercase tracking-wider">Aksiyon</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[color:var(--line)]">
+                {tableStats.map((row) => (
+                  <tr key={`${row.branchName}-${row.tableId}`}>
+                    <td className="py-2 pr-4 font-medium">{row.branchName}</td>
+                    <td className="py-2 pr-4">
+                      <span className="admin-chip rounded-full px-2 py-0.5 text-xs">
+                        {row.tableId.replace(/^m(\d+)$/, "Masa $1")}
+                      </span>
+                    </td>
+                    <td className="py-2 pr-4 text-right">{row.pageViews.toLocaleString("tr-TR")}</td>
+                    <td className="py-2 pr-4 text-right">{row.sessions.toLocaleString("tr-TR")}</td>
+                    <td className="py-2 text-right">{row.interactions.toLocaleString("tr-TR")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </section>
       )}

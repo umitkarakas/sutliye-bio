@@ -614,3 +614,48 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
     };
   }
 }
+
+export type TableStatRow = {
+  branchName: string;
+  tableId: string;
+  pageViews: number;
+  sessions: number;
+  interactions: number;
+};
+
+export async function getTableStats(days = 30): Promise<TableStatRow[]> {
+  if (!hasDatabaseUrl()) return [];
+
+  try {
+    const businessId = await getPrimaryBusinessId();
+    if (!businessId) return [];
+
+    const result = await withDb((db) =>
+      db.query<TableStatRow>(
+        `
+          SELECT
+            b.name AS "branchName",
+            e."metadataJson"->>'tableId' AS "tableId",
+            COUNT(*) FILTER (WHERE e."eventName" = 'page_view')::int AS "pageViews",
+            COUNT(DISTINCT e."sessionId")::int AS sessions,
+            COUNT(*) FILTER (
+              WHERE e."eventName" IN ('call_click', 'whatsapp_click', 'map_click', 'feedback_submit')
+            )::int AS interactions
+          FROM "EventLog" e
+          INNER JOIN "Branch" b ON b.id = e."branchId"
+          WHERE e."businessId" = $1
+            AND e."metadataJson"->>'tableId' IS NOT NULL
+            AND e."createdAt" >= NOW() - INTERVAL '1 day' * $2
+          GROUP BY b.name, e."metadataJson"->>'tableId'
+          ORDER BY "pageViews" DESC
+        `,
+        [businessId, days]
+      )
+    );
+
+    return result.rows;
+  } catch (error) {
+    logAnalyticsFallback(error, "tableStats");
+    return [];
+  }
+}

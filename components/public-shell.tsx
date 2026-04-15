@@ -1,3 +1,6 @@
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import type { Branch, MenuCategoryWithItems, PublicBusiness, TabId } from "@/lib/types";
 import { AnalyticsBeacon } from "@/components/analytics-beacon";
@@ -13,6 +16,7 @@ type PublicShellProps = {
   business: PublicBusiness;
   menu: MenuCategoryWithItems[];
   rootBranchSlug: string;
+  tableId?: string;
 };
 
 function ContactIcon({ className }: { className?: string }) {
@@ -69,6 +73,30 @@ function StoreIcon({ className }: { className?: string }) {
   );
 }
 
+function PhoneIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
+      <path d="M6.5 3.5h3l1.5 4-2 1.5c1 2 2.5 3.5 4.5 4.5L15 11l4 1.5v3c0 1-1 2-2 2C9 19.5 4.5 11 4.5 6c0-1 1-2.5 2-2.5Z" />
+    </svg>
+  );
+}
+
+function FeedbackIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" className={className}>
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
 function getBranchHref(branchSlug: string, rootBranchSlug: string) {
   return branchSlug === rootBranchSlug ? "/" : `/b/${branchSlug}`;
 }
@@ -89,14 +117,55 @@ export function PublicShell({
   branches,
   business,
   menu,
-  rootBranchSlug
+  rootBranchSlug,
+  tableId
 }: PublicShellProps) {
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackState, setFeedbackState] = useState<"idle" | "submitting" | "success" | "error">("idle");
+
   const visibleCategories = menu.filter((category) => category.items.length > 0);
   const menuItemCount = visibleCategories.reduce((count, category) => count + category.items.length, 0);
   const orderedBranches = [
     activeBranch,
     ...branches.filter((branch) => branch.id !== activeBranch.id)
   ];
+
+  async function handleFeedbackSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (feedbackMessage.trim().length < 5) return;
+    setFeedbackState("submitting");
+
+    try {
+      const storedTableId = typeof window !== "undefined"
+        ? (window.sessionStorage.getItem("qr_table_id") ?? tableId)
+        : tableId;
+
+      const res = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          branchId: activeBranch.id,
+          tableId: storedTableId,
+          rating: feedbackRating || undefined,
+          message: feedbackMessage.trim()
+        })
+      });
+
+      if (!res.ok) throw new Error("submit failed");
+
+      setFeedbackState("success");
+      setTimeout(() => {
+        setShowFeedbackForm(false);
+        setFeedbackState("idle");
+        setFeedbackMessage("");
+        setFeedbackRating(0);
+      }, 2000);
+    } catch {
+      setFeedbackState("error");
+    }
+  }
 
   // Richer gradient background — gives glass cards something to blur against
   const shellStyle = {
@@ -123,7 +192,7 @@ export function PublicShell({
 
   return (
     <main style={shellStyle} className="min-h-screen px-4 py-5 pb-[6.5rem] text-[15px] text-[color:var(--foreground)] sm:px-6">
-      <AnalyticsBeacon branchId={activeBranch.id} activeTab={activeTab} source="public_shell" />
+      <AnalyticsBeacon branchId={activeBranch.id} activeTab={activeTab} source="public_shell" tableId={tableId} />
       <div className="mx-auto w-full max-w-md space-y-3">
 
         {/* Header card — dark, opaque */}
@@ -151,65 +220,168 @@ export function PublicShell({
         {/* Content — cards float directly on gradient for true glass effect */}
         {activeTab === "contact" ? (
           <section className="space-y-3">
-            {orderedBranches.map((branch) => (
-              <article
-                key={branch.id}
-                style={glassCard}
-                className="rounded-[20px] border border-white/40 p-4 shadow-[var(--shadow-soft)]"
+            <article
+              style={glassCard}
+              className="rounded-[20px] border border-white/40 p-4 shadow-[var(--shadow-soft)]"
+            >
+              <h2 className="font-[family-name:var(--font-display)] text-3xl">{activeBranch.name}</h2>
+              {activeBranch.blurb && <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{activeBranch.blurb}</p>}
+              <div className="mt-3 space-y-1.5 text-sm">
+                <p>{activeBranch.address}</p>
+                <p className="text-[color:var(--muted)]">{activeBranch.district} / {activeBranch.city}</p>
+                <p className="font-medium">Çalışma Saatleri: {activeBranch.hours}</p>
+              </div>
+
+              {/* 2-kolon aksiyon grid */}
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <EventLink
+                  href={getWhatsappHref(activeBranch.whatsapp)}
+                  target="_blank"
+                  rel="noreferrer"
+                  eventName="whatsapp_click"
+                  branchId={activeBranch.id}
+                  source="public_shell"
+                  style={glassCardStrong}
+                  className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <WhatsAppIcon className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">WhatsApp</span>
+                </EventLink>
+
+                <a
+                  href={getReviewHref(activeBranch)}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={glassCardStrong}
+                  className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <StarIcon className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Google Yorum</span>
+                </a>
+
+                <EventLink
+                  href={activeBranch.mapUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  eventName="map_click"
+                  branchId={activeBranch.id}
+                  source="public_shell"
+                  style={glassCardStrong}
+                  className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <PinIcon className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Yol Tarifi</span>
+                </EventLink>
+
+                <EventLink
+                  href={`tel:${activeBranch.phone.replace(/\D/g, "")}`}
+                  eventName="call_click"
+                  branchId={activeBranch.id}
+                  source="public_shell"
+                  style={glassCardStrong}
+                  className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <PhoneIcon className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Telefon Et</span>
+                </EventLink>
+
+                {/* Geri Bildirim — tam genişlik */}
+                <button
+                  type="button"
+                  onClick={() => setShowFeedbackForm(true)}
+                  style={glassCardStrong}
+                  className="col-span-2 inline-flex flex-row items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <FeedbackIcon className="h-4.5 w-4.5" />
+                  </span>
+                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Geri Bildirim</span>
+                </button>
+              </div>
+            </article>
+
+            {/* Feedback bottom sheet modal */}
+            {showFeedbackForm ? (
+              <div
+                className="fixed inset-0 z-20 flex items-end"
+                style={{ background: "rgba(0,0,0,0.45)" }}
+                onClick={(e) => { if (e.target === e.currentTarget) setShowFeedbackForm(false); }}
               >
-                <h2 className="font-[family-name:var(--font-display)] text-3xl">{branch.name}</h2>
-                <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{branch.blurb}</p>
-                <div className="mt-3 space-y-1.5 text-sm">
-                  <p>{branch.address}</p>
-                  <p className="text-[color:var(--muted)]">{branch.district} / {branch.city}</p>
-                  <p className="font-medium">Çalışma Saatleri: {branch.hours}</p>
+                <div
+                  className="w-full rounded-t-[28px] p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+                  style={{
+                    background: "rgba(255,252,253,0.96)",
+                    backdropFilter: "blur(24px)",
+                    WebkitBackdropFilter: "blur(24px)"
+                  }}
+                >
+                  <div className="mb-4 flex items-center justify-between">
+                    <h3 className="font-[family-name:var(--font-display)] text-2xl">Geri Bildirim</h3>
+                    <button
+                      type="button"
+                      onClick={() => setShowFeedbackForm(false)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-black/8 text-[color:var(--muted)]"
+                    >
+                      <XIcon className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {feedbackState === "success" ? (
+                    <p className="py-6 text-center text-base font-medium text-[color:var(--accent)]">
+                      Teşekkürler! Yorumunuz alındı.
+                    </p>
+                  ) : (
+                    <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+                      {/* Yıldız puanı */}
+                      <div className="flex justify-center gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setFeedbackRating(star === feedbackRating ? 0 : star)}
+                            className="text-2xl transition-transform active:scale-110"
+                            aria-label={`${star} yıldız`}
+                          >
+                            <StarIcon className={`h-7 w-7 ${star <= feedbackRating ? "text-[color:var(--accent)]" : "text-black/20"}`} />
+                          </button>
+                        ))}
+                      </div>
+
+                      <textarea
+                        required
+                        minLength={5}
+                        maxLength={1000}
+                        rows={4}
+                        placeholder="Deneyiminizi yazın..."
+                        value={feedbackMessage}
+                        onChange={(e) => setFeedbackMessage(e.target.value)}
+                        className="w-full resize-none rounded-2xl border border-black/10 bg-white/70 px-4 py-3 text-sm outline-none focus:border-[color:var(--accent)] focus:ring-2 focus:ring-[color:var(--accent)]/20"
+                      />
+
+                      {feedbackState === "error" ? (
+                        <p className="text-center text-xs text-red-500">Bir hata oluştu, lütfen tekrar deneyin.</p>
+                      ) : null}
+
+                      <button
+                        type="submit"
+                        disabled={feedbackState === "submitting" || feedbackMessage.trim().length < 5}
+                        className="w-full rounded-2xl bg-[color:var(--accent)] py-3.5 text-sm font-semibold text-white shadow-[0_6px_20px_rgba(96,8,16,0.30)] disabled:opacity-50"
+                      >
+                        {feedbackState === "submitting" ? "Gönderiliyor..." : "Gönder"}
+                      </button>
+                    </form>
+                  )}
                 </div>
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  <EventLink
-                    href={branch.mapUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    eventName="map_click"
-                    branchId={branch.id}
-                    source="public_shell"
-                    style={glassCardStrong}
-                    className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
-                      <PinIcon className="h-4.5 w-4.5" />
-                    </span>
-                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Adres</span>
-                  </EventLink>
-                  <EventLink
-                    href={getWhatsappHref(branch.whatsapp)}
-                    target="_blank"
-                    rel="noreferrer"
-                    eventName="whatsapp_click"
-                    branchId={branch.id}
-                    source="public_shell"
-                    style={glassCardStrong}
-                    className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
-                      <WhatsAppIcon className="h-4.5 w-4.5" />
-                    </span>
-                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">WhatsApp</span>
-                  </EventLink>
-                  <a
-                    href={getReviewHref(branch)}
-                    target="_blank"
-                    rel="noreferrer"
-                    style={glassCardStrong}
-                    className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
-                      <StarIcon className="h-4.5 w-4.5" />
-                    </span>
-                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Google Yorum</span>
-                  </a>
-                </div>
-              </article>
-            ))}
+              </div>
+            ) : null}
           </section>
         ) : (
           <section className="space-y-4">
