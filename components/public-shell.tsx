@@ -234,74 +234,8 @@ export function PublicShell({
               className="rounded-[20px] border border-white/40 p-4 shadow-[var(--shadow-soft)]"
             >
               <div className="space-y-3">
-                {/* Address and Hours grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <EventLink
-                    href={activeBranch.mapUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    eventName="map_click"
-                    branchId={activeBranch.id}
-                    source="public_shell"
-                    style={glassCardStrong}
-                    className="inline-flex min-h-[136px] flex-col items-start justify-center gap-2 rounded-[24px] border border-white/50 px-3.5 py-3 text-left"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
-                      <PinIcon className="h-4.5 w-4.5" />
-                    </span>
-                    <div className="min-w-0 space-y-1">
-                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--muted)]">Adres</p>
-                      <p className="text-xs font-medium text-[color:var(--foreground)] leading-snug">{activeBranch.address}</p>
-                      <p className="text-xs text-[color:var(--muted)]">{activeBranch.district} / {activeBranch.city}</p>
-                    </div>
-                  </EventLink>
 
-                  <div
-                    style={glassCardStrong}
-                    className="inline-flex min-h-[136px] flex-col items-start justify-center gap-2 rounded-[24px] border border-white/50 px-3.5 py-3"
-                  >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
-                      <ClockIcon className="h-4.5 w-4.5" />
-                    </span>
-                    <div className="space-y-1">
-                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--muted)]">Çalışma Saatleri</p>
-                      <p className="text-xs font-medium text-[color:var(--foreground)]">{activeBranch.hours}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 2-kolon aksiyon grid */}
-              <div className="mt-3 grid grid-cols-2 gap-3">
-                <EventLink
-                  href={getWhatsappHref(activeBranch.whatsapp)}
-                  target="_blank"
-                  rel="noreferrer"
-                  eventName="whatsapp_click"
-                  branchId={activeBranch.id}
-                  source="public_shell"
-                  style={glassCardStrong}
-                  className="inline-flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[24px] border border-white/50 px-3 py-4 text-center"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
-                    <WhatsAppIcon className="h-4.5 w-4.5" />
-                  </span>
-                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">WhatsApp</span>
-                </EventLink>
-
-                <a
-                  href={getReviewHref(activeBranch)}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={glassCardStrong}
-                  className="inline-flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[24px] border border-white/50 px-3 py-4 text-center"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
-                    <StarIcon className="h-4.5 w-4.5" />
-                  </span>
-                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Google Yorum</span>
-                </a>
-
+                {/* Adres — tam genişlik */}
                 <EventLink
                   href={activeBranch.mapUrl}
                   target="_blank"
@@ -310,40 +244,107 @@ export function PublicShell({
                   branchId={activeBranch.id}
                   source="public_shell"
                   style={glassCardStrong}
-                  className="inline-flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[24px] border border-white/50 px-3 py-4 text-center"
+                  className="flex w-full items-center gap-3 rounded-[20px] border border-white/50 px-4 py-3.5 shadow-[0_2px_10px_rgba(0,0,0,0.07)] text-left"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                     <PinIcon className="h-4.5 w-4.5" />
                   </span>
-                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Yol Tarifi</span>
+                  <div className="min-w-0 space-y-0.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">Adres</p>
+                    <p className="text-sm font-medium text-[color:var(--foreground)] leading-snug">{activeBranch.address}</p>
+                    <p className="text-xs text-[color:var(--muted)]">{activeBranch.district} / {activeBranch.city}</p>
+                  </div>
                 </EventLink>
 
-                <EventLink
-                  href={`tel:${activeBranch.phone.replace(/\D/g, "")}`}
-                  eventName="call_click"
-                  branchId={activeBranch.id}
-                  source="public_shell"
+                {/* Çalışma Saatleri — tam genişlik */}
+                <div
                   style={glassCardStrong}
-                  className="inline-flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[24px] border border-white/50 px-3 py-4 text-center"
+                  className="flex w-full items-center gap-3 rounded-[20px] border border-white/50 px-4 py-3.5 shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
-                    <PhoneIcon className="h-4.5 w-4.5" />
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <ClockIcon className="h-4.5 w-4.5" />
                   </span>
-                  <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Telefon Et</span>
-                </EventLink>
+                  <div className="space-y-0.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[color:var(--muted)]">Çalışma Saatleri</p>
+                    <p className="text-sm font-medium text-[color:var(--foreground)]">{activeBranch.hours}</p>
+                  </div>
+                </div>
+
+                {/* 2-kolon aksiyon grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <EventLink
+                    href={getWhatsappHref(activeBranch.whatsapp)}
+                    target="_blank"
+                    rel="noreferrer"
+                    eventName="whatsapp_click"
+                    branchId={activeBranch.id}
+                    source="public_shell"
+                    style={glassCardStrong}
+                    className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <WhatsAppIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">WhatsApp</span>
+                  </EventLink>
+
+                  <a
+                    href={getReviewHref(activeBranch)}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={glassCardStrong}
+                    className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <StarIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Google Yorum</span>
+                  </a>
+
+                  <EventLink
+                    href={activeBranch.mapUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    eventName="map_click"
+                    branchId={activeBranch.id}
+                    source="public_shell"
+                    style={glassCardStrong}
+                    className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <PinIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Yol Tarifi</span>
+                  </EventLink>
+
+                  <EventLink
+                    href={`tel:${activeBranch.phone.replace(/\D/g, "")}`}
+                    eventName="call_click"
+                    branchId={activeBranch.id}
+                    source="public_shell"
+                    style={glassCardStrong}
+                    className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <PhoneIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Telefon Et</span>
+                  </EventLink>
+                </div>
 
                 {/* Geri Bildirim — tam genişlik */}
                 <button
                   type="button"
                   onClick={() => setShowFeedbackForm(true)}
                   style={glassCardStrong}
-                  className="col-span-2 inline-flex min-h-[112px] flex-row items-center justify-center gap-3 rounded-[24px] border border-white/50 px-4 py-4 text-center"
+                  className="flex w-full items-center justify-center gap-3 rounded-[20px] border border-white/50 px-4 py-4 shadow-[0_2px_10px_rgba(0,0,0,0.07)] text-center"
                 >
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                     <FeedbackIcon className="h-4.5 w-4.5" />
                   </span>
                   <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Geri Bildirim</span>
                 </button>
+
               </div>
             </article>
 
