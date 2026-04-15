@@ -47,6 +47,15 @@ function PinIcon({ className }: { className?: string }) {
   );
 }
 
+function ClockIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5v5l3 1.8" />
+    </svg>
+  );
+}
+
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={className}>
@@ -224,16 +233,40 @@ export function PublicShell({
               style={glassCard}
               className="rounded-[20px] border border-white/40 p-4 shadow-[var(--shadow-soft)]"
             >
-              <h2 className="font-[family-name:var(--font-display)] text-3xl">{activeBranch.name}</h2>
-              {activeBranch.blurb && <p className="mt-2 text-sm leading-6 text-[color:var(--muted)]">{activeBranch.blurb}</p>}
-              <div className="mt-3 space-y-1.5 text-sm">
-                <p>{activeBranch.address}</p>
-                <p className="text-[color:var(--muted)]">{activeBranch.district} / {activeBranch.city}</p>
-                <p className="font-medium">Çalışma Saatleri: {activeBranch.hours}</p>
+              <div className="space-y-3 text-sm">
+                <div
+                  style={glassCardStrong}
+                  className="rounded-[22px] border border-white/50 px-4 py-4 shadow-[var(--shadow-soft)]"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <PinIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <div className="space-y-1">
+                      <p className="font-medium text-[color:var(--foreground)]">{activeBranch.address}</p>
+                      <p className="text-[color:var(--muted)]">{activeBranch.district} / {activeBranch.city}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  style={glassCardStrong}
+                  className="rounded-[22px] border border-white/50 px-4 py-4 shadow-[var(--shadow-soft)]"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <ClockIcon className="h-4.5 w-4.5" />
+                    </span>
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--muted)]">Çalışma Saatleri</p>
+                      <p className="font-medium text-[color:var(--foreground)]">{activeBranch.hours}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* 2-kolon aksiyon grid */}
-              <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="mt-4 grid grid-cols-2 gap-3">
                 <EventLink
                   href={getWhatsappHref(activeBranch.whatsapp)}
                   target="_blank"
@@ -242,7 +275,7 @@ export function PublicShell({
                   branchId={activeBranch.id}
                   source="public_shell"
                   style={glassCardStrong}
-                  className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                  className="inline-flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[24px] border border-white/50 px-3 py-4 text-center"
                 >
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                     <WhatsAppIcon className="h-4.5 w-4.5" />
@@ -255,7 +288,7 @@ export function PublicShell({
                   target="_blank"
                   rel="noreferrer"
                   style={glassCardStrong}
-                  className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                  className="inline-flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[24px] border border-white/50 px-3 py-4 text-center"
                 >
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                     <StarIcon className="h-4.5 w-4.5" />
@@ -271,7 +304,7 @@ export function PublicShell({
                   branchId={activeBranch.id}
                   source="public_shell"
                   style={glassCardStrong}
-                  className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                  className="inline-flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[24px] border border-white/50 px-3 py-4 text-center"
                 >
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                     <PinIcon className="h-4.5 w-4.5" />
@@ -285,7 +318,7 @@ export function PublicShell({
                   branchId={activeBranch.id}
                   source="public_shell"
                   style={glassCardStrong}
-                  className="inline-flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                  className="inline-flex min-h-[148px] flex-col items-center justify-center gap-3 rounded-[24px] border border-white/50 px-3 py-4 text-center"
                 >
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                     <PhoneIcon className="h-4.5 w-4.5" />
@@ -298,7 +331,7 @@ export function PublicShell({
                   type="button"
                   onClick={() => setShowFeedbackForm(true)}
                   style={glassCardStrong}
-                  className="col-span-2 inline-flex flex-row items-center justify-center gap-2 rounded-2xl border border-white/50 px-3 py-3 text-center"
+                  className="col-span-2 inline-flex min-h-[112px] flex-row items-center justify-center gap-3 rounded-[24px] border border-white/50 px-4 py-4 text-center"
                 >
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                     <FeedbackIcon className="h-4.5 w-4.5" />
@@ -311,12 +344,12 @@ export function PublicShell({
             {/* Feedback bottom sheet modal */}
             {showFeedbackForm ? (
               <div
-                className="fixed inset-0 z-20 flex items-end"
+                className="fixed inset-0 z-20 flex items-end justify-center p-3 sm:items-center sm:p-4"
                 style={{ background: "rgba(0,0,0,0.45)" }}
                 onClick={(e) => { if (e.target === e.currentTarget) setShowFeedbackForm(false); }}
               >
                 <div
-                  className="w-full rounded-t-[28px] p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))]"
+                  className="w-full max-w-md rounded-[28px] p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:max-h-[min(88vh,720px)] sm:overflow-y-auto"
                   style={{
                     background: "rgba(255,252,253,0.96)",
                     backdropFilter: "blur(24px)",

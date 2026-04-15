@@ -60,7 +60,7 @@ export const branches: Branch[] = [
     mapUrl: "https://maps.google.com/?q=Moda+Caddesi+No:+18+Kadıköy",
     reviewUrl: "https://maps.google.com/?q=Moda+Caddesi+No:+18+Kadıköy",
     hours: "10:00 - 23:30",
-    blurb: "Yoğun yaya trafiği ve hızlı servis odaklı şube.",
+    blurb: "",
     heroNote: "Moda ve Çarşı hattından yürüyerek erişim."
   },
   {
