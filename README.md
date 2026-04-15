@@ -2,18 +2,6 @@
 
 QR ve bio-link trafiği için tasarlanmış mobil öncelikli restoran menü uygulaması. Public tarafta şube bilgileri ve menü gösterilir; aynı uygulama içindeki `/admin` alanında şube, kategori, ürün, fiyat ve temel analytics yönetilir.
 
-## Production Source Of Truth
-
-Production deploy yuzeyi Hetzner + Coolify'dir.
-
-- Kaynak checkout: `/opt/apps/kebapci-menu`
-- Orkestrasyon: Coolify + Docker
-- Host bind: `127.0.0.1:3010 -> 3000`
-- Public ingress: CyberPanel/OpenLiteSpeed reverse proxy
-- Aktif public domain: `https://01.qrbir.com`
-
-Cloudflare komutlari bu repo icinde yardimci/opsiyonel yuzey olarak durur. Production deploy karari olarak kullanilmamalidir.
-
 ## Stack
 
 - Next.js App Router
@@ -45,12 +33,13 @@ cp .env.example .env
 3. `.env` içindeki en az şu alanları doldurun:
 
 - `DATABASE_URL`
+- `DIRECT_URL`
 - `APP_BASE_URL`
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
 - `ADMIN_SESSION_SECRET`
 
-`DIRECT_URL` opsiyoneldir; tanımlı değilse Prisma ve scriptler `DATABASE_URL` ile çalışır. `NEXT_PUBLIC_GA_MEASUREMENT_ID` de opsiyoneldir. Seed sırasında `ADMIN_FULL_NAME` verilmezse varsayılan ad kullanılır.
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` opsiyoneldir. Seed sırasında `ADMIN_FULL_NAME` verilmezse varsayılan ad kullanılır.
 
 4. Prisma client üretin ve veritabanını hazırlayın:
 
@@ -101,7 +90,7 @@ Uygulama varsayılan olarak Next.js üzerinde çalışır. Docker deploy yüzeyi
 - `npm run docker:build`: lokal Docker image üretme
 - `npm run cf:build`: OpenNext Cloudflare build
 - `npm run preview`: Cloudflare preview
-- `npm run deploy:cloudflare`: Cloudflare deploy
+- `npm run deploy`: Cloudflare deploy
 
 ## Uygulama Yüzeyleri
 
@@ -145,8 +134,6 @@ Admin girişinin source of truth'ü şu anda `.env` içindeki kimlik bilgileridi
 
 ## Deploy Notları
 
-Production akışı GitHub `main` -> Hetzner `/opt/apps/kebapci-menu` checkout -> `docker compose up -d --build` şeklindedir. Public trafik Cloudflare Worker'a değil, CyberPanel/OpenLiteSpeed reverse proxy katmanına gider.
-
 Hetzner/Coolify canlı checkout yüzeyi `/opt/apps/kebapci-menu` olarak normalize edilmiştir. Orkestrasyon metadata'sı `/data/coolify/services/<service-uuid>` altında tutulur; bu dizin kaynak repo gibi kullanılmamalıdır.
 
-Detayli deploy, canli domain, metadata ve drift kurallari icin [DEPLOY_HETZNER.md](/Users/umitkarakas/Yandex.Disk.localized/Develop/kebapci_menu/DEPLOY_HETZNER.md) dosyasina bakin.
+Ayrıntılı canlı kurulum ve deploy izlenebilirliği notları için [DEPLOY_HETZNER.md](/Users/umitkarakas/Yandex.Disk.localized/Develop/kebapci_menu/DEPLOY_HETZNER.md) dosyasına bakın.
