@@ -233,40 +233,46 @@ export function PublicShell({
               style={glassCard}
               className="rounded-[20px] border border-white/40 p-4 shadow-[var(--shadow-soft)]"
             >
-              <div className="space-y-3 text-sm">
-                <div
-                  style={glassCardStrong}
-                  className="rounded-[22px] border border-white/50 px-4 py-4 shadow-[var(--shadow-soft)]"
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+              <div className="space-y-3">
+                {/* Address and Hours grid */}
+                <div className="grid grid-cols-2 gap-3">
+                  <EventLink
+                    href={activeBranch.mapUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    eventName="map_click"
+                    branchId={activeBranch.id}
+                    source="public_shell"
+                    style={glassCardStrong}
+                    className="inline-flex min-h-[136px] flex-col items-start justify-center gap-2 rounded-[24px] border border-white/50 px-3.5 py-3 text-left"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                       <PinIcon className="h-4.5 w-4.5" />
                     </span>
-                    <div className="space-y-1">
-                      <p className="font-medium text-[color:var(--foreground)]">{activeBranch.address}</p>
-                      <p className="text-[color:var(--muted)]">{activeBranch.district} / {activeBranch.city}</p>
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--muted)]">Adres</p>
+                      <p className="text-xs font-medium text-[color:var(--foreground)] leading-snug">{activeBranch.address}</p>
+                      <p className="text-xs text-[color:var(--muted)]">{activeBranch.district} / {activeBranch.city}</p>
                     </div>
-                  </div>
-                </div>
+                  </EventLink>
 
-                <div
-                  style={glassCardStrong}
-                  className="rounded-[22px] border border-white/50 px-4 py-4 shadow-[var(--shadow-soft)]"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                  <div
+                    style={glassCardStrong}
+                    className="inline-flex min-h-[136px] flex-col items-start justify-center gap-2 rounded-[24px] border border-white/50 px-3.5 py-3"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                       <ClockIcon className="h-4.5 w-4.5" />
                     </span>
                     <div className="space-y-1">
                       <p className="text-xs font-medium uppercase tracking-[0.18em] text-[color:var(--muted)]">Çalışma Saatleri</p>
-                      <p className="font-medium text-[color:var(--foreground)]">{activeBranch.hours}</p>
+                      <p className="text-xs font-medium text-[color:var(--foreground)]">{activeBranch.hours}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* 2-kolon aksiyon grid */}
-              <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="mt-3 grid grid-cols-2 gap-3">
                 <EventLink
                   href={getWhatsappHref(activeBranch.whatsapp)}
                   target="_blank"
@@ -349,7 +355,7 @@ export function PublicShell({
                 onClick={(e) => { if (e.target === e.currentTarget) setShowFeedbackForm(false); }}
               >
                 <div
-                  className="w-full max-w-md rounded-[28px] p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:max-h-[min(88vh,720px)] sm:overflow-y-auto"
+                  className="w-[calc(100%-1.5rem)] max-w-md rounded-[28px] p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:max-h-[min(88vh,720px)] sm:overflow-y-auto"
                   style={{
                     background: "rgba(255,252,253,0.96)",
                     backdropFilter: "blur(24px)",
