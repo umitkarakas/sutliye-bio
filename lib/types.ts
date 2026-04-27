@@ -29,6 +29,7 @@ export type Branch = {
   whatsapp: string;
   mapUrl: string;
   reviewUrl?: string;
+  instagram?: string;
   hours: string;
   blurb: string;
   heroNote: string;

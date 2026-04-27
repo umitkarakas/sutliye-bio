@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     whatsapp?: string;
     mapUrl?: string;
     reviewUrl?: string;
+    instagram?: string;
   };
 
   if (
@@ -55,7 +56,8 @@ export async function POST(request: Request) {
       phone: body.phone,
       whatsapp: body.whatsapp,
       mapUrl: body.mapUrl,
-      reviewUrl: body.reviewUrl
+      reviewUrl: body.reviewUrl,
+      instagram: body.instagram
     });
 
     return NextResponse.json({ branch }, { status: 201 });

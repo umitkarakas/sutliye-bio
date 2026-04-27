@@ -48,6 +48,7 @@ export type BranchMinAggregateOutputType = {
   city: string | null
   mapUrl: string | null
   reviewUrl: string | null
+  instagram: string | null
   phone: string | null
   whatsapp: string | null
   latitude: number | null
@@ -70,6 +71,7 @@ export type BranchMaxAggregateOutputType = {
   city: string | null
   mapUrl: string | null
   reviewUrl: string | null
+  instagram: string | null
   phone: string | null
   whatsapp: string | null
   latitude: number | null
@@ -92,6 +94,7 @@ export type BranchCountAggregateOutputType = {
   city: number
   mapUrl: number
   reviewUrl: number
+  instagram: number
   phone: number
   whatsapp: number
   latitude: number
@@ -128,6 +131,7 @@ export type BranchMinAggregateInputType = {
   city?: true
   mapUrl?: true
   reviewUrl?: true
+  instagram?: true
   phone?: true
   whatsapp?: true
   latitude?: true
@@ -150,6 +154,7 @@ export type BranchMaxAggregateInputType = {
   city?: true
   mapUrl?: true
   reviewUrl?: true
+  instagram?: true
   phone?: true
   whatsapp?: true
   latitude?: true
@@ -172,6 +177,7 @@ export type BranchCountAggregateInputType = {
   city?: true
   mapUrl?: true
   reviewUrl?: true
+  instagram?: true
   phone?: true
   whatsapp?: true
   latitude?: true
@@ -281,6 +287,7 @@ export type BranchGroupByOutputType = {
   city: string
   mapUrl: string
   reviewUrl: string | null
+  instagram: string | null
   phone: string
   whatsapp: string
   latitude: number | null
@@ -326,6 +333,7 @@ export type BranchWhereInput = {
   city?: Prisma.StringFilter<"Branch"> | string
   mapUrl?: Prisma.StringFilter<"Branch"> | string
   reviewUrl?: Prisma.StringNullableFilter<"Branch"> | string | null
+  instagram?: Prisma.StringNullableFilter<"Branch"> | string | null
   phone?: Prisma.StringFilter<"Branch"> | string
   whatsapp?: Prisma.StringFilter<"Branch"> | string
   latitude?: Prisma.FloatNullableFilter<"Branch"> | number | null
@@ -353,6 +361,7 @@ export type BranchOrderByWithRelationInput = {
   city?: Prisma.SortOrder
   mapUrl?: Prisma.SortOrder
   reviewUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  instagram?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrder
   whatsapp?: Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -384,6 +393,7 @@ export type BranchWhereUniqueInput = Prisma.AtLeast<{
   city?: Prisma.StringFilter<"Branch"> | string
   mapUrl?: Prisma.StringFilter<"Branch"> | string
   reviewUrl?: Prisma.StringNullableFilter<"Branch"> | string | null
+  instagram?: Prisma.StringNullableFilter<"Branch"> | string | null
   phone?: Prisma.StringFilter<"Branch"> | string
   whatsapp?: Prisma.StringFilter<"Branch"> | string
   latitude?: Prisma.FloatNullableFilter<"Branch"> | number | null
@@ -411,6 +421,7 @@ export type BranchOrderByWithAggregationInput = {
   city?: Prisma.SortOrder
   mapUrl?: Prisma.SortOrder
   reviewUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  instagram?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrder
   whatsapp?: Prisma.SortOrder
   latitude?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -441,6 +452,7 @@ export type BranchScalarWhereWithAggregatesInput = {
   city?: Prisma.StringWithAggregatesFilter<"Branch"> | string
   mapUrl?: Prisma.StringWithAggregatesFilter<"Branch"> | string
   reviewUrl?: Prisma.StringNullableWithAggregatesFilter<"Branch"> | string | null
+  instagram?: Prisma.StringNullableWithAggregatesFilter<"Branch"> | string | null
   phone?: Prisma.StringWithAggregatesFilter<"Branch"> | string
   whatsapp?: Prisma.StringWithAggregatesFilter<"Branch"> | string
   latitude?: Prisma.FloatNullableWithAggregatesFilter<"Branch"> | number | null
@@ -462,6 +474,7 @@ export type BranchCreateInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -489,6 +502,7 @@ export type BranchUncheckedCreateInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -514,6 +528,7 @@ export type BranchUpdateInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -541,6 +556,7 @@ export type BranchUncheckedUpdateInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -567,6 +583,7 @@ export type BranchCreateManyInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -588,6 +605,7 @@ export type BranchUpdateManyMutationInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -610,6 +628,7 @@ export type BranchUncheckedUpdateManyInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -647,6 +666,7 @@ export type BranchCountOrderByAggregateInput = {
   city?: Prisma.SortOrder
   mapUrl?: Prisma.SortOrder
   reviewUrl?: Prisma.SortOrder
+  instagram?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   whatsapp?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
@@ -675,6 +695,7 @@ export type BranchMaxOrderByAggregateInput = {
   city?: Prisma.SortOrder
   mapUrl?: Prisma.SortOrder
   reviewUrl?: Prisma.SortOrder
+  instagram?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   whatsapp?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
@@ -697,6 +718,7 @@ export type BranchMinOrderByAggregateInput = {
   city?: Prisma.SortOrder
   mapUrl?: Prisma.SortOrder
   reviewUrl?: Prisma.SortOrder
+  instagram?: Prisma.SortOrder
   phone?: Prisma.SortOrder
   whatsapp?: Prisma.SortOrder
   latitude?: Prisma.SortOrder
@@ -852,6 +874,7 @@ export type BranchCreateWithoutBusinessInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -877,6 +900,7 @@ export type BranchUncheckedCreateWithoutBusinessInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -932,6 +956,7 @@ export type BranchScalarWhereInput = {
   city?: Prisma.StringFilter<"Branch"> | string
   mapUrl?: Prisma.StringFilter<"Branch"> | string
   reviewUrl?: Prisma.StringNullableFilter<"Branch"> | string | null
+  instagram?: Prisma.StringNullableFilter<"Branch"> | string | null
   phone?: Prisma.StringFilter<"Branch"> | string
   whatsapp?: Prisma.StringFilter<"Branch"> | string
   latitude?: Prisma.FloatNullableFilter<"Branch"> | number | null
@@ -953,6 +978,7 @@ export type BranchCreateWithoutHoursInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -979,6 +1005,7 @@ export type BranchUncheckedCreateWithoutHoursInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -1019,6 +1046,7 @@ export type BranchUpdateWithoutHoursInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1045,6 +1073,7 @@ export type BranchUncheckedUpdateWithoutHoursInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1069,6 +1098,7 @@ export type BranchCreateWithoutBranchProductsInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -1095,6 +1125,7 @@ export type BranchUncheckedCreateWithoutBranchProductsInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -1135,6 +1166,7 @@ export type BranchUpdateWithoutBranchProductsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1161,6 +1193,7 @@ export type BranchUncheckedUpdateWithoutBranchProductsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1185,6 +1218,7 @@ export type BranchCreateWithoutFeedbacksInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -1211,6 +1245,7 @@ export type BranchUncheckedCreateWithoutFeedbacksInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -1251,6 +1286,7 @@ export type BranchUpdateWithoutFeedbacksInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1277,6 +1313,7 @@ export type BranchUncheckedUpdateWithoutFeedbacksInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1301,6 +1338,7 @@ export type BranchCreateWithoutEventLogsInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -1327,6 +1365,7 @@ export type BranchUncheckedCreateWithoutEventLogsInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -1367,6 +1406,7 @@ export type BranchUpdateWithoutEventLogsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1393,6 +1433,7 @@ export type BranchUncheckedUpdateWithoutEventLogsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1417,6 +1458,7 @@ export type BranchCreateManyBusinessInput = {
   city: string
   mapUrl: string
   reviewUrl?: string | null
+  instagram?: string | null
   phone: string
   whatsapp: string
   latitude?: number | null
@@ -1438,6 +1480,7 @@ export type BranchUpdateWithoutBusinessInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1463,6 +1506,7 @@ export type BranchUncheckedUpdateWithoutBusinessInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1488,6 +1532,7 @@ export type BranchUncheckedUpdateManyWithoutBusinessInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   mapUrl?: Prisma.StringFieldUpdateOperationsInput | string
   reviewUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  instagram?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.StringFieldUpdateOperationsInput | string
   whatsapp?: Prisma.StringFieldUpdateOperationsInput | string
   latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1568,6 +1613,7 @@ export type BranchSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   city?: boolean
   mapUrl?: boolean
   reviewUrl?: boolean
+  instagram?: boolean
   phone?: boolean
   whatsapp?: boolean
   latitude?: boolean
@@ -1596,6 +1642,7 @@ export type BranchSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   city?: boolean
   mapUrl?: boolean
   reviewUrl?: boolean
+  instagram?: boolean
   phone?: boolean
   whatsapp?: boolean
   latitude?: boolean
@@ -1619,6 +1666,7 @@ export type BranchSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   city?: boolean
   mapUrl?: boolean
   reviewUrl?: boolean
+  instagram?: boolean
   phone?: boolean
   whatsapp?: boolean
   latitude?: boolean
@@ -1642,6 +1690,7 @@ export type BranchSelectScalar = {
   city?: boolean
   mapUrl?: boolean
   reviewUrl?: boolean
+  instagram?: boolean
   phone?: boolean
   whatsapp?: boolean
   latitude?: boolean
@@ -1654,7 +1703,7 @@ export type BranchSelectScalar = {
   updatedAt?: boolean
 }
 
-export type BranchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "name" | "slug" | "address" | "district" | "city" | "mapUrl" | "reviewUrl" | "phone" | "whatsapp" | "latitude" | "longitude" | "isActive" | "displayOrder" | "blurb" | "heroNote" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>
+export type BranchOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "name" | "slug" | "address" | "district" | "city" | "mapUrl" | "reviewUrl" | "instagram" | "phone" | "whatsapp" | "latitude" | "longitude" | "isActive" | "displayOrder" | "blurb" | "heroNote" | "createdAt" | "updatedAt", ExtArgs["result"]["branch"]>
 export type BranchInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
   hours?: boolean | Prisma.Branch$hoursArgs<ExtArgs>
@@ -1689,6 +1738,7 @@ export type $BranchPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     city: string
     mapUrl: string
     reviewUrl: string | null
+    instagram: string | null
     phone: string
     whatsapp: string
     latitude: number | null
@@ -2136,6 +2186,7 @@ export interface BranchFieldRefs {
   readonly city: Prisma.FieldRef<"Branch", 'String'>
   readonly mapUrl: Prisma.FieldRef<"Branch", 'String'>
   readonly reviewUrl: Prisma.FieldRef<"Branch", 'String'>
+  readonly instagram: Prisma.FieldRef<"Branch", 'String'>
   readonly phone: Prisma.FieldRef<"Branch", 'String'>
   readonly whatsapp: Prisma.FieldRef<"Branch", 'String'>
   readonly latitude: Prisma.FieldRef<"Branch", 'Float'>

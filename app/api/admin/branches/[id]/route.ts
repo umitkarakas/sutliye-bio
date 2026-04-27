@@ -26,6 +26,7 @@ export async function PATCH(request: Request, { params }: Context) {
     whatsapp?: string;
     mapUrl?: string;
     reviewUrl?: string;
+    instagram?: string;
   };
 
   if (
@@ -53,7 +54,8 @@ export async function PATCH(request: Request, { params }: Context) {
       phone: body.phone,
       whatsapp: body.whatsapp,
       mapUrl: body.mapUrl,
-      reviewUrl: body.reviewUrl
+      reviewUrl: body.reviewUrl,
+      instagram: body.instagram
     });
 
     return NextResponse.json({ branch });

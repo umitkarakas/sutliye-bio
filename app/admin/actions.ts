@@ -94,7 +94,8 @@ export async function createBranchAction(formData: FormData) {
     phone: String(formData.get("phone") || "").trim(),
     whatsapp: String(formData.get("whatsapp") || "").trim(),
     mapUrl: String(formData.get("mapUrl") || "").trim(),
-    reviewUrl: String(formData.get("reviewUrl") || "").trim()
+    reviewUrl: String(formData.get("reviewUrl") || "").trim(),
+    instagram: String(formData.get("instagram") || "").trim().replace(/^@/, "")
   };
 
   if (
@@ -128,7 +129,8 @@ export async function createBranchAction(formData: FormData) {
   try {
     await createAdminBranch({
       ...payload,
-      reviewUrl: payload.reviewUrl || undefined
+      reviewUrl: payload.reviewUrl || undefined,
+      instagram: payload.instagram || undefined
     });
   } catch {
     redirect(statusUrl(returnTo, "error"));
@@ -152,7 +154,8 @@ export async function updateBranchAction(formData: FormData) {
     phone: String(formData.get("phone") || "").trim(),
     whatsapp: String(formData.get("whatsapp") || "").trim(),
     mapUrl: String(formData.get("mapUrl") || "").trim(),
-    reviewUrl: String(formData.get("reviewUrl") || "").trim()
+    reviewUrl: String(formData.get("reviewUrl") || "").trim(),
+    instagram: String(formData.get("instagram") || "").trim().replace(/^@/, "")
   };
 
   if (
@@ -172,7 +175,8 @@ export async function updateBranchAction(formData: FormData) {
   try {
     await updateAdminBranch({
       ...payload,
-      reviewUrl: payload.reviewUrl || undefined
+      reviewUrl: payload.reviewUrl || undefined,
+      instagram: payload.instagram || undefined
     });
   } catch {
     redirect(statusUrl(returnTo, "error"));

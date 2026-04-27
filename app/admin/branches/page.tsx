@@ -252,6 +252,12 @@ export default async function AdminBranchesPage({
                         placeholder="Google yorum linki"
                         className="admin-input rounded-2xl px-4 py-3"
                       />
+                      <input
+                        name="instagram"
+                        defaultValue={branch.instagram ?? ""}
+                        placeholder="Instagram kullanıcı adı (@ olmadan)"
+                        className="admin-input rounded-2xl px-4 py-3"
+                      />
                       <button
                         type="submit"
                         disabled={isDemo}

@@ -22,6 +22,7 @@ export type AdminBranchListItem = {
   whatsapp: string;
   mapUrl: string;
   reviewUrl?: string | null;
+  instagram?: string | null;
   isActive: boolean;
   displayOrder: number;
 };
@@ -302,6 +303,7 @@ export async function listAdminBranches(): Promise<AdminBranchListItem[]> {
       whatsapp: branch.whatsapp,
       mapUrl: branch.mapUrl,
       reviewUrl: branch.reviewUrl ?? null,
+      instagram: null,
       isActive: true,
       displayOrder: index
     }));
@@ -322,6 +324,7 @@ export async function listAdminBranches(): Promise<AdminBranchListItem[]> {
             whatsapp,
             "mapUrl",
             "reviewUrl",
+            instagram,
             "isActive",
             "displayOrder"
           FROM "Branch"
@@ -344,6 +347,7 @@ export async function listAdminBranches(): Promise<AdminBranchListItem[]> {
       whatsapp: branch.whatsapp,
       mapUrl: branch.mapUrl,
       reviewUrl: branch.reviewUrl ?? null,
+      instagram: null,
       isActive: true,
       displayOrder: index
     }));
@@ -360,6 +364,7 @@ export async function createAdminBranch(input: {
   whatsapp: string;
   mapUrl: string;
   reviewUrl?: string;
+  instagram?: string;
 }) {
   if (!hasDatabaseUrl()) {
     throw new Error("Database is not configured.");
@@ -390,10 +395,11 @@ export async function createAdminBranch(input: {
           whatsapp,
           "mapUrl",
           "reviewUrl",
+          instagram,
           "displayOrder",
           "updatedAt"
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW())
         RETURNING
           id,
           name,
@@ -405,6 +411,7 @@ export async function createAdminBranch(input: {
           whatsapp,
           "mapUrl",
           "reviewUrl",
+          instagram,
           "isActive",
           "displayOrder"
       `,
@@ -420,6 +427,7 @@ export async function createAdminBranch(input: {
         input.whatsapp,
         input.mapUrl,
         input.reviewUrl ?? null,
+        input.instagram ?? null,
         nextDisplayOrder?.displayOrder ?? 0
       ]
     );
@@ -568,6 +576,7 @@ export async function updateAdminBranch(input: {
   whatsapp: string;
   mapUrl: string;
   reviewUrl?: string;
+  instagram?: string;
 }) {
   if (!hasDatabaseUrl()) {
     throw new Error("Database is not configured.");
@@ -588,6 +597,7 @@ export async function updateAdminBranch(input: {
           whatsapp = $8,
           "mapUrl" = $9,
           "reviewUrl" = $10,
+          instagram = $11,
           "updatedAt" = NOW()
         WHERE id = $1
         RETURNING
@@ -601,6 +611,7 @@ export async function updateAdminBranch(input: {
           whatsapp,
           "mapUrl",
           "reviewUrl",
+          instagram,
           "isActive",
           "displayOrder"
       `,
@@ -614,7 +625,8 @@ export async function updateAdminBranch(input: {
         input.phone,
         input.whatsapp,
         input.mapUrl,
-        input.reviewUrl ?? null
+        input.reviewUrl ?? null,
+        input.instagram ?? null
       ]
     );
 
