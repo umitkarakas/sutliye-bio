@@ -130,9 +130,14 @@ export default async function AdminFeedbackPage({ searchParams }: PageProps) {
                   <span className="admin-chip rounded-full px-2 py-0.5 text-xs">
                     {sourceLabel(fb.source)}
                   </span>
+                  {fb.tableId && (
+                    <span className="admin-chip rounded-full px-2 py-0.5 text-xs">
+                      {fb.tableId.replace(/^m(\d+)$/, "Masa $1")}
+                    </span>
+                  )}
                   {fb.rating ? <StarRating rating={fb.rating} /> : null}
                 </div>
-                <span className="admin-copy text-xs">{formatDate(fb.createdAt)}</span>
+                <span className="admin-copy text-xs">{fb.createdAt}</span>
               </div>
 
               <p className="mt-2 text-sm leading-relaxed">{fb.message}</p>

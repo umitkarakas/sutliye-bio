@@ -32,6 +32,8 @@ export type EventLogMinAggregateOutputType = {
   sessionId: string | null
   eventName: string | null
   source: string | null
+  channel: string | null
+  tableId: string | null
   createdAt: Date | null
 }
 
@@ -43,6 +45,8 @@ export type EventLogMaxAggregateOutputType = {
   sessionId: string | null
   eventName: string | null
   source: string | null
+  channel: string | null
+  tableId: string | null
   createdAt: Date | null
 }
 
@@ -54,6 +58,8 @@ export type EventLogCountAggregateOutputType = {
   sessionId: number
   eventName: number
   source: number
+  channel: number
+  tableId: number
   metadataJson: number
   createdAt: number
   _all: number
@@ -68,6 +74,8 @@ export type EventLogMinAggregateInputType = {
   sessionId?: true
   eventName?: true
   source?: true
+  channel?: true
+  tableId?: true
   createdAt?: true
 }
 
@@ -79,6 +87,8 @@ export type EventLogMaxAggregateInputType = {
   sessionId?: true
   eventName?: true
   source?: true
+  channel?: true
+  tableId?: true
   createdAt?: true
 }
 
@@ -90,6 +100,8 @@ export type EventLogCountAggregateInputType = {
   sessionId?: true
   eventName?: true
   source?: true
+  channel?: true
+  tableId?: true
   metadataJson?: true
   createdAt?: true
   _all?: true
@@ -175,6 +187,8 @@ export type EventLogGroupByOutputType = {
   sessionId: string
   eventName: string
   source: string
+  channel: string | null
+  tableId: string | null
   metadataJson: runtime.JsonValue | null
   createdAt: Date
   _count: EventLogCountAggregateOutputType | null
@@ -208,6 +222,8 @@ export type EventLogWhereInput = {
   sessionId?: Prisma.StringFilter<"EventLog"> | string
   eventName?: Prisma.StringFilter<"EventLog"> | string
   source?: Prisma.StringFilter<"EventLog"> | string
+  channel?: Prisma.StringNullableFilter<"EventLog"> | string | null
+  tableId?: Prisma.StringNullableFilter<"EventLog"> | string | null
   metadataJson?: Prisma.JsonNullableFilter<"EventLog">
   createdAt?: Prisma.DateTimeFilter<"EventLog"> | Date | string
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
@@ -223,6 +239,8 @@ export type EventLogOrderByWithRelationInput = {
   sessionId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   source?: Prisma.SortOrder
+  channel?: Prisma.SortOrderInput | Prisma.SortOrder
+  tableId?: Prisma.SortOrderInput | Prisma.SortOrder
   metadataJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   business?: Prisma.BusinessOrderByWithRelationInput
@@ -241,6 +259,8 @@ export type EventLogWhereUniqueInput = Prisma.AtLeast<{
   sessionId?: Prisma.StringFilter<"EventLog"> | string
   eventName?: Prisma.StringFilter<"EventLog"> | string
   source?: Prisma.StringFilter<"EventLog"> | string
+  channel?: Prisma.StringNullableFilter<"EventLog"> | string | null
+  tableId?: Prisma.StringNullableFilter<"EventLog"> | string | null
   metadataJson?: Prisma.JsonNullableFilter<"EventLog">
   createdAt?: Prisma.DateTimeFilter<"EventLog"> | Date | string
   business?: Prisma.XOR<Prisma.BusinessScalarRelationFilter, Prisma.BusinessWhereInput>
@@ -256,6 +276,8 @@ export type EventLogOrderByWithAggregationInput = {
   sessionId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   source?: Prisma.SortOrder
+  channel?: Prisma.SortOrderInput | Prisma.SortOrder
+  tableId?: Prisma.SortOrderInput | Prisma.SortOrder
   metadataJson?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.EventLogCountOrderByAggregateInput
@@ -274,6 +296,8 @@ export type EventLogScalarWhereWithAggregatesInput = {
   sessionId?: Prisma.StringWithAggregatesFilter<"EventLog"> | string
   eventName?: Prisma.StringWithAggregatesFilter<"EventLog"> | string
   source?: Prisma.StringWithAggregatesFilter<"EventLog"> | string
+  channel?: Prisma.StringNullableWithAggregatesFilter<"EventLog"> | string | null
+  tableId?: Prisma.StringNullableWithAggregatesFilter<"EventLog"> | string | null
   metadataJson?: Prisma.JsonNullableWithAggregatesFilter<"EventLog">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"EventLog"> | Date | string
 }
@@ -283,6 +307,8 @@ export type EventLogCreateInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   business: Prisma.BusinessCreateNestedOneWithoutEventLogsInput
@@ -298,6 +324,8 @@ export type EventLogUncheckedCreateInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
@@ -307,6 +335,8 @@ export type EventLogUpdateInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   business?: Prisma.BusinessUpdateOneRequiredWithoutEventLogsNestedInput
@@ -322,6 +352,8 @@ export type EventLogUncheckedUpdateInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -334,6 +366,8 @@ export type EventLogCreateManyInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
@@ -343,6 +377,8 @@ export type EventLogUpdateManyMutationInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -355,6 +391,8 @@ export type EventLogUncheckedUpdateManyInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -377,6 +415,8 @@ export type EventLogCountOrderByAggregateInput = {
   sessionId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   source?: Prisma.SortOrder
+  channel?: Prisma.SortOrder
+  tableId?: Prisma.SortOrder
   metadataJson?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -389,6 +429,8 @@ export type EventLogMaxOrderByAggregateInput = {
   sessionId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   source?: Prisma.SortOrder
+  channel?: Prisma.SortOrder
+  tableId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -400,6 +442,8 @@ export type EventLogMinOrderByAggregateInput = {
   sessionId?: Prisma.SortOrder
   eventName?: Prisma.SortOrder
   source?: Prisma.SortOrder
+  channel?: Prisma.SortOrder
+  tableId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -534,6 +578,8 @@ export type EventLogCreateWithoutBusinessInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   branch?: Prisma.BranchCreateNestedOneWithoutEventLogsInput
@@ -547,6 +593,8 @@ export type EventLogUncheckedCreateWithoutBusinessInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
@@ -588,6 +636,8 @@ export type EventLogScalarWhereInput = {
   sessionId?: Prisma.StringFilter<"EventLog"> | string
   eventName?: Prisma.StringFilter<"EventLog"> | string
   source?: Prisma.StringFilter<"EventLog"> | string
+  channel?: Prisma.StringNullableFilter<"EventLog"> | string | null
+  tableId?: Prisma.StringNullableFilter<"EventLog"> | string | null
   metadataJson?: Prisma.JsonNullableFilter<"EventLog">
   createdAt?: Prisma.DateTimeFilter<"EventLog"> | Date | string
 }
@@ -597,6 +647,8 @@ export type EventLogCreateWithoutBranchInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   business: Prisma.BusinessCreateNestedOneWithoutEventLogsInput
@@ -610,6 +662,8 @@ export type EventLogUncheckedCreateWithoutBranchInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
@@ -645,6 +699,8 @@ export type EventLogCreateWithoutProductInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   business: Prisma.BusinessCreateNestedOneWithoutEventLogsInput
@@ -658,6 +714,8 @@ export type EventLogUncheckedCreateWithoutProductInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
@@ -695,6 +753,8 @@ export type EventLogCreateManyBusinessInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
@@ -704,6 +764,8 @@ export type EventLogUpdateWithoutBusinessInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   branch?: Prisma.BranchUpdateOneWithoutEventLogsNestedInput
@@ -717,6 +779,8 @@ export type EventLogUncheckedUpdateWithoutBusinessInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -728,6 +792,8 @@ export type EventLogUncheckedUpdateManyWithoutBusinessInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -739,6 +805,8 @@ export type EventLogCreateManyBranchInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
@@ -748,6 +816,8 @@ export type EventLogUpdateWithoutBranchInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   business?: Prisma.BusinessUpdateOneRequiredWithoutEventLogsNestedInput
@@ -761,6 +831,8 @@ export type EventLogUncheckedUpdateWithoutBranchInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -772,6 +844,8 @@ export type EventLogUncheckedUpdateManyWithoutBranchInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -783,6 +857,8 @@ export type EventLogCreateManyProductInput = {
   sessionId: string
   eventName: string
   source: string
+  channel?: string | null
+  tableId?: string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
 }
@@ -792,6 +868,8 @@ export type EventLogUpdateWithoutProductInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   business?: Prisma.BusinessUpdateOneRequiredWithoutEventLogsNestedInput
@@ -805,6 +883,8 @@ export type EventLogUncheckedUpdateWithoutProductInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -816,6 +896,8 @@ export type EventLogUncheckedUpdateManyWithoutProductInput = {
   sessionId?: Prisma.StringFieldUpdateOperationsInput | string
   eventName?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
+  channel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadataJson?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -830,6 +912,8 @@ export type EventLogSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   sessionId?: boolean
   eventName?: boolean
   source?: boolean
+  channel?: boolean
+  tableId?: boolean
   metadataJson?: boolean
   createdAt?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
@@ -845,6 +929,8 @@ export type EventLogSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   sessionId?: boolean
   eventName?: boolean
   source?: boolean
+  channel?: boolean
+  tableId?: boolean
   metadataJson?: boolean
   createdAt?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
@@ -860,6 +946,8 @@ export type EventLogSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   sessionId?: boolean
   eventName?: boolean
   source?: boolean
+  channel?: boolean
+  tableId?: boolean
   metadataJson?: boolean
   createdAt?: boolean
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
@@ -875,11 +963,13 @@ export type EventLogSelectScalar = {
   sessionId?: boolean
   eventName?: boolean
   source?: boolean
+  channel?: boolean
+  tableId?: boolean
   metadataJson?: boolean
   createdAt?: boolean
 }
 
-export type EventLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "branchId" | "productId" | "sessionId" | "eventName" | "source" | "metadataJson" | "createdAt", ExtArgs["result"]["eventLog"]>
+export type EventLogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "branchId" | "productId" | "sessionId" | "eventName" | "source" | "channel" | "tableId" | "metadataJson" | "createdAt", ExtArgs["result"]["eventLog"]>
 export type EventLogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.EventLog$branchArgs<ExtArgs>
@@ -911,6 +1001,8 @@ export type $EventLogPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     sessionId: string
     eventName: string
     source: string
+    channel: string | null
+    tableId: string | null
     metadataJson: runtime.JsonValue | null
     createdAt: Date
   }, ExtArgs["result"]["eventLog"]>
@@ -1346,6 +1438,8 @@ export interface EventLogFieldRefs {
   readonly sessionId: Prisma.FieldRef<"EventLog", 'String'>
   readonly eventName: Prisma.FieldRef<"EventLog", 'String'>
   readonly source: Prisma.FieldRef<"EventLog", 'String'>
+  readonly channel: Prisma.FieldRef<"EventLog", 'String'>
+  readonly tableId: Prisma.FieldRef<"EventLog", 'String'>
   readonly metadataJson: Prisma.FieldRef<"EventLog", 'Json'>
   readonly createdAt: Prisma.FieldRef<"EventLog", 'DateTime'>
 }

@@ -62,9 +62,10 @@ export async function createFeedback(input: {
             message,
             source,
             status,
+            "tableId",
             "createdAt"
           )
-          VALUES ($1, $2, $3, $4, $5, $6, 'new', NOW())
+          VALUES ($1, $2, $3, $4, $5, $6, 'new', $7, NOW())
         `,
         [
           crypto.randomUUID(),
@@ -72,7 +73,8 @@ export async function createFeedback(input: {
           input.branchId,
           input.rating ?? null,
           input.message,
-          input.source || "public"
+          input.source || "public",
+          input.tableId ?? null
         ]
       )
     );
@@ -96,7 +98,7 @@ export async function getFeedbacks(days = 90): Promise<FeedbackRow[]> {
     if (!businessId) return [];
 
     const result = await withDb((db) =>
-      db.query<FeedbackRow & { tableIdRaw: string | null }>(
+      db.query<FeedbackRow>(
         `
           SELECT
             f.id,
@@ -105,9 +107,10 @@ export async function getFeedbacks(days = 90): Promise<FeedbackRow[]> {
             f.message,
             f.source,
             f.status,
+            f."tableId",
             f."contactName",
             f."contactPhone",
-            f."createdAt"::text
+            TO_CHAR(f."createdAt" AT TIME ZONE 'Europe/Istanbul', 'DD.MM.YYYY HH24:MI') AS "createdAt"
           FROM "Feedback" f
           LEFT JOIN "Branch" b ON b.id = f."branchId"
           WHERE f."businessId" = $1
@@ -118,10 +121,7 @@ export async function getFeedbacks(days = 90): Promise<FeedbackRow[]> {
       )
     );
 
-    return result.rows.map((row) => ({
-      ...row,
-      tableId: null
-    }));
+    return result.rows;
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error(`[feedback-data] getFeedbacks error: ${message}`);

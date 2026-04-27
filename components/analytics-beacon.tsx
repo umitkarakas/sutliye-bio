@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { TabId } from "@/lib/types";
 import { createClientSessionId } from "@/lib/client-session-id";
+import { detectChannel } from "@/lib/channel";
 
 type AnalyticsBeaconProps = {
   branchId: string;
@@ -73,11 +74,19 @@ export function AnalyticsBeacon({ branchId, activeTab, source, tableId }: Analyt
     const resolvedTableId = resolveTableId(tableId);
     const tableMetadata = resolvedTableId ? { tableId: resolvedTableId } : {};
 
+    const channel = detectChannel(
+      new URLSearchParams(window.location.search),
+      document.referrer
+    );
+    window.sessionStorage.setItem("analytics_channel", channel);
+
     sendEvent({
       eventName: "page_view",
       branchId,
       source,
       sessionId,
+      channel,
+      tableId: resolvedTableId ?? null,
       metadata: {
         activeTab,
         referrer: document.referrer || "direct",
@@ -91,6 +100,8 @@ export function AnalyticsBeacon({ branchId, activeTab, source, tableId }: Analyt
       branchId,
       source,
       sessionId,
+      channel,
+      tableId: resolvedTableId ?? null,
       metadata: tableMetadata
     });
 
@@ -99,6 +110,8 @@ export function AnalyticsBeacon({ branchId, activeTab, source, tableId }: Analyt
       branchId,
       source,
       sessionId,
+      channel,
+      tableId: resolvedTableId ?? null,
       metadata: {
         activeTab,
         ...tableMetadata

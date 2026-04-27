@@ -13,8 +13,11 @@ import {
   getEventTypeTotals,
   getHourlyDistribution,
   getWeekdayDistribution,
-  getTableStats
+  getTableTrafficByBranch,
+  getChannelBreakdown
 } from "@/lib/server/analytics-data";
+import { getFeedbacks } from "@/lib/server/feedback-data";
+import { CHANNEL_LABELS } from "@/lib/channel";
 
 type SearchParams = Promise<{ days?: string | string[] }>;
 
@@ -43,20 +46,6 @@ const DOW_LABELS = ["Paz", "Pzt", "Sal", "Çar", "Per", "Cum", "Cmt"];
 
 function eventLabel(name: string) {
   return EVENT_LABELS[name] ?? name;
-}
-
-function formatDate(iso: string) {
-  try {
-    return new Date(iso).toLocaleString("tr-TR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  } catch {
-    return iso;
-  }
 }
 
 function BarRow({ label, value, max, suffix = "" }: { label: string; value: number; max: number; suffix?: string }) {
@@ -94,7 +83,9 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
     eventTypeTotals,
     hourlyDist,
     weekdayDist,
-    tableStats
+    tableTraffic,
+    channelBreakdown,
+    recentFeedbacks
   ] = await Promise.all([
     getAnalyticsOverview(days),
     getEventsByDay(days),
@@ -106,7 +97,9 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
     getEventTypeTotals(days),
     getHourlyDistribution(days),
     getWeekdayDistribution(days),
-    getTableStats(days)
+    getTableTrafficByBranch(days),
+    getChannelBreakdown(days),
+    getFeedbacks(30)
   ]);
 
   const maxDayCount = Math.max(...byDay.map((d) => d.count), 1);
@@ -132,7 +125,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
 
       {overview.isDemo && (
         <section className="admin-notice rounded-[24px] px-4 py-3 text-sm">
-          Demo verileri gösteriliyor. Gerçek veriler için `DATABASE_URL` gerekir.
+          Demo verileri gösteriliyor. Gerçek veriler için <code>DATABASE_URL</code> gerekir.
         </section>
       )}
 
@@ -164,10 +157,37 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
         </div>
       </section>
 
+      {/* Trafik Kaynakları — channel breakdown */}
+      {channelBreakdown.length > 0 && (
+        <section className="admin-panel rounded-[32px] p-4">
+          <h2 className="font-[family-name:var(--font-display)] text-xl">Trafik Kaynakları</h2>
+          <p className="admin-copy mt-0.5 text-xs">Ziyaretçilerin nereden geldiği (Türkiye saati)</p>
+          <div className="mt-4 space-y-3">
+            {channelBreakdown.map((c) => (
+              <div key={c.channel} className="flex items-center gap-3">
+                <span className="w-[130px] shrink-0 text-sm font-medium">
+                  {CHANNEL_LABELS[c.channel as keyof typeof CHANNEL_LABELS] ?? c.channel}
+                </span>
+                <div className="flex-1 h-1.5 overflow-hidden rounded-full bg-[color:var(--line)]">
+                  <div
+                    className="h-full rounded-full bg-[color:var(--accent)]"
+                    style={{ width: `${c.pct}%` }}
+                  />
+                </div>
+                <span className="admin-copy w-32 shrink-0 text-right text-xs">
+                  {c.visits.toLocaleString("tr-TR")} ziyaret · %{c.pct}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Daily chart */}
       {byDay.length > 0 && (
         <section className="admin-panel rounded-[32px] p-4">
           <h2 className="font-[family-name:var(--font-display)] text-xl">Günlük Ziyaret</h2>
+          <p className="admin-copy mt-0.5 text-xs">Türkiye saatine göre</p>
           <div className="mt-4 flex h-28 items-end gap-[3px]">
             {byDay.map((d) => (
               <div
@@ -189,7 +209,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
       <div className="grid gap-4 sm:grid-cols-2">
         <section className="admin-panel rounded-[32px] p-4">
           <h2 className="font-[family-name:var(--font-display)] text-xl">Saatlik Dağılım</h2>
-          <p className="admin-copy mt-0.5 text-xs">Hangi saatlerde daha çok ziyaret var</p>
+          <p className="admin-copy mt-0.5 text-xs">Türkiye saatine göre</p>
           <div className="mt-4 flex h-20 items-end gap-[2px]">
             {hourlyDist.map((h) => (
               <div
@@ -209,7 +229,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
 
         <section className="admin-panel rounded-[32px] p-4">
           <h2 className="font-[family-name:var(--font-display)] text-xl">Haftanın Günleri</h2>
-          <p className="admin-copy mt-0.5 text-xs">Hangi günlerde daha çok ziyaret var</p>
+          <p className="admin-copy mt-0.5 text-xs">Türkiye saatine göre</p>
           <div className="mt-4 flex h-20 items-end gap-[4px]">
             {weekdayDist.map((d) => (
               <div key={d.dow} className="flex flex-1 flex-col items-center gap-1">
@@ -263,7 +283,43 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
         </section>
       )}
 
-      {/* Event type totals (cumulative) */}
+      {/* Masa Trafiği */}
+      {tableTraffic.length > 0 && (
+        <section className="admin-panel rounded-[32px] p-4">
+          <h2 className="font-[family-name:var(--font-display)] text-xl">Masa Trafiği</h2>
+          <p className="admin-copy mt-0.5 text-xs">QR kod ile açılan masa oturumları — en yoğun masalar üstte</p>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[color:var(--line)] text-left">
+                  <th className="admin-copy pb-2 pr-4 text-xs font-medium uppercase tracking-wider">Şube</th>
+                  <th className="admin-copy pb-2 pr-4 text-xs font-medium uppercase tracking-wider">Masa</th>
+                  <th className="admin-copy pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wider">Ziyaret</th>
+                  <th className="admin-copy pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wider">Oturum</th>
+                  <th className="admin-copy pb-2 text-right text-xs font-medium uppercase tracking-wider">Geri Bildirim</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[color:var(--line)]">
+                {tableTraffic.map((row) => (
+                  <tr key={`${row.branchName}-${row.tableId}`}>
+                    <td className="py-2 pr-4 font-medium">{row.branchName}</td>
+                    <td className="py-2 pr-4">
+                      <span className="admin-chip rounded-full px-2 py-0.5 text-xs">
+                        {row.tableId.replace(/^m(\d+)$/, "Masa $1")}
+                      </span>
+                    </td>
+                    <td className="py-2 pr-4 text-right tabular-nums">{row.pageViews.toLocaleString("tr-TR")}</td>
+                    <td className="py-2 pr-4 text-right tabular-nums">{row.sessions.toLocaleString("tr-TR")}</td>
+                    <td className="py-2 text-right tabular-nums">{row.feedbackCount.toLocaleString("tr-TR")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Event type totals */}
       {eventTypeTotals.length > 0 && (
         <section className="admin-panel rounded-[32px] p-4">
           <h2 className="font-[family-name:var(--font-display)] text-xl">Etkileşim Dağılımı</h2>
@@ -298,7 +354,8 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
         </section>
 
         <section className="admin-panel rounded-[32px] p-4">
-          <h2 className="font-[family-name:var(--font-display)] text-xl">Trafik Kaynağı</h2>
+          <h2 className="font-[family-name:var(--font-display)] text-xl">Ham Kaynak</h2>
+          <p className="admin-copy mt-0.5 text-xs">Referrer adresleri</p>
           {topReferrers.length === 0 ? (
             <p className="admin-copy mt-3 text-sm">Henüz veri yok.</p>
           ) : (
@@ -332,42 +389,6 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
         </section>
       )}
 
-      {/* Masa bazlı QR trafik */}
-      {tableStats.length > 0 && (
-        <section className="admin-panel rounded-[32px] p-4">
-          <h2 className="font-[family-name:var(--font-display)] text-xl">Masa Bazlı Trafik</h2>
-          <p className="admin-copy mt-1 text-xs">Sadece QR kod ile açılan oturumlar.</p>
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[color:var(--line)] text-left">
-                  <th className="admin-copy pb-2 pr-4 text-xs font-medium uppercase tracking-wider">Şube</th>
-                  <th className="admin-copy pb-2 pr-4 text-xs font-medium uppercase tracking-wider">Masa</th>
-                  <th className="admin-copy pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wider">Ziyaret</th>
-                  <th className="admin-copy pb-2 pr-4 text-right text-xs font-medium uppercase tracking-wider">Oturum</th>
-                  <th className="admin-copy pb-2 text-right text-xs font-medium uppercase tracking-wider">Aksiyon</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[color:var(--line)]">
-                {tableStats.map((row) => (
-                  <tr key={`${row.branchName}-${row.tableId}`}>
-                    <td className="py-2 pr-4 font-medium">{row.branchName}</td>
-                    <td className="py-2 pr-4">
-                      <span className="admin-chip rounded-full px-2 py-0.5 text-xs">
-                        {row.tableId.replace(/^m(\d+)$/, "Masa $1")}
-                      </span>
-                    </td>
-                    <td className="py-2 pr-4 text-right">{row.pageViews.toLocaleString("tr-TR")}</td>
-                    <td className="py-2 pr-4 text-right">{row.sessions.toLocaleString("tr-TR")}</td>
-                    <td className="py-2 text-right">{row.interactions.toLocaleString("tr-TR")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
       {/* Recent events */}
       <section className="admin-panel rounded-[32px] p-4">
         <h2 className="font-[family-name:var(--font-display)] text-xl">Son Aktiviteler</h2>
@@ -380,17 +401,58 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
                 <div className="min-w-0">
                   <span className="font-medium">{eventLabel(e.eventName)}</span>
                   {e.branchName && <span className="admin-copy"> · {e.branchName}</span>}
-                  {e.productName && <span className="admin-copy"> · {e.productName}</span>}
-                  {e.referrer && e.referrer !== "direct" && (
-                    <span className="admin-copy"> · {e.referrer}</span>
+                  {e.tableId && (
+                    <span className="admin-chip ml-1 rounded-full px-1.5 py-0.5 text-[10px]">
+                      {e.tableId.replace(/^m(\d+)$/, "M$1")}
+                    </span>
                   )}
+                  {e.channel && e.channel !== "direct" && (
+                    <span className="admin-copy text-xs"> · {CHANNEL_LABELS[e.channel as keyof typeof CHANNEL_LABELS] ?? e.channel}</span>
+                  )}
+                  {e.productName && <span className="admin-copy"> · {e.productName}</span>}
                 </div>
-                <span className="admin-copy shrink-0 text-xs">{formatDate(e.createdAt)}</span>
+                <span className="admin-copy shrink-0 text-xs">{e.createdAt}</span>
               </div>
             ))}
           </div>
         )}
       </section>
+
+      {/* Son Geri Bildirimler */}
+      {recentFeedbacks.length > 0 && (
+        <section className="admin-panel rounded-[32px] p-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-[family-name:var(--font-display)] text-xl">Son Geri Bildirimler</h2>
+            <Link href="/admin/feedback" className="admin-copy text-xs underline underline-offset-2">
+              Tümünü gör →
+            </Link>
+          </div>
+          <p className="admin-copy mt-0.5 text-xs">Son 30 gün · Türkiye saatine göre</p>
+          <div className="mt-3 divide-y divide-[color:var(--line)]">
+            {recentFeedbacks.slice(0, 8).map((fb) => (
+              <div key={fb.id} className="flex flex-wrap items-start justify-between gap-2 py-2.5 text-sm">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {fb.branchName && <span className="font-medium">{fb.branchName}</span>}
+                    {fb.tableId && (
+                      <span className="admin-chip rounded-full px-2 py-0.5 text-xs">
+                        {fb.tableId.replace(/^m(\d+)$/, "Masa $1")}
+                      </span>
+                    )}
+                    {fb.rating != null && (
+                      <span className="text-xs text-[color:var(--accent)]">
+                        {"★".repeat(fb.rating)}{"☆".repeat(5 - fb.rating)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-0.5 line-clamp-1 text-xs text-[color:var(--muted)]">{fb.message}</p>
+                </div>
+                <span className="admin-copy shrink-0 text-xs">{fb.createdAt}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
     </AdminPageShell>
   );

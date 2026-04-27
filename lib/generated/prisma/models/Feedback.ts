@@ -42,6 +42,7 @@ export type FeedbackMinAggregateOutputType = {
   message: string | null
   source: string | null
   status: $Enums.FeedbackStatus | null
+  tableId: string | null
   contactName: string | null
   contactPhone: string | null
   createdAt: Date | null
@@ -55,6 +56,7 @@ export type FeedbackMaxAggregateOutputType = {
   message: string | null
   source: string | null
   status: $Enums.FeedbackStatus | null
+  tableId: string | null
   contactName: string | null
   contactPhone: string | null
   createdAt: Date | null
@@ -68,6 +70,7 @@ export type FeedbackCountAggregateOutputType = {
   message: number
   source: number
   status: number
+  tableId: number
   contactName: number
   contactPhone: number
   createdAt: number
@@ -91,6 +94,7 @@ export type FeedbackMinAggregateInputType = {
   message?: true
   source?: true
   status?: true
+  tableId?: true
   contactName?: true
   contactPhone?: true
   createdAt?: true
@@ -104,6 +108,7 @@ export type FeedbackMaxAggregateInputType = {
   message?: true
   source?: true
   status?: true
+  tableId?: true
   contactName?: true
   contactPhone?: true
   createdAt?: true
@@ -117,6 +122,7 @@ export type FeedbackCountAggregateInputType = {
   message?: true
   source?: true
   status?: true
+  tableId?: true
   contactName?: true
   contactPhone?: true
   createdAt?: true
@@ -217,6 +223,7 @@ export type FeedbackGroupByOutputType = {
   message: string
   source: string
   status: $Enums.FeedbackStatus
+  tableId: string | null
   contactName: string | null
   contactPhone: string | null
   createdAt: Date
@@ -253,6 +260,7 @@ export type FeedbackWhereInput = {
   message?: Prisma.StringFilter<"Feedback"> | string
   source?: Prisma.StringFilter<"Feedback"> | string
   status?: Prisma.EnumFeedbackStatusFilter<"Feedback"> | $Enums.FeedbackStatus
+  tableId?: Prisma.StringNullableFilter<"Feedback"> | string | null
   contactName?: Prisma.StringNullableFilter<"Feedback"> | string | null
   contactPhone?: Prisma.StringNullableFilter<"Feedback"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Feedback"> | Date | string
@@ -268,6 +276,7 @@ export type FeedbackOrderByWithRelationInput = {
   message?: Prisma.SortOrder
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tableId?: Prisma.SortOrderInput | Prisma.SortOrder
   contactName?: Prisma.SortOrderInput | Prisma.SortOrder
   contactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -286,6 +295,7 @@ export type FeedbackWhereUniqueInput = Prisma.AtLeast<{
   message?: Prisma.StringFilter<"Feedback"> | string
   source?: Prisma.StringFilter<"Feedback"> | string
   status?: Prisma.EnumFeedbackStatusFilter<"Feedback"> | $Enums.FeedbackStatus
+  tableId?: Prisma.StringNullableFilter<"Feedback"> | string | null
   contactName?: Prisma.StringNullableFilter<"Feedback"> | string | null
   contactPhone?: Prisma.StringNullableFilter<"Feedback"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Feedback"> | Date | string
@@ -301,6 +311,7 @@ export type FeedbackOrderByWithAggregationInput = {
   message?: Prisma.SortOrder
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tableId?: Prisma.SortOrderInput | Prisma.SortOrder
   contactName?: Prisma.SortOrderInput | Prisma.SortOrder
   contactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -322,6 +333,7 @@ export type FeedbackScalarWhereWithAggregatesInput = {
   message?: Prisma.StringWithAggregatesFilter<"Feedback"> | string
   source?: Prisma.StringWithAggregatesFilter<"Feedback"> | string
   status?: Prisma.EnumFeedbackStatusWithAggregatesFilter<"Feedback"> | $Enums.FeedbackStatus
+  tableId?: Prisma.StringNullableWithAggregatesFilter<"Feedback"> | string | null
   contactName?: Prisma.StringNullableWithAggregatesFilter<"Feedback"> | string | null
   contactPhone?: Prisma.StringNullableWithAggregatesFilter<"Feedback"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Feedback"> | Date | string
@@ -333,6 +345,7 @@ export type FeedbackCreateInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -348,6 +361,7 @@ export type FeedbackUncheckedCreateInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -359,6 +373,7 @@ export type FeedbackUpdateInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -374,6 +389,7 @@ export type FeedbackUncheckedUpdateInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -387,6 +403,7 @@ export type FeedbackCreateManyInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -398,6 +415,7 @@ export type FeedbackUpdateManyMutationInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -411,6 +429,7 @@ export type FeedbackUncheckedUpdateManyInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -434,6 +453,7 @@ export type FeedbackCountOrderByAggregateInput = {
   message?: Prisma.SortOrder
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tableId?: Prisma.SortOrder
   contactName?: Prisma.SortOrder
   contactPhone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -451,6 +471,7 @@ export type FeedbackMaxOrderByAggregateInput = {
   message?: Prisma.SortOrder
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tableId?: Prisma.SortOrder
   contactName?: Prisma.SortOrder
   contactPhone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -464,6 +485,7 @@ export type FeedbackMinOrderByAggregateInput = {
   message?: Prisma.SortOrder
   source?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  tableId?: Prisma.SortOrder
   contactName?: Prisma.SortOrder
   contactPhone?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -567,6 +589,7 @@ export type FeedbackCreateWithoutBusinessInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -580,6 +603,7 @@ export type FeedbackUncheckedCreateWithoutBusinessInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -622,6 +646,7 @@ export type FeedbackScalarWhereInput = {
   message?: Prisma.StringFilter<"Feedback"> | string
   source?: Prisma.StringFilter<"Feedback"> | string
   status?: Prisma.EnumFeedbackStatusFilter<"Feedback"> | $Enums.FeedbackStatus
+  tableId?: Prisma.StringNullableFilter<"Feedback"> | string | null
   contactName?: Prisma.StringNullableFilter<"Feedback"> | string | null
   contactPhone?: Prisma.StringNullableFilter<"Feedback"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Feedback"> | Date | string
@@ -633,6 +658,7 @@ export type FeedbackCreateWithoutBranchInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -646,6 +672,7 @@ export type FeedbackUncheckedCreateWithoutBranchInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -684,6 +711,7 @@ export type FeedbackCreateManyBusinessInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -695,6 +723,7 @@ export type FeedbackUpdateWithoutBusinessInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -708,6 +737,7 @@ export type FeedbackUncheckedUpdateWithoutBusinessInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -720,6 +750,7 @@ export type FeedbackUncheckedUpdateManyWithoutBusinessInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -732,6 +763,7 @@ export type FeedbackCreateManyBranchInput = {
   message: string
   source: string
   status?: $Enums.FeedbackStatus
+  tableId?: string | null
   contactName?: string | null
   contactPhone?: string | null
   createdAt?: Date | string
@@ -743,6 +775,7 @@ export type FeedbackUpdateWithoutBranchInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -756,6 +789,7 @@ export type FeedbackUncheckedUpdateWithoutBranchInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -768,6 +802,7 @@ export type FeedbackUncheckedUpdateManyWithoutBranchInput = {
   message?: Prisma.StringFieldUpdateOperationsInput | string
   source?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumFeedbackStatusFieldUpdateOperationsInput | $Enums.FeedbackStatus
+  tableId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -783,6 +818,7 @@ export type FeedbackSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   message?: boolean
   source?: boolean
   status?: boolean
+  tableId?: boolean
   contactName?: boolean
   contactPhone?: boolean
   createdAt?: boolean
@@ -798,6 +834,7 @@ export type FeedbackSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   message?: boolean
   source?: boolean
   status?: boolean
+  tableId?: boolean
   contactName?: boolean
   contactPhone?: boolean
   createdAt?: boolean
@@ -813,6 +850,7 @@ export type FeedbackSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   message?: boolean
   source?: boolean
   status?: boolean
+  tableId?: boolean
   contactName?: boolean
   contactPhone?: boolean
   createdAt?: boolean
@@ -828,12 +866,13 @@ export type FeedbackSelectScalar = {
   message?: boolean
   source?: boolean
   status?: boolean
+  tableId?: boolean
   contactName?: boolean
   contactPhone?: boolean
   createdAt?: boolean
 }
 
-export type FeedbackOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "branchId" | "rating" | "message" | "source" | "status" | "contactName" | "contactPhone" | "createdAt", ExtArgs["result"]["feedback"]>
+export type FeedbackOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "businessId" | "branchId" | "rating" | "message" | "source" | "status" | "tableId" | "contactName" | "contactPhone" | "createdAt", ExtArgs["result"]["feedback"]>
 export type FeedbackInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   business?: boolean | Prisma.BusinessDefaultArgs<ExtArgs>
   branch?: boolean | Prisma.Feedback$branchArgs<ExtArgs>
@@ -861,6 +900,7 @@ export type $FeedbackPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     message: string
     source: string
     status: $Enums.FeedbackStatus
+    tableId: string | null
     contactName: string | null
     contactPhone: string | null
     createdAt: Date
@@ -1296,6 +1336,7 @@ export interface FeedbackFieldRefs {
   readonly message: Prisma.FieldRef<"Feedback", 'String'>
   readonly source: Prisma.FieldRef<"Feedback", 'String'>
   readonly status: Prisma.FieldRef<"Feedback", 'FeedbackStatus'>
+  readonly tableId: Prisma.FieldRef<"Feedback", 'String'>
   readonly contactName: Prisma.FieldRef<"Feedback", 'String'>
   readonly contactPhone: Prisma.FieldRef<"Feedback", 'String'>
   readonly createdAt: Prisma.FieldRef<"Feedback", 'DateTime'>

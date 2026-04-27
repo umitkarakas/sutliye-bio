@@ -213,6 +213,7 @@ export const FeedbackScalarFieldEnum = {
   message: 'message',
   source: 'source',
   status: 'status',
+  tableId: 'tableId',
   contactName: 'contactName',
   contactPhone: 'contactPhone',
   createdAt: 'createdAt'
@@ -229,6 +230,8 @@ export const EventLogScalarFieldEnum = {
   sessionId: 'sessionId',
   eventName: 'eventName',
   source: 'source',
+  channel: 'channel',
+  tableId: 'tableId',
   metadataJson: 'metadataJson',
   createdAt: 'createdAt'
 } as const

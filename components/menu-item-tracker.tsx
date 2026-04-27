@@ -23,12 +23,17 @@ function getSessionId() {
 
 export function MenuItemTracker({ productId, branchId, source, children, className, style }: MenuItemTrackerProps) {
   const handleClick = useCallback(() => {
+    const tableId = window.sessionStorage.getItem("qr_table_id");
+    const channel = window.sessionStorage.getItem("analytics_channel") ?? "direct";
+
     const body = JSON.stringify({
       eventName: "menu_item_view",
       productId,
       branchId,
       source,
-      sessionId: getSessionId()
+      sessionId: getSessionId(),
+      channel,
+      tableId: tableId ?? undefined
     });
     if (navigator.sendBeacon) {
       navigator.sendBeacon("/api/events", new Blob([body], { type: "application/json" }));

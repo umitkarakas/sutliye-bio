@@ -34,11 +34,16 @@ export function EventLink({
     (event) => {
       onClick?.(event);
 
+      const tableId = window.sessionStorage.getItem("qr_table_id");
+      const channel = window.sessionStorage.getItem("analytics_channel") ?? "direct";
+
       const body = JSON.stringify({
         eventName,
         branchId,
         source,
-        sessionId: getAnalyticsSessionId()
+        sessionId: getAnalyticsSessionId(),
+        channel,
+        tableId: tableId ?? undefined
       });
 
       if (navigator.sendBeacon) {

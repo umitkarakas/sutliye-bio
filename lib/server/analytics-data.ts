@@ -6,6 +6,8 @@ type RecordEventInput = {
   productId?: string;
   sessionId?: string;
   source?: string;
+  channel?: string;
+  tableId?: string;
   metadata?: Record<string, unknown>;
 };
 
@@ -80,9 +82,11 @@ export async function recordAnalyticsEvent(input: RecordEventInput) {
             "sessionId",
             "eventName",
             source,
+            channel,
+            "tableId",
             "metadataJson"
           )
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb)
         `,
         [
           crypto.randomUUID(),
@@ -92,6 +96,8 @@ export async function recordAnalyticsEvent(input: RecordEventInput) {
           input.sessionId || crypto.randomUUID(),
           input.eventName,
           input.source || "public_shell",
+          input.channel ?? null,
+          input.tableId ?? null,
           input.metadata ? JSON.stringify(input.metadata) : null
         ]
       )
@@ -146,6 +152,8 @@ export type RecentEvent = {
   branchName: string | null;
   productName: string | null;
   referrer: string | null;
+  channel: string | null;
+  tableId: string | null;
   createdAt: string;
 };
 
@@ -168,6 +176,8 @@ type RecentRow = {
   branchName: string | null;
   productName: string | null;
   referrer: string | null;
+  channel: string | null;
+  tableId: string | null;
   createdAt: string;
 };
 
@@ -226,10 +236,10 @@ export async function getEventsByDay(days: number): Promise<DailyCount[]> {
       if (!business) return [];
       const filter = days > 0 ? `AND "createdAt" > NOW() - INTERVAL '${days} days'` : "";
       const rows = await db.query<DailyRow>(
-        `SELECT DATE("createdAt")::text AS date, COUNT(*)::int AS count
+        `SELECT DATE("createdAt" AT TIME ZONE 'Europe/Istanbul')::text AS date, COUNT(*)::int AS count
          FROM "EventLog"
          WHERE "businessId" = $1 AND "eventName" = 'page_view' ${filter}
-         GROUP BY DATE("createdAt")
+         GROUP BY DATE("createdAt" AT TIME ZONE 'Europe/Istanbul')
          ORDER BY date ASC`,
         [business.id]
       );
@@ -341,7 +351,9 @@ export async function getRecentEvents(limit: number): Promise<RecentEvent[]> {
            b.name AS "branchName",
            p.name AS "productName",
            e."metadataJson"->>'referrer' AS referrer,
-           e."createdAt"::text AS "createdAt"
+           e.channel,
+           e."tableId",
+           TO_CHAR(e."createdAt" AT TIME ZONE 'Europe/Istanbul', 'DD.MM.YYYY HH24:MI') AS "createdAt"
          FROM "EventLog" e
          LEFT JOIN "Branch" b ON b.id = e."branchId"
          LEFT JOIN "Product" p ON p.id = e."productId"
@@ -615,15 +627,15 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
   }
 }
 
-export type TableStatRow = {
+export type TableTrafficRow = {
   branchName: string;
   tableId: string;
   pageViews: number;
   sessions: number;
-  interactions: number;
+  feedbackCount: number;
 };
 
-export async function getTableStats(days = 30): Promise<TableStatRow[]> {
+export async function getTableTrafficByBranch(days = 30): Promise<TableTrafficRow[]> {
   if (!hasDatabaseUrl()) return [];
 
   try {
@@ -631,22 +643,20 @@ export async function getTableStats(days = 30): Promise<TableStatRow[]> {
     if (!businessId) return [];
 
     const result = await withDb((db) =>
-      db.query<TableStatRow>(
+      db.query<TableTrafficRow>(
         `
           SELECT
             b.name AS "branchName",
-            e."metadataJson"->>'tableId' AS "tableId",
+            e."tableId",
             COUNT(*) FILTER (WHERE e."eventName" = 'page_view')::int AS "pageViews",
             COUNT(DISTINCT e."sessionId")::int AS sessions,
-            COUNT(*) FILTER (
-              WHERE e."eventName" IN ('call_click', 'whatsapp_click', 'map_click', 'feedback_submit')
-            )::int AS interactions
+            COUNT(*) FILTER (WHERE e."eventName" = 'feedback_submit')::int AS "feedbackCount"
           FROM "EventLog" e
           INNER JOIN "Branch" b ON b.id = e."branchId"
           WHERE e."businessId" = $1
-            AND e."metadataJson"->>'tableId' IS NOT NULL
+            AND e."tableId" IS NOT NULL
             AND e."createdAt" >= NOW() - INTERVAL '1 day' * $2
-          GROUP BY b.name, e."metadataJson"->>'tableId'
+          GROUP BY b.name, e."tableId"
           ORDER BY "pageViews" DESC
         `,
         [businessId, days]
@@ -655,7 +665,59 @@ export async function getTableStats(days = 30): Promise<TableStatRow[]> {
 
     return result.rows;
   } catch (error) {
-    logAnalyticsFallback(error, "tableStats");
+    logAnalyticsFallback(error, "tableTraffic");
+    return [];
+  }
+}
+
+export type ChannelStat = {
+  channel: string;
+  sessions: number;
+  visits: number;
+  pct: number;
+};
+
+export async function getChannelBreakdown(days: number): Promise<ChannelStat[]> {
+  if (!hasDatabaseUrl()) {
+    return [
+      { channel: "direct",        sessions: 280, visits: 720, pct: 56 },
+      { channel: "qr_table",      sessions: 120, visits: 340, pct: 26 },
+      { channel: "instagram_bio", sessions:  45, visits:  90, pct: 11 },
+      { channel: "qr_branch",     sessions:  20, visits:  40, pct:  5 },
+      { channel: "other",         sessions:   7, visits:  14, pct:  2 }
+    ];
+  }
+
+  try {
+    const businessId = await getPrimaryBusinessId();
+    if (!businessId) return [];
+
+    const filter = days > 0 ? `AND "createdAt" >= NOW() - INTERVAL '${days} days'` : "";
+    const result = await withDb((db) =>
+      db.query<{ channel: string; sessions: number; visits: number }>(
+        `
+          SELECT
+            COALESCE(channel, 'other') AS channel,
+            COUNT(DISTINCT "sessionId")::int AS sessions,
+            COUNT(*)::int AS visits
+          FROM "EventLog"
+          WHERE "businessId" = $1
+            AND "eventName" = 'page_view'
+            ${filter}
+          GROUP BY 1
+          ORDER BY visits DESC
+        `,
+        [businessId]
+      )
+    );
+
+    const total = result.rows.reduce((s, r) => s + r.visits, 0) || 1;
+    return result.rows.map((r) => ({
+      ...r,
+      pct: Math.round((r.visits / total) * 100)
+    }));
+  } catch (error) {
+    logAnalyticsFallback(error, "channelBreakdown");
     return [];
   }
 }

@@ -19,6 +19,8 @@ export async function POST(request: Request) {
     productId?: string;
     source?: string;
     sessionId?: string;
+    channel?: string;
+    tableId?: string;
     metadata?: Record<string, unknown>;
   };
 
@@ -32,6 +34,8 @@ export async function POST(request: Request) {
     productId: body.productId,
     source: body.source,
     sessionId: body.sessionId,
+    channel: body.channel,
+    tableId: body.tableId,
     metadata: body.metadata
   });
 
