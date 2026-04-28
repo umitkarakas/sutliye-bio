@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
 import { AdminPageShell } from "@/components/admin-page-shell";
+import { DateFilterBar } from "@/components/date-filter-bar";
 import { getFeedbacks, getFeedbackStats, updateFeedbackStatus, type FeedbackStatus } from "@/lib/server/feedback-data";
+import { parseFilterDates } from "@/lib/admin-date-filter";
 
 const STATUS_LABELS: Record<FeedbackStatus, string> = {
   new: "Yeni",
@@ -51,7 +53,7 @@ function sourceLabel(source: string) {
 }
 
 type PageProps = {
-  searchParams?: Promise<{ days?: string }>;
+  searchParams?: Promise<{ from?: string; to?: string; days?: string }>;
 };
 
 export default async function AdminFeedbackPage({ searchParams }: PageProps) {
@@ -59,10 +61,10 @@ export default async function AdminFeedbackPage({ searchParams }: PageProps) {
   if (!session) redirect("/admin/login");
 
   const resolved = (await searchParams) ?? {};
-  const days = [7, 30, 90].includes(Number(resolved.days)) ? Number(resolved.days) : 30;
+  const { from, to } = parseFilterDates(resolved);
 
   const [feedbacks, stats] = await Promise.all([
-    getFeedbacks(days),
+    getFeedbacks(from, to),
     getFeedbackStats()
   ]);
 
@@ -98,17 +100,7 @@ export default async function AdminFeedbackPage({ searchParams }: PageProps) {
       </section>
 
       {/* Dönem filtresi */}
-      <section className="flex gap-2">
-        {[7, 30, 90].map((d) => (
-          <a
-            key={d}
-            href={`/admin/feedback?days=${d}`}
-            className={["admin-chip rounded-full px-4 py-2 text-sm", days === d ? "admin-cta-primary" : ""].join(" ")}
-          >
-            Son {d} gün
-          </a>
-        ))}
-      </section>
+      <DateFilterBar from={from} to={to} basePath="/admin/feedback" />
 
       {/* Yorum listesi */}
       {feedbacks.length === 0 ? (

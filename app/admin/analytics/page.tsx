@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
 import { AdminPageShell } from "@/components/admin-page-shell";
+import { DateFilterBar } from "@/components/date-filter-bar";
 import {
   getAnalyticsOverview,
   getEventsByDay,
@@ -18,18 +19,9 @@ import {
 } from "@/lib/server/analytics-data";
 import { getFeedbacks } from "@/lib/server/feedback-data";
 import { CHANNEL_LABELS } from "@/lib/channel";
+import { parseFilterDates } from "@/lib/admin-date-filter";
 
-type SearchParams = Promise<{ days?: string | string[] }>;
-
-function asSingle(v: string | string[] | undefined) {
-  return Array.isArray(v) ? (v[0] ?? "") : (v ?? "");
-}
-
-function parseDays(raw: string): number {
-  const n = parseInt(raw, 10);
-  if ([7, 30, 90].includes(n)) return n;
-  return 30;
-}
+type SearchParams = Promise<{ from?: string | string[]; to?: string | string[]; days?: string | string[] }>;
 
 const EVENT_LABELS: Record<string, string> = {
   page_view: "Sayfa görüntüleme",
@@ -70,7 +62,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
   if (!session) redirect("/admin/login");
 
   const resolved = (await searchParams) ?? {};
-  const days = parseDays(asSingle(resolved.days) || "30");
+  const { from, to } = parseFilterDates(resolved);
 
   const [
     overview,
@@ -87,41 +79,30 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
     channelBreakdown,
     recentFeedbacks
   ] = await Promise.all([
-    getAnalyticsOverview(days),
-    getEventsByDay(days),
-    getTopBranches(days),
-    getTopReferrers(days),
-    getTopProducts(days),
+    getAnalyticsOverview(from, to),
+    getEventsByDay(from, to),
+    getTopBranches(from, to),
+    getTopReferrers(from, to),
+    getTopProducts(from, to),
     getRecentEvents(25),
-    getBranchInteractions(days),
-    getEventTypeTotals(days),
-    getHourlyDistribution(days),
-    getWeekdayDistribution(days),
-    getTableTrafficByBranch(days),
-    getChannelBreakdown(days),
-    getFeedbacks(30)
+    getBranchInteractions(from, to),
+    getEventTypeTotals(from, to),
+    getHourlyDistribution(from, to),
+    getWeekdayDistribution(from, to),
+    getTableTrafficByBranch(from, to),
+    getChannelBreakdown(from, to),
+    getFeedbacks(from, to)
   ]);
 
   const maxDayCount = Math.max(...byDay.map((d) => d.count), 1);
   const maxHour = Math.max(...hourlyDist.map((h) => h.count), 1);
   const maxWeekday = Math.max(...weekdayDist.map((d) => d.count), 1);
-  const tabHref = (d: number) => `/admin/analytics?days=${d}`;
 
   return (
     <AdminPageShell currentPath="/admin/analytics" title="Analytics" sessionEmail={session.email}>
 
       {/* Period tabs */}
-      <section className="flex gap-2">
-        {[7, 30, 90].map((d) => (
-          <Link
-            key={d}
-            href={tabHref(d)}
-            className={["admin-chip rounded-full px-4 py-2 text-sm", days === d ? "admin-cta-primary" : ""].join(" ")}
-          >
-            Son {d} gün
-          </Link>
-        ))}
-      </section>
+      <DateFilterBar from={from} to={to} basePath="/admin/analytics" />
 
       {overview.isDemo && (
         <section className="admin-notice rounded-[24px] px-4 py-3 text-sm">

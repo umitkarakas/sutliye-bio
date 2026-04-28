@@ -87,7 +87,7 @@ export async function createFeedback(input: {
   }
 }
 
-export async function getFeedbacks(days = 90): Promise<FeedbackRow[]> {
+export async function getFeedbacks(from: string, to: string): Promise<FeedbackRow[]> {
   if (!hasDatabaseUrl()) {
     return [];
   }
@@ -114,10 +114,11 @@ export async function getFeedbacks(days = 90): Promise<FeedbackRow[]> {
           FROM "Feedback" f
           LEFT JOIN "Branch" b ON b.id = f."branchId"
           WHERE f."businessId" = $1
-            AND f."createdAt" >= NOW() - INTERVAL '1 day' * $2
+            AND f."createdAt" >= (DATE '${from}' AT TIME ZONE 'Europe/Istanbul')
+            AND f."createdAt" < ((DATE '${to}' + INTERVAL '1 day') AT TIME ZONE 'Europe/Istanbul')
           ORDER BY f."createdAt" DESC
         `,
-        [businessId, days]
+        [businessId]
       )
     );
 

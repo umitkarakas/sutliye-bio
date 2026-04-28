@@ -181,11 +181,13 @@ type RecentRow = {
   createdAt: string;
 };
 
-function daysSql(days: number) {
-  return days > 0 ? `AND "createdAt" > NOW() - INTERVAL '${days} days'` : "";
+// from/to are validated YYYY-MM-DD strings in Istanbul timezone
+function dateRangeSql(from: string, to: string): string {
+  return `AND "createdAt" >= (DATE '${from}' AT TIME ZONE 'Europe/Istanbul')
+          AND "createdAt" < ((DATE '${to}' + INTERVAL '1 day') AT TIME ZONE 'Europe/Istanbul')`;
 }
 
-export async function getAnalyticsOverview(days: number): Promise<AnalyticsOverview> {
+export async function getAnalyticsOverview(from: string, to: string): Promise<AnalyticsOverview> {
   if (!hasDatabaseUrl()) {
     return { isDemo: true, totalVisits: 1284, uniqueSessions: 432, callClicks: 164, mapClicks: 119, whatsappClicks: 87, menuItemViews: 573 };
   }
@@ -193,7 +195,7 @@ export async function getAnalyticsOverview(days: number): Promise<AnalyticsOverv
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return { isDemo: true, totalVisits: 0, uniqueSessions: 0, callClicks: 0, mapClicks: 0, whatsappClicks: 0, menuItemViews: 0 };
-      const filter = daysSql(days);
+      const filter = dateRangeSql(from, to);
       const row = await queryFirst<OverviewRow>(
         db,
         `SELECT
@@ -223,10 +225,14 @@ export async function getAnalyticsOverview(days: number): Promise<AnalyticsOverv
   }
 }
 
-export async function getEventsByDay(days: number): Promise<DailyCount[]> {
+export async function getEventsByDay(from: string, to: string): Promise<DailyCount[]> {
   if (!hasDatabaseUrl()) {
-    return Array.from({ length: Math.min(days || 30, 30) }, (_, i) => ({
-      date: new Date(Date.now() - (29 - i) * 86400000).toISOString().slice(0, 10),
+    const days = Math.min(
+      Math.round((new Date(to + "T00:00:00").getTime() - new Date(from + "T00:00:00").getTime()) / 86400000) + 1,
+      90
+    );
+    return Array.from({ length: days }, (_, i) => ({
+      date: new Date(new Date(from + "T00:00:00").getTime() + i * 86400000).toISOString().slice(0, 10),
       count: Math.floor(Math.random() * 80 + 10)
     }));
   }
@@ -234,7 +240,7 @@ export async function getEventsByDay(days: number): Promise<DailyCount[]> {
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return [];
-      const filter = days > 0 ? `AND "createdAt" > NOW() - INTERVAL '${days} days'` : "";
+      const filter = dateRangeSql(from, to);
       const rows = await db.query<DailyRow>(
         `SELECT DATE("createdAt" AT TIME ZONE 'Europe/Istanbul')::text AS date, COUNT(*)::int AS count
          FROM "EventLog"
@@ -251,7 +257,7 @@ export async function getEventsByDay(days: number): Promise<DailyCount[]> {
   }
 }
 
-export async function getTopBranches(days: number): Promise<BranchStat[]> {
+export async function getTopBranches(from: string, to: string): Promise<BranchStat[]> {
   if (!hasDatabaseUrl()) {
     return [{ name: "Beşiktaş", views: 412 }, { name: "Kadıköy", views: 189 }, { name: "Şişli", views: 87 }];
   }
@@ -259,7 +265,7 @@ export async function getTopBranches(days: number): Promise<BranchStat[]> {
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return [];
-      const filter = days > 0 ? `AND e."createdAt" > NOW() - INTERVAL '${days} days'` : "";
+      const filter = dateRangeSql(from, to).replace(/\b"createdAt"\b/g, `e."createdAt"`);
       const rows = await db.query<BranchRow>(
         `SELECT b.name, COUNT(*)::int AS views
          FROM "EventLog" e
@@ -278,7 +284,7 @@ export async function getTopBranches(days: number): Promise<BranchStat[]> {
   }
 }
 
-export async function getTopReferrers(days: number): Promise<ReferrerStat[]> {
+export async function getTopReferrers(from: string, to: string): Promise<ReferrerStat[]> {
   if (!hasDatabaseUrl()) {
     return [{ referrer: "direct", count: 520 }, { referrer: "google.com", count: 190 }, { referrer: "instagram.com", count: 74 }];
   }
@@ -286,7 +292,7 @@ export async function getTopReferrers(days: number): Promise<ReferrerStat[]> {
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return [];
-      const filter = daysSql(days);
+      const filter = dateRangeSql(from, to);
       const rows = await db.query<ReferrerRow>(
         `SELECT
            COALESCE(
@@ -309,7 +315,7 @@ export async function getTopReferrers(days: number): Promise<ReferrerStat[]> {
   }
 }
 
-export async function getTopProducts(days: number): Promise<ProductStat[]> {
+export async function getTopProducts(from: string, to: string): Promise<ProductStat[]> {
   if (!hasDatabaseUrl()) {
     return [{ name: "Adana Kebap", views: 234 }, { name: "Urfa Kebap", views: 178 }, { name: "Pide", views: 95 }];
   }
@@ -317,7 +323,7 @@ export async function getTopProducts(days: number): Promise<ProductStat[]> {
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return [];
-      const filter = days > 0 ? `AND e."createdAt" > NOW() - INTERVAL '${days} days'` : "";
+      const filter = dateRangeSql(from, to).replace(/\b"createdAt"\b/g, `e."createdAt"`);
       const rows = await db.query<ProductRow>(
         `SELECT p.name, COUNT(*)::int AS views
          FROM "EventLog" e
@@ -412,7 +418,7 @@ type EventTypeRow = { eventName: string; count: number };
 type HourRow = { hour: number; count: number };
 type WeekdayRow = { dow: number; count: number };
 
-export async function getBranchInteractions(days: number): Promise<BranchInteraction[]> {
+export async function getBranchInteractions(from: string, to: string): Promise<BranchInteraction[]> {
   if (!hasDatabaseUrl()) {
     return [
       { branchId: "1", branchName: "Beşiktaş", pageViews: 412, whatsappClicks: 45, callClicks: 23, mapClicks: 67, menuItemViews: 234, totalInteractions: 369 },
@@ -423,7 +429,7 @@ export async function getBranchInteractions(days: number): Promise<BranchInterac
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return [];
-      const filter = days > 0 ? `AND e."createdAt" > NOW() - INTERVAL '${days} days'` : "";
+      const filter = dateRangeSql(from, to).replace(/\b"createdAt"\b/g, `e."createdAt"`);
       const rows = await db.query<BranchInteractionRow>(
         `SELECT
            b.id AS "branchId",
@@ -449,7 +455,7 @@ export async function getBranchInteractions(days: number): Promise<BranchInterac
   }
 }
 
-export async function getEventTypeTotals(days: number): Promise<EventTypeStat[]> {
+export async function getEventTypeTotals(from: string, to: string): Promise<EventTypeStat[]> {
   if (!hasDatabaseUrl()) {
     return [
       { eventName: "page_view", count: 1284, pct: 62 },
@@ -464,7 +470,7 @@ export async function getEventTypeTotals(days: number): Promise<EventTypeStat[]>
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return [];
-      const filter = days > 0 ? `AND "createdAt" > NOW() - INTERVAL '${days} days'` : "";
+      const filter = dateRangeSql(from, to);
       const rows = await db.query<EventTypeRow>(
         `SELECT "eventName", COUNT(*)::int AS count
          FROM "EventLog"
@@ -482,7 +488,7 @@ export async function getEventTypeTotals(days: number): Promise<EventTypeStat[]>
   }
 }
 
-export async function getHourlyDistribution(days: number): Promise<HourStat[]> {
+export async function getHourlyDistribution(from: string, to: string): Promise<HourStat[]> {
   if (!hasDatabaseUrl()) {
     return Array.from({ length: 24 }, (_, h) => ({
       hour: h,
@@ -493,7 +499,7 @@ export async function getHourlyDistribution(days: number): Promise<HourStat[]> {
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return [];
-      const filter = days > 0 ? `AND "createdAt" > NOW() - INTERVAL '${days} days'` : "";
+      const filter = dateRangeSql(from, to);
       const rows = await db.query<HourRow>(
         `SELECT EXTRACT(HOUR FROM "createdAt" AT TIME ZONE 'Europe/Istanbul')::int AS hour, COUNT(*)::int AS count
          FROM "EventLog"
@@ -511,7 +517,7 @@ export async function getHourlyDistribution(days: number): Promise<HourStat[]> {
   }
 }
 
-export async function getWeekdayDistribution(days: number): Promise<WeekdayStat[]> {
+export async function getWeekdayDistribution(from: string, to: string): Promise<WeekdayStat[]> {
   if (!hasDatabaseUrl()) {
     const labels = [1, 2, 3, 4, 5, 6, 0];
     return labels.map((dow) => ({ dow, count: Math.floor(Math.random() * 120 + 30) }));
@@ -520,7 +526,7 @@ export async function getWeekdayDistribution(days: number): Promise<WeekdayStat[
     return await withDb(async (db) => {
       const business = await queryFirst<BusinessIdRow>(db, `SELECT id FROM "Business" ORDER BY "createdAt" ASC LIMIT 1`);
       if (!business) return [];
-      const filter = days > 0 ? `AND "createdAt" > NOW() - INTERVAL '${days} days'` : "";
+      const filter = dateRangeSql(from, to);
       const rows = await db.query<WeekdayRow>(
         `SELECT EXTRACT(DOW FROM "createdAt" AT TIME ZONE 'Europe/Istanbul')::int AS dow, COUNT(*)::int AS count
          FROM "EventLog"
@@ -635,13 +641,14 @@ export type TableTrafficRow = {
   feedbackCount: number;
 };
 
-export async function getTableTrafficByBranch(days = 30): Promise<TableTrafficRow[]> {
+export async function getTableTrafficByBranch(from: string, to: string): Promise<TableTrafficRow[]> {
   if (!hasDatabaseUrl()) return [];
 
   try {
     const businessId = await getPrimaryBusinessId();
     if (!businessId) return [];
 
+    const filter = dateRangeSql(from, to).replace(/\b"createdAt"\b/g, `e."createdAt"`);
     const result = await withDb((db) =>
       db.query<TableTrafficRow>(
         `
@@ -655,11 +662,11 @@ export async function getTableTrafficByBranch(days = 30): Promise<TableTrafficRo
           INNER JOIN "Branch" b ON b.id = e."branchId"
           WHERE e."businessId" = $1
             AND e."tableId" IS NOT NULL
-            AND e."createdAt" >= NOW() - INTERVAL '1 day' * $2
+            ${filter}
           GROUP BY b.name, e."tableId"
           ORDER BY "pageViews" DESC
         `,
-        [businessId, days]
+        [businessId]
       )
     );
 
@@ -677,7 +684,7 @@ export type ChannelStat = {
   pct: number;
 };
 
-export async function getChannelBreakdown(days: number): Promise<ChannelStat[]> {
+export async function getChannelBreakdown(from: string, to: string): Promise<ChannelStat[]> {
   if (!hasDatabaseUrl()) {
     return [
       { channel: "direct",        sessions: 280, visits: 720, pct: 56 },
@@ -692,7 +699,7 @@ export async function getChannelBreakdown(days: number): Promise<ChannelStat[]> 
     const businessId = await getPrimaryBusinessId();
     if (!businessId) return [];
 
-    const filter = days > 0 ? `AND "createdAt" >= NOW() - INTERVAL '${days} days'` : "";
+    const filter = dateRangeSql(from, to);
     const result = await withDb((db) =>
       db.query<{ channel: string; sessions: number; visits: number }>(
         `
