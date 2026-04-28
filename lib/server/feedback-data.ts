@@ -110,7 +110,7 @@ export async function getFeedbacks(from: string, to: string): Promise<FeedbackRo
             f."tableId",
             f."contactName",
             f."contactPhone",
-            TO_CHAR(f."createdAt" AT TIME ZONE 'Europe/Istanbul', 'DD.MM.YYYY HH24:MI') AS "createdAt"
+            TO_CHAR((f."createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Istanbul', 'DD.MM.YYYY HH24:MI') AS "createdAt"
           FROM "Feedback" f
           LEFT JOIN "Branch" b ON b.id = f."branchId"
           WHERE f."businessId" = $1

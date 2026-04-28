@@ -242,10 +242,10 @@ export async function getEventsByDay(from: string, to: string): Promise<DailyCou
       if (!business) return [];
       const filter = dateRangeSql(from, to);
       const rows = await db.query<DailyRow>(
-        `SELECT DATE("createdAt" AT TIME ZONE 'Europe/Istanbul')::text AS date, COUNT(*)::int AS count
+        `SELECT DATE(("createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Istanbul')::text AS date, COUNT(*)::int AS count
          FROM "EventLog"
          WHERE "businessId" = $1 AND "eventName" = 'page_view' ${filter}
-         GROUP BY DATE("createdAt" AT TIME ZONE 'Europe/Istanbul')
+         GROUP BY DATE(("createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Istanbul')
          ORDER BY date ASC`,
         [business.id]
       );
@@ -359,7 +359,7 @@ export async function getRecentEvents(limit: number): Promise<RecentEvent[]> {
            e."metadataJson"->>'referrer' AS referrer,
            e.channel,
            e."tableId",
-           TO_CHAR(e."createdAt" AT TIME ZONE 'Europe/Istanbul', 'DD.MM.YYYY HH24:MI') AS "createdAt"
+           TO_CHAR((e."createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Istanbul', 'DD.MM.YYYY HH24:MI') AS "createdAt"
          FROM "EventLog" e
          LEFT JOIN "Branch" b ON b.id = e."branchId"
          LEFT JOIN "Product" p ON p.id = e."productId"
@@ -501,7 +501,7 @@ export async function getHourlyDistribution(from: string, to: string): Promise<H
       if (!business) return [];
       const filter = dateRangeSql(from, to);
       const rows = await db.query<HourRow>(
-        `SELECT EXTRACT(HOUR FROM "createdAt" AT TIME ZONE 'Europe/Istanbul')::int AS hour, COUNT(*)::int AS count
+        `SELECT EXTRACT(HOUR FROM ("createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Istanbul')::int AS hour, COUNT(*)::int AS count
          FROM "EventLog"
          WHERE "businessId" = $1 AND "eventName" = 'page_view' ${filter}
          GROUP BY 1
@@ -528,7 +528,7 @@ export async function getWeekdayDistribution(from: string, to: string): Promise<
       if (!business) return [];
       const filter = dateRangeSql(from, to);
       const rows = await db.query<WeekdayRow>(
-        `SELECT EXTRACT(DOW FROM "createdAt" AT TIME ZONE 'Europe/Istanbul')::int AS dow, COUNT(*)::int AS count
+        `SELECT EXTRACT(DOW FROM ("createdAt" AT TIME ZONE 'UTC') AT TIME ZONE 'Europe/Istanbul')::int AS dow, COUNT(*)::int AS count
          FROM "EventLog"
          WHERE "businessId" = $1 AND "eventName" = 'page_view' ${filter}
          GROUP BY 1
