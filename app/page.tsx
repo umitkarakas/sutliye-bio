@@ -47,8 +47,46 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     name: business.name,
     description: business.seoDescription || business.tagline,
     url: baseUrl,
-    telephone: business.primaryPhone,
-    servesCuisine: "Türk Mutfağı"
+    telephone: activeBranch.phone,
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: activeBranch.address,
+      addressLocality: activeBranch.district,
+      addressRegion: activeBranch.city,
+      addressCountry: "TR"
+    },
+    ...(activeBranch.mapUrl ? { hasMap: activeBranch.mapUrl } : {}),
+    servesCuisine: "Türk Mutfağı",
+    ...(menu.length > 0
+      ? {
+          hasMenu: {
+            "@type": "Menu",
+            name: "Menü",
+            url: `${baseUrl}?tab=menu`,
+            hasMenuSection: menu
+              .filter((cat) => cat.items.length > 0)
+              .map((cat) => ({
+                "@type": "MenuSection",
+                name: cat.name,
+                hasMenuItem: cat.items.map((item) => ({
+                  "@type": "MenuItem",
+                  name: item.name,
+                  description: item.description,
+                  ...(item.imageUrl ? { image: item.imageUrl } : {}),
+                  offers: {
+                    "@type": "Offer",
+                    price: item.price.toFixed(2),
+                    priceCurrency: "TRY",
+                    availability:
+                      item.stockStatus === "in_stock"
+                        ? "https://schema.org/InStock"
+                        : "https://schema.org/OutOfStock"
+                  }
+                }))
+              }))
+          }
+        }
+      : {})
   };
 
   return (
