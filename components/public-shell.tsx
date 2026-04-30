@@ -223,7 +223,7 @@ export function PublicShell({
                 </div>
               ) : null}
               <div>
-                <h1 className="font-[family-name:var(--font-display)] text-4xl leading-[0.92] text-white">
+                <h1 className="font-[family-name:var(--font-display)] text-4xl font-extrabold leading-[0.92] text-white">
                   {business.name}
                 </h1>
                 <p className="mt-2 text-sm text-white/60">
@@ -291,7 +291,7 @@ export function PublicShell({
                     style={glassCardStrong}
                     className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                       <WhatsAppIcon className="h-4.5 w-4.5" />
                     </span>
                     <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">WhatsApp</span>
@@ -305,7 +305,7 @@ export function PublicShell({
                     style={glassCardStrong}
                     className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                       <PhoneIcon className="h-4.5 w-4.5" />
                     </span>
                     <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Telefon Et</span>
@@ -322,7 +322,7 @@ export function PublicShell({
                     style={glassCardStrong}
                     className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                       <PinIcon className="h-4.5 w-4.5" />
                     </span>
                     <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Yol Tarifi</span>
@@ -335,7 +335,7 @@ export function PublicShell({
                     style={glassCardStrong}
                     className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                       <StarIcon className="h-4.5 w-4.5" />
                     </span>
                     <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Google Yorum</span>
@@ -350,7 +350,7 @@ export function PublicShell({
                       style={glassCardStrong}
                       className="inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]"
                     >
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                         <InstagramIcon className="h-4.5 w-4.5" />
                       </span>
                       <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Instagram</span>
@@ -363,7 +363,7 @@ export function PublicShell({
                     style={glassCardStrong}
                     className={`inline-flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[20px] border border-white/50 px-3 py-4 text-center shadow-[0_2px_10px_rgba(0,0,0,0.07)]${!activeBranch.instagram ? " col-span-2" : ""}`}
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--accent)] text-white shadow-[0_6px_14px_rgba(96,8,16,0.28)]">
                       <FeedbackIcon className="h-4.5 w-4.5" />
                     </span>
                     <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Geri Bildirim</span>
