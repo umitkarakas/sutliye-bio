@@ -17,6 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = business.seoTitle || business.name;
   const description = business.seoDescription || business.tagline;
 
+  const logoUrl = business.logoUrl;
+
   return {
     metadataBase: new URL(baseUrl),
     title: {
@@ -24,16 +26,27 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${title}`
     },
     description,
+    ...(logoUrl
+      ? {
+          icons: {
+            icon: logoUrl,
+            shortcut: logoUrl,
+            apple: logoUrl
+          }
+        }
+      : {}),
     openGraph: {
       title,
       description,
       type: "website",
-      siteName: title
+      siteName: title,
+      ...(logoUrl ? { images: [{ url: logoUrl }] } : {})
     },
     twitter: {
       title,
       description,
-      card: "summary"
+      card: "summary",
+      ...(logoUrl ? { images: [logoUrl] } : {})
     }
   };
 }

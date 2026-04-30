@@ -47,6 +47,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     name: business.name,
     description: business.seoDescription || business.tagline,
     url: baseUrl,
+    ...(business.logoUrl ? { image: business.logoUrl } : {}),
     telephone: activeBranch.phone,
     address: {
       "@type": "PostalAddress",

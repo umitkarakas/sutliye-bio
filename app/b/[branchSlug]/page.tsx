@@ -76,6 +76,7 @@ export default async function BranchPage({ params, searchParams }: BranchPagePro
       `${business.name} ${branch.name} şubesi — ${branch.address}, ${branch.district}, ${branch.city}`,
     telephone: branch.phone,
     url: `${baseUrl}/b/${branch.slug}`,
+    ...(business.logoUrl ? { image: business.logoUrl } : {}),
     ...(branch.mapUrl ? { hasMap: branch.mapUrl } : {}),
     address: {
       "@type": "PostalAddress",
