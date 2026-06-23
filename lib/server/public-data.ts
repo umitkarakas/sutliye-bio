@@ -394,7 +394,7 @@ export async function getPublicMenuForBranch(branchId: string): Promise<MenuCate
       const item: MenuItemView = {
         id: row.productId,
         name: row.productName,
-        description: row.productDescription,
+        description: row.productDescription ?? "",
         imageUrl: row.imageUrl ?? undefined,
         badge: row.badgeLabel ?? undefined,
         price: Number(row.price),
