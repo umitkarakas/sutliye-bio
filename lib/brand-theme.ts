@@ -10,9 +10,9 @@ const LEGACY_BRAND_THEME: BrandTheme = {
 };
 
 export const DEFAULT_BRAND_THEME: BrandTheme = {
-  primaryColor: "#ba0814",
-  secondaryColor: "#dc6f79",
-  backgroundColor: "#efb7bd"
+  primaryColor: "#02808b",
+  secondaryColor: "#ec83b5",
+  backgroundColor: "#eef3f3"
 };
 
 export function normalizeHexColor(value: string | null | undefined, fallback: string) {

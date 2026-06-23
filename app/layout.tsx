@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Figtree } from "next/font/google";
 import { getPublicBusiness } from "@/lib/server/public-data";
 import "./globals.css";
 
-const jakartaSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+const figtree = Figtree({
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-jakarta",
   display: "swap",
 });
@@ -55,7 +55,7 @@ const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="tr" className={jakartaSans.variable}>
+    <html lang="tr" className={figtree.variable}>
       <body>
         {children}
         {gaId && (

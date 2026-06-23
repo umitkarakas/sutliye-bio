@@ -41,9 +41,9 @@ export const business = {
   seoTitle: "Ocakbaşı Sofrası",
   seoDescription: "Şube seç, menüyü gör, tek dokunuşla ara veya yol tarifi al.",
   theme: {
-    primaryColor: "#ba0814",
-    secondaryColor: "#dc6f79",
-    backgroundColor: "#efb7bd"
+    primaryColor: "#02808b",
+    secondaryColor: "#ec83b5",
+    backgroundColor: "#eef3f3"
   }
 };
 

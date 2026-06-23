@@ -33,16 +33,9 @@ export default async function AdminPage() {
       title="Özet"
       sessionEmail={session.email}
       actions={
-        <>
-          <Link href="/" className="admin-cta-primary whitespace-nowrap">
-            Mobil görünüm
-          </Link>
-          <form action="/api/admin/auth/logout" method="post">
-            <button type="submit" className="admin-cta-secondary whitespace-nowrap">
-              Çıkış yap
-            </button>
-          </form>
-        </>
+        <Link href="/" className="admin-cta-primary whitespace-nowrap">
+          Menüyü görüntüle
+        </Link>
       }
     >
       {summary.isDemo ? (

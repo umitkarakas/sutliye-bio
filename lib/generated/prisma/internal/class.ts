@@ -23,7 +23,7 @@ const config: runtime.GetPrismaClientConfig = {
       "value": "prisma-client"
     },
     "output": {
-      "value": "/Users/umitkarakas/Yandex.Disk.localized/Develop/kebapci_menu/lib/generated/prisma",
+      "value": "/Users/umitkarakas/Yandex.Disk.localized/Develop/suliye-bio/biomenu/lib/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -38,7 +38,7 @@ const config: runtime.GetPrismaClientConfig = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/umitkarakas/Yandex.Disk.localized/Develop/kebapci_menu/prisma/schema.prisma",
+    "sourceFilePath": "/Users/umitkarakas/Yandex.Disk.localized/Develop/suliye-bio/biomenu/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativePath": "../../../prisma",
