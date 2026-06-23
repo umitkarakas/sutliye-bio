@@ -104,8 +104,6 @@ export async function createBranchAction(formData: FormData) {
     !payload.address ||
     !payload.district ||
     !payload.city ||
-    !payload.phone ||
-    !payload.whatsapp ||
     !payload.mapUrl
   ) {
     const hashIdx = returnTo.indexOf("#");
@@ -165,8 +163,6 @@ export async function updateBranchAction(formData: FormData) {
     !payload.address ||
     !payload.district ||
     !payload.city ||
-    !payload.phone ||
-    !payload.whatsapp ||
     !payload.mapUrl
   ) {
     redirect(statusUrl(returnTo, "invalid"));

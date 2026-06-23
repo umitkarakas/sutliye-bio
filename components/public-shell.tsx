@@ -281,6 +281,7 @@ export function PublicShell({
                 {/* 2-kolon aksiyon grid */}
                 <div className="grid grid-cols-2 gap-3">
                   {/* Satır 1: WhatsApp | Telefon */}
+                  {activeBranch.whatsapp ? (
                   <EventLink
                     href={getWhatsappHref(activeBranch.whatsapp)}
                     target="_blank"
@@ -296,7 +297,9 @@ export function PublicShell({
                     </span>
                     <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">WhatsApp</span>
                   </EventLink>
+                  ) : null}
 
+                  {activeBranch.phone ? (
                   <EventLink
                     href={`tel:${activeBranch.phone.replace(/\D/g, "")}`}
                     eventName="call_click"
@@ -310,6 +313,7 @@ export function PublicShell({
                     </span>
                     <span className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--muted)]">Telefon Et</span>
                   </EventLink>
+                  ) : null}
 
                   {/* Satır 2: Yol Tarifi | Google Yorum */}
                   <EventLink

@@ -36,8 +36,6 @@ export async function PATCH(request: Request, { params }: Context) {
     !body.address ||
     !body.district ||
     !body.city ||
-    !body.phone ||
-    !body.whatsapp ||
     !body.mapUrl
   ) {
     return jsonError("Missing required branch fields");
@@ -51,8 +49,8 @@ export async function PATCH(request: Request, { params }: Context) {
       address: body.address,
       district: body.district,
       city: body.city,
-      phone: body.phone,
-      whatsapp: body.whatsapp,
+      phone: body.phone ?? "",
+      whatsapp: body.whatsapp ?? "",
       mapUrl: body.mapUrl,
       reviewUrl: body.reviewUrl,
       instagram: body.instagram
