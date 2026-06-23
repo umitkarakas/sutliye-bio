@@ -383,7 +383,7 @@ export async function getPublicMenuForBranch(branchId: string): Promise<MenuCate
         });
       }
 
-      if (!row.productId || !row.productName || !row.productDescription) {
+      if (!row.productId || !row.productName) {
         continue;
       }
 
