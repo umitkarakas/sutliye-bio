@@ -212,12 +212,15 @@ export function PublicShell({
       <AnalyticsBeacon branchId={activeBranch.id} activeTab={activeTab} source="public_shell" tableId={tableId} />
       <div className="mx-auto w-full max-w-md space-y-3">
 
-        {/* Header card — dark, opaque */}
-        <section className="overflow-hidden rounded-[28px] border border-white/10 bg-[#171416] shadow-[var(--shadow)]">
+        {/* Header card — marka teal gradyan */}
+        <section
+          className="overflow-hidden rounded-[28px] border border-white/15 shadow-[var(--shadow)]"
+          style={{ background: "linear-gradient(135deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 72%, #022a2e) 100%)" }}
+        >
           <div className="px-5 py-6 text-white">
             <div className="flex items-center gap-5">
               {business.logoUrl ? (
-                <div className="flex h-20 w-20 flex-none items-center justify-center overflow-hidden rounded-[18px] border border-white/10 bg-white/8 p-2.5">
+                <div className="flex h-20 w-20 flex-none items-center justify-center overflow-hidden rounded-[18px] border border-white/40 bg-white p-2.5 shadow-[0_4px_14px_rgba(0,0,0,0.12)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={business.logoUrl} alt={`${business.name} logosu`} className="h-full w-full object-contain" />
                 </div>
