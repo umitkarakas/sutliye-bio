@@ -205,7 +205,7 @@ export function AdminSidebar({ sessionEmail }: { sessionEmail: string }) {
   return (
     <>
       {/* Mobile top bar */}
-      <div className="admin-mobilebar lg:hidden">
+      <div className="admin-mobilebar">
         <button type="button" className="admin-mobilebar-burger" onClick={() => setMobileOpen(true)} aria-label="Menüyü aç">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
             <line x1="3" y1="6" x2="21" y2="6" />
@@ -217,13 +217,13 @@ export function AdminSidebar({ sessionEmail }: { sessionEmail: string }) {
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="admin-sidebar hidden lg:flex" data-collapsed={collapsed ? "true" : "false"}>
+      <aside className="admin-sidebar" data-collapsed={collapsed ? "true" : "false"}>
         {navBody}
       </aside>
 
       {/* Mobile drawer */}
       {mobileOpen ? (
-        <div className="admin-drawer-overlay lg:hidden" onClick={() => setMobileOpen(false)}>
+        <div className="admin-drawer-overlay" onClick={() => setMobileOpen(false)}>
           <aside className="admin-sidebar admin-sidebar-drawer" data-collapsed="false" onClick={(event) => event.stopPropagation()}>
             {navBody}
           </aside>
